@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- LINGKARAN GRADASI YANG BENAR-BENAR MUNCUL -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M50,5
+            A45,45 0 1 1 49.99,5Z">
+        <gradient
+            android:type="linear"
+            android:startX="0"
+            android:startY="0"
+            android:endX="100"
+            android:endY="100"
+            android:startColor="#FFFFFF"
+            android:endColor="#D0D0D0"/>
+    </path>
+
+    <!-- BORDER LINGKARAN HITAM TEBAL -->
+    <path
+        android:pathData="M50,5
+            A45,45 0 1 1 49.99,5Z"
+        android:strokeColor="#000000"
+        android:strokeWidth="6"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- ICON KEPALA -->
+    <path
+        android:pathData="M50,30
+            A12,12 0 1 1 49.99,30Z"
+        android:fillColor="#000000" />
+
+    <!-- ICON BADAN -->
+    <path
+        android:pathData="M30,65
+            Q50,50 70,65
+            A25,20 0 0 1 30,65Z"
+        android:fillColor="#000000" />
+
+</vector>
