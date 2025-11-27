@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230524777102",
+    "project_id": "bkdigital-801ea",
+    "storage_bucket": "bkdigital-801ea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230524777102:android:3809ee7981c37e4a478fdf",
+        "android_client_info": {
+          "package_name": "com.example"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXCa7cMZOgSlyGDzSEc1v58127VgqZ5Tk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

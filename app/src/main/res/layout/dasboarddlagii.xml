@@ -23,10 +23,10 @@
             android:layout_marginBottom="20dp">
 
             <ImageView
-                android:layout_width="22dp"
+                android:layout_width="wrap_content"
                 android:layout_height="22dp"
                 android:src="@drawable/menu"
-                android:tint="@android:color/black"/>
+                app:tint="@android:color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -87,7 +87,7 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/Jumlahsiswa"
-                            android:tint="#FFFFFF" />
+                            app:tint="#FFFFFF" />
 
                     </LinearLayout>
 
@@ -142,7 +142,7 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahguru"
-                            android:tint="#FFFFFF"/>
+                            app:tint="#FFFFFF"/>
 
                     </LinearLayout>
 
@@ -196,7 +196,7 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahtes"
-                            android:tint="#ffffff" />
+                            app:tint="#ffffff" />
 
                     </LinearLayout>
 

@@ -9,7 +9,7 @@
     <View
         android:id="@+id/rectangle_2"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="485dp"
         android:layout_alignParentTop="true"
         android:background="@drawable/rectangle_2" />
 
@@ -35,29 +35,24 @@
         android:layout_marginTop="100dp"
         android:background="@android:color/transparent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Admin"
-            android:textColor="#FFFFFF"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Selamat Datang"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:layout_marginBottom="4dp" />
+            android:textSize="22sp"
+            android:layout_marginBottom="4dp"
+            android:textStyle="bold"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="di BK Digital"
+            android:text="Di BK Digital"
             android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
     <!-- Container untuk FORM SAJA -->
@@ -70,86 +65,98 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Form Container dengan background putih -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/form_background"
-            android:elevation="8dp"
+            android:layout_height="378dp"
+            android:layout_marginTop="120dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="25dp">
+            android:padding="24dp"> <!-- TAMBAHKAN INI -->
 
-            <!-- Username Field -->
-            <TextView
+            <!-- Form Container dengan background putih -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Username"
-                android:textColor="#000000"
-                android:textSize="16sp" />
+                android:background="@drawable/form_background"
+                android:elevation="10dp"
+                android:orientation="vertical"
+                android:padding="25dp">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginBottom="24dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Masukkan username"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textSize="16sp" />
-
-            <!-- Password Field -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Password"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginBottom="32dp">
-
-                <EditText
-                    android:id="@+id/passwordEditText"
+                <!-- Username Field -->
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/edittext_background"
-                    android:hint="Masukkan password"
-                    android:inputType="textPassword"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="56dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Username"
+                    android:textColor="#000000"
                     android:textSize="16sp" />
 
-                <ImageView
-                    android:id="@+id/passwordToggle"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Toggle password visibility"
-                    android:src="@android:drawable/ic_lock_lock" />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/edittext_background"
+                    android:hint="Masukkan username"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:textSize="16sp" />
 
-            </RelativeLayout>
+                <!-- Password Field -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Password"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
 
-            <!-- Login Button -->
-            <Button
-                android:id="@+id/loginButton"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@drawable/rounded_button"
-                android:padding="16dp"
-                android:stateListAnimator="@null"
-                android:text="LOGIN"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="32dp">
 
+                    <EditText
+                        android:id="@+id/passwordEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/edittext_background"
+                        android:hint="Masukkan password"
+                        android:inputType="textPassword"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="56dp"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/passwordToggle"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="16dp"
+                        android:contentDescription="Toggle password visibility"
+                        android:src="@android:drawable/ic_lock_lock" />
+
+                </RelativeLayout>
+
+                <!-- Login Button -->
+                <Button
+                    android:id="@+id/loginButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/rounded_button"
+                    android:padding="16dp"
+                    android:stateListAnimator="@null"
+                    android:text="LOGIN"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
 
+        <!-- Form Container dengan background putih -->
+
+        <!-- Login Button -->
 </RelativeLayout>
