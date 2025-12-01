@@ -1,22 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="80dp"
     android:height="80dp"
     android:viewportWidth="100"
     android:viewportHeight="100">
 
-    <!-- LINGKARAN GRADASI YANG BENAR-BENAR MUNCUL -->
+    <!-- LINGKARAN GRADASI -->
     <path
-        android:fillColor="@android:color/transparent"
         android:pathData="M50,5
             A45,45 0 1 1 49.99,5Z">
-        <gradient
-            android:type="linear"
-            android:startX="0"
-            android:startY="0"
-            android:endX="100"
-            android:endY="100"
-            android:startColor="#FFFFFF"
-            android:endColor="#D0D0D0"/>
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="100"
+                android:endY="100">
+                <item android:offset="0" android:color="#FFFFFF"/>
+                <item android:offset="1" android:color="#D0D0D0"/>
+            </gradient>
+        </aapt:attr>
     </path>
 
     <!-- BORDER LINGKARAN HITAM TEBAL -->

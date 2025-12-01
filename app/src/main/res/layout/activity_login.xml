@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -18,8 +19,8 @@
         android:id="@+id/logo"
         android:layout_width="120dp"
         android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="20dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="25dp"
         android:src="@drawable/logo_bk_digital"
@@ -31,11 +32,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="100dp"
         android:background="@android:color/transparent">
-
-
 
         <TextView
             android:layout_width="wrap_content"
@@ -67,12 +66,12 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="378dp"
-            android:layout_marginTop="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="180dp"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp"> <!-- TAMBAHKAN INI -->
+            android:padding="28dp">
 
             <!-- Form Container dengan background putih -->
             <LinearLayout
@@ -93,6 +92,7 @@
                     android:textSize="16sp" />
 
                 <EditText
+                    android:id="@+id/usernameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginBottom="24dp"
@@ -139,6 +139,17 @@
 
                 </RelativeLayout>
 
+                <!-- Google Sign In Button -->
+                <Button
+                    android:id="@+id/googleLoginButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/rounded_button"
+                    android:text="Login with Google"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
+
                 <!-- Login Button -->
                 <Button
                     android:id="@+id/loginButton"
@@ -156,7 +167,4 @@
         </LinearLayout>
     </LinearLayout>
 
-        <!-- Form Container dengan background putih -->
-
-        <!-- Login Button -->
 </RelativeLayout>
