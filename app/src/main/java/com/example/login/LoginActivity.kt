@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -26,12 +23,12 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var passwordToggle: ImageView
     private lateinit var loginButton: Button
-    private lateinit var googleLoginButton: Button
+    private lateinit var googleLoginButton: LinearLayout // <-- Ubah dari Button ke LinearLayout
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    // Google Sign-In Launcher (Modern approach)
+    // Google Sign-In Launcher
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -64,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
         passwordEditText = findViewById(R.id.passwordEditText)
         passwordToggle = findViewById(R.id.passwordToggle)
         loginButton = findViewById(R.id.loginButton)
-        googleLoginButton = findViewById(R.id.googleLoginButton)
+        googleLoginButton = findViewById(R.id.googleLoginButton) // <-- LinearLayout
     }
 
     private fun setupGoogleSignIn() {
@@ -79,7 +76,7 @@ class LoginActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         passwordToggle.setOnClickListener { togglePasswordVisibility() }
         loginButton.setOnClickListener { loginWithEmailPassword() }
-        googleLoginButton.setOnClickListener { signInWithGoogle() }
+        googleLoginButton.setOnClickListener { signInWithGoogle() } // <-- Tetap bisa diklik
     }
 
     private fun togglePasswordVisibility() {
@@ -118,19 +115,29 @@ class LoginActivity : AppCompatActivity() {
         }
 
         loginButton.isEnabled = false
-        loginButton.text = "Loading..."
+        (loginButton as? Button)?.text = "Loading..."
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
+                    saveUserData(email)
                     navigateToDashboard()
                 } else {
                     Toast.makeText(this, "Login gagal: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
                 loginButton.isEnabled = true
-                loginButton.text = "LOGIN"
+                (loginButton as? Button)?.text = "LOGIN"
             }
+    }
+
+    private fun saveUserData(email: String) {
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putBoolean("is_logged_in", true)
+        editor.putString("user_name", email.split("@")[0])
+        editor.putString("user_email", email) // Simpan email juga
+        editor.apply()
     }
 
     private fun signInWithGoogle() {
@@ -138,20 +145,16 @@ class LoginActivity : AppCompatActivity() {
         googleSignInLauncher.launch(signInIntent)
     }
 
-    // HAPUS method onActivityResult karena sudah tidak digunakan
-    /*
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // Method ini sudah digantikan oleh googleSignInLauncher
-    }
-    */
-
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login dengan Google berhasil!", Toast.LENGTH_SHORT).show()
+                    val user = auth.currentUser
+                    user?.let {
+                        saveUserData(it.email ?: it.displayName ?: "Google User")
+                    }
                     navigateToDashboard()
                 } else {
                     Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -164,12 +167,18 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
     override fun onStart() {
         super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            navigateToDashboard()
+
+        // Cek apakah user sudah login
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("is_logged_in", false)
+
+        if (isLoggedIn) {
+            // User sudah login, langsung redirect ke dashboard
+            val intent = Intent(this, DashboardActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }

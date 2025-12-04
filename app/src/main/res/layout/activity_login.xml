@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -9,162 +11,223 @@
     <!-- Background Biru Melengkung (rectangle_2) -->
     <View
         android:id="@+id/rectangle_2"
-        android:layout_width="match_parent"
-        android:layout_height="485dp"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/rectangle_2" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/rectangle_2"
+        app:layout_constraintHeight_percent="0.65"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Logo di pojok kiri atas -->
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="120dp"
-        android:layout_height="30dp"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="25dp"
+        android:layout_width="@dimen/logo_size_large"
+        android:layout_height="@dimen/logo_size_medium"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:adjustViewBounds="true"
+        android:clickable="true"
+        android:contentDescription="Logo BK Digital"
+        android:focusable="true"
+        android:scaleType="centerInside"
         android:src="@drawable/logo_bk_digital"
-        android:scaleType="fitCenter"
-        android:contentDescription="Logo BK Digital" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- TEKS DIPINDAH KE SINI - di atas background biru -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/welcomeTextContainer"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="30dp"
+        android:background="@android:color/transparent"
+        android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="100dp"
-        android:background="@android:color/transparent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Selamat Datang"
             android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:layout_marginBottom="4dp"
-            android:textStyle="bold"/>
+            android:textSize="@dimen/text_large"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Di BK Digital"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"/>
     </LinearLayout>
 
-    <!-- Container untuk FORM SAJA -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Container untuk FORM -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/formCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@android:color/transparent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_marginStart="@dimen/margin_xlarge"
+        android:layout_marginEnd="@dimen/margin_xlarge"
+        android:layout_marginBottom="@dimen/margin_xlarge"
+        app:cardCornerRadius="@dimen/corner_radius_large"
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.882">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="180dp"
-            android:background="@android:color/transparent"
-            android:gravity="center"
             android:orientation="vertical"
-            android:padding="28dp">
+            android:padding="@dimen/padding_large">
 
-            <!-- Form Container dengan background putih -->
-            <LinearLayout
+            <!-- Username Field -->
+            <TextView
+                android:id="@+id/usernameLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/form_background"
-                android:elevation="10dp"
-                android:orientation="vertical"
-                android:padding="25dp">
+                android:layout_marginBottom="8dp"
+                android:text="Username"
+                android:textColor="#000000"
+                android:textSize="@dimen/text_normal" />
 
-                <!-- Username Field -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Username"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+            <EditText
+                android:id="@+id/usernameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Masukkan username"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="@dimen/text_normal" />
+
+            <!-- Password Field -->
+            <TextView
+                android:id="@+id/passwordLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Password"
+                android:textColor="#000000"
+                android:textSize="@dimen/text_normal" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginBottom="32dp">
 
                 <EditText
-                    android:id="@+id/usernameEditText"
+                    android:id="@+id/passwordEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edittext_background"
-                    android:hint="Masukkan username"
+                    android:hint="Masukkan password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="56dp"
+                    android:textSize="@dimen/text_normal" />
+
+                <ImageView
+                    android:id="@+id/passwordToggle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Toggle password visibility"
+                    android:src="@android:drawable/ic_lock_lock" />
+
+            </RelativeLayout>
+
+            <!-- Login Button -->
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_button"
+                android:elevation="2dp"
+                android:stateListAnimator="@null"
+                android:text="Login"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/text_normal" />
+
+
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_centerVertical="true"
+                    android:background="#E0E0E0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@android:color/white"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:textSize="16sp" />
+                    android:text="OR"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
 
-                <!-- Password Field -->
+            </RelativeLayout>
+
+            <!-- Google Sign In Button (VERSI YANG DIPERBAIKI) -->
+            <LinearLayout
+                android:id="@+id/googleLoginButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/google_button_background"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="2dp"
+                android:padding="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/googlebutton"
+                    android:scaleType="fitCenter"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Google logo" />
+
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Password"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginBottom="32dp">
-
-                    <EditText
-                        android:id="@+id/passwordEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/edittext_background"
-                        android:hint="Masukkan password"
-                        android:inputType="textPassword"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="56dp"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:id="@+id/passwordToggle"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Toggle password visibility"
-                        android:src="@android:drawable/ic_lock_lock" />
-
-                </RelativeLayout>
-
-                <!-- Google Sign In Button -->
-                <Button
-                    android:id="@+id/googleLoginButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/rounded_button"
-                    android:text="Login with Google"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp" />
-
-                <!-- Login Button -->
-                <Button
-                    android:id="@+id/loginButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@drawable/rounded_button"
-                    android:padding="16dp"
-                    android:stateListAnimator="@null"
-                    android:text="LOGIN"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:text="Sign in with Google"
+                    android:textColor="#3C4043"
+                    android:textSize="15sp"
+                    android:textStyle="normal"
+                    android:fontFamily="sans-serif-medium" />
 
             </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
 
-</RelativeLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

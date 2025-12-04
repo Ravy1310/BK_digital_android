@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#1A000000">
+
+    <item>
+        <selector>
+            <!-- State ketika ditekan -->
+            <item android:state_pressed="true">
+                <shape android:shape="rectangle">
+                    <corners android:radius="8dp" />
+                    <solid android:color="#F1F1F1" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="#DADCE0" />
+                </shape>
+            </item>
+
+            <!-- State ketika difokus -->
+            <item android:state_focused="true">
+                <shape android:shape="rectangle">
+                    <corners android:radius="8dp" />
+                    <solid android:color="#FFFFFF" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="#4285F4" />
+                </shape>
+            </item>
+
+            <!-- State normal (default) -->
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="8dp" />
+                    <solid android:color="#FFFFFF" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="#DADCE0" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+
+</ripple>

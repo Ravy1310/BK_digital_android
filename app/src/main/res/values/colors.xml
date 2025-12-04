@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Warna Material Design Default -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +8,28 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Warna utama aplikasi Anda -->
+    <color name="colorPrimary">#1E40AF</color>
+    <color name="colorPrimaryDark">#1E3A8A</color>
+    <color name="colorAccent">#3B82F6</color>
+
+    <!-- Warna navigation -->
+    <color name="nav_selected">#1E40AF</color>
+    <color name="nav_normal">#000000</color>
+    <color name="nav_icon_selected">#1E40AF</color>
+    <color name="nav_icon_normal">#757575</color>
+
+    <!-- Warna background -->
+    <color name="background_light">#F5F7FA</color>
+    <color name="background_white">#FFFFFF</color>
+
+    <!-- Warna text -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_dark">#000000</color>
+
+    <!-- Warna card -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_shadow">#1A000000</color>
 </resources>

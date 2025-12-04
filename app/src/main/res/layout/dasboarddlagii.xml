@@ -23,6 +23,7 @@
             android:layout_marginBottom="20dp">
 
             <ImageView
+                android:id="@+id/menu_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="22dp"
                 android:src="@drawable/menu"
@@ -43,6 +44,7 @@
                 android:layout_weight="1" />
 
             <ImageView
+                android:id="@+id/profile_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/akunn"
@@ -221,15 +223,40 @@
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-        <!-- SECTION TITLE -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- SECTION TITLE dengan "Lihat Semua" -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tes Terpopuler"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginBottom="4dp"
-            android:textColor="@android:color/black"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tes Terpopuler"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tv_lihat_semua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lihat Semua"
+                android:textSize="14sp"
+                android:textColor="#1E40AF"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"

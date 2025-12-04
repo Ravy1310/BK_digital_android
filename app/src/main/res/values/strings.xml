@@ -1,3 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Menu strings -->
+    <string name="menu_user_name">Nama Pengguna</string>
+    <string name="menu_logout">Logout</string>
+
+    <!-- Untuk teks yang bisa berubah -->
+    <string name="welcome_user">Halo, %s</string>
+
+    <!-- Login strings -->
     <string name="app_name">BK Digital</string>
-    </resources>
+    <string name="login_title">Login</string>
+    <string name="username_hint">Masukkan username</string>
+    <string name="password_hint">Masukkan password</string>
+    <string name="login_button">Login</string>
+    <string name="google_login_button">Sign in with Google</string>
+</resources>
