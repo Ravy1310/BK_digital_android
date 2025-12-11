@@ -3,24 +3,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.login">
 
+    <!-- IZIN INTERNET -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- SUPPORT SEMUA UKURAN LAYAR -->
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
+
+    <!-- API LEVEL TARGET -->
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="34" />
+
     <application
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Login"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:theme="@style/Theme.Login"
+        android:usesCleartextTraffic="true"
+        android:resizeableActivity="true"
         tools:targetApi="31">
 
     <!-- LOGIN ACTIVITY - MAIN ENTRY POINT -->
     <activity
-        android:name=".LoginActivity"
+        android:name=".ui.auth.LoginActivity"
         android:exported="true"
-        android:launchMode="singleTask"
-        android:screenOrientation="portrait">
+        android:screenOrientation="portrait"
+        android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize"
+        android:windowSoftInputMode="adjustResize">  <!-- Adjust untuk keyboard -->
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
@@ -29,9 +48,24 @@
 
     <!-- DASHBOARD ACTIVITY -->
     <activity
-        android:name=".DashboardActivity"
+        android:name=".ui.dashboard.DashboardActivity"
         android:exported="false"
-        android:screenOrientation="portrait" />
+        android:screenOrientation="portrait"
+        android:configChanges="orientation|screenSize|keyboardHidden" />
+
+    <!-- REGISTER ACTIVITY -->
+    <activity
+        android:name=".ui.auth.RegisterActivity"
+        android:exported="false"
+        android:screenOrientation="portrait"
+        android:configChanges="orientation|screenSize|keyboardHidden"
+        android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.test.TestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
 </application>
+
     </manifest>

@@ -14,4 +14,18 @@
     <string name="password_hint">Masukkan password</string>
     <string name="login_button">Login</string>
     <string name="google_login_button">Sign in with Google</string>
+
+    <!-- String Dashboard-->
+    <string name="icon_jumlah_siswa">Icon jumlah siswa</string>
+    <string name="icon_jumlah_guru">Icon jumlah guru</string>
+    <string name="icon_jumlah_tes">Icon jumlah tes</string>
+    <string name="jumlah_siswa">Jumlah Siswa</string>
+    <string name="jumlah_guru">Jumlah Guru</string>
+    <string name="jumlah_tes">Jumlah Tes</string>
+    <string name="tes_terpopuler">Tes Terpopuler</string>
+    <string name="lihat_semua">Lihat Semua</string>
+    <string name="lihat_semua_desc">Tampilkan semua tes terpopuler</string>
+    <string name="deskripsi_tes_terpopuler">Tes yang paling banyak dikerjakan siswa</string>
+    <string name="tes_minat_belajar">Tes Minat Belajar</string>
+    <string name="dikerjakan_oleh_50_siswa">Dikerjakan oleh 50 siswa</string>
 </resources>

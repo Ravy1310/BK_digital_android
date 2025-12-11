@@ -43,7 +43,7 @@
             android:layout_marginBottom="8dp"/>
 
         <EditText
-            android:id="@+id/et_deskripsi_tes"
+            android:id="@+id/et_nama_tes_baru"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/info_background"
@@ -105,7 +105,7 @@
             <Button
                 android:id="@+id/btn_browse"
                 android:layout_width="95dp"
-                android:layout_height="35dp"
+                android:layout_height="48dp"
                 android:text="Browse"
                 android:textSize="13sp"
                 android:textColor="#4CAF50"
