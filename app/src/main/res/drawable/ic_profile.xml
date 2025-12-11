@@ -1,0 +1,44 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+
+    <!-- Lingkaran background -->
+    <path
+        android:pathData="M20,2
+                          A18,18 0 1,1 20,38
+                          A18,18 0 1,1 20,2Z"
+        android:fillColor="#E0E0E0" />
+
+    <!-- Border -->
+    <path
+        android:pathData="M20,2
+                          A18,18 0 1,1 20,38
+                          A18,18 0 1,1 20,2Z"
+        android:strokeWidth="3"
+        android:strokeColor="#000000"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- IKON ORANG -->
+    <group
+        android:translateX="10"
+        android:translateY="6">
+
+        <!-- Kepala -->
+        <path
+            android:pathData="M10,6
+                              A4,4 0 1,1 10,14
+                              A4,4 0 1,1 10,6Z"
+            android:fillColor="#000" />
+
+        <!-- Badan -->
+        <path
+            android:pathData="M2,22
+                              C2,16 6,12 10,12
+                              C14,12 18,16 18,22Z"
+            android:fillColor="#000" />
+
+    </group>
+
+</vector>
