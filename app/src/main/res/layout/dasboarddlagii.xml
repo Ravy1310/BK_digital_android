@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#BFD6E9">
+    android:background="#BFD6E9"> <!-- SAMAKAN dengan kelolasoaltes.xml -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,52 +13,11 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- HEADER -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:background="#ffffff"
-            android:padding="12dp"
-            android:layout_marginBottom="20dp">
-
-            <ImageView
-                android:id="@+id/menu_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="22dp"
-                android:src="@drawable/menu"
-                app:tint="@android:color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="BK Digital"
-                android:textStyle="bold"
-                android:textColor="@android:color/holo_blue_dark"
-                android:layout_marginStart="12dp"
-                android:textSize="18sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/profile_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/akunn"
-                android:background="@drawable/circle_background"
-                android:padding="6dp"/>
-        </LinearLayout>
-
         <!-- KOTAK STATISTIK -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="3"
             android:layout_marginBottom="25dp">
 
             <!-- CARD 1 - JUMLAH SISWA -->
@@ -89,7 +49,8 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahsiswa"
-                            app:tint="#FFFFFF" />
+                            app:tint="#FFFFFF"
+                            android:contentDescription="icon jumlah siswa" />
 
                     </LinearLayout>
 
@@ -144,7 +105,8 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahguru"
-                            app:tint="#FFFFFF"/>
+                            app:tint="#FFFFFF"
+                            android:contentDescription="icon jumlah guru"/>
 
                     </LinearLayout>
 
@@ -174,7 +136,7 @@
                 android:layout_height="130dp"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
-                app:cardBackgroundColor="#F29A4E"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
@@ -183,8 +145,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="#FFFFFF">
+                    android:padding="12dp">
 
                     <LinearLayout
                         android:layout_width="60dp"
@@ -198,7 +159,8 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahtes"
-                            app:tint="#ffffff" />
+                            app:tint="#ffffff"
+                            android:contentDescription="icon jumlah tes" />
 
                     </LinearLayout>
 
@@ -237,7 +199,7 @@
                 android:text="Tes Terpopuler"
                 android:textStyle="bold"
                 android:textSize="20sp"
-                android:textColor="@android:color/black"/>
+                android:textColor="#000000"/>
 
             <View
                 android:layout_width="0dp"
@@ -248,22 +210,26 @@
                 android:id="@+id/tv_lihat_semua"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
                 android:text="Lihat Semua"
                 android:textSize="14sp"
                 android:textColor="#1E40AF"
                 android:textStyle="bold"
                 android:padding="8dp"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="lihat semua tes" />
 
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test yang paling banyak di kerjakan siswa"
+            android:text="Tes yang paling banyak dikerjakan siswa"
             android:textSize="12sp"
-            android:textColor="#666"
+            android:textColor="#666666"
             android:layout_marginBottom="16dp"/>
 
         <!-- LIST ITEM -->
@@ -291,7 +257,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tes Minat Belajar"
-                        android:textColor="@android:color/black"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
@@ -299,7 +265,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Dikerjakan oleh 50 siswa"
-                        android:textColor="#666"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -324,7 +290,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tes Minat Belajar"
-                        android:textColor="@android:color/black"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
@@ -332,7 +298,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Dikerjakan oleh 50 siswa"
-                        android:textColor="#666"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -357,7 +323,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tes Minat Belajar"
-                        android:textColor="@android:color/black"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
@@ -365,7 +331,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Dikerjakan oleh 50 siswa"
-                        android:textColor="#666"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -390,7 +356,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tes Minat Belajar"
-                        android:textColor="@android:color/black"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
@@ -398,7 +364,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Dikerjakan oleh 50 siswa"
-                        android:textColor="#666"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>

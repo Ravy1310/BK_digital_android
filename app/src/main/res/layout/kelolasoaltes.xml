@@ -1,53 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#BFD6E9"
     android:padding="16dp">
 
     <LinearLayout
+        android:id="@+id/kelolaTesMainLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <!-- Container utama untuk semua informasi -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:layout_marginBottom="20dp"
-            android:background="#ffffff">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/menu"
-                android:tint="@android:color/black"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="BK Digital"
-                android:textStyle="bold"
-                android:textColor="@android:color/holo_blue_dark"
-                android:layout_marginStart="12dp"
-                android:textSize="18sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:src="@drawable/akunn"
-                android:background="@drawable/circle_background"
-                android:padding="6dp"/>
-        </LinearLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,6 +36,7 @@
 
                     <!-- Kotak Total Soal -->
                     <LinearLayout
+                        android:id="@+id/totalSoalCard"
                         android:layout_width="0dp"
                         android:layout_height="120dp"
                         android:layout_weight="1"
@@ -90,6 +56,7 @@
                             android:layout_marginBottom="8dp"/>
 
                         <TextView
+                            android:id="@+id/tvTotalSoal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="500"
@@ -101,6 +68,7 @@
 
                     <!-- Kotak Jenis Tes -->
                     <LinearLayout
+                        android:id="@+id/jenisTesCard"
                         android:layout_width="0dp"
                         android:layout_height="120dp"
                         android:layout_weight="1"
@@ -120,6 +88,7 @@
                             android:layout_marginBottom="8dp"/>
 
                         <TextView
+                            android:id="@+id/tvJenisTes"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10"
@@ -139,6 +108,7 @@
 
                     <!-- Kotak Kelola Tes BK -->
                     <LinearLayout
+                        android:id="@+id/kelolaTesBKLayout"
                         android:layout_width="0dp"
                         android:layout_height="60dp"
                         android:layout_weight="1"
@@ -150,26 +120,27 @@
 
                         <!-- Ikon di kiri -->
                         <ImageView
+                            android:id="@+id/iconKelolaTes"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:src="@drawable/kelolatesbk"
-                            android:tint="#ffffff" />
+                            android:src="@drawable/kelolates"
+                            app:tint="#ffffff" />
 
                         <!-- Teks -->
                         <TextView
+                            android:id="@+id/tvKelolaTesBK"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Kelola Tes BK"
                             android:textSize="10sp"
                             android:textColor="#ffffff"
                             android:textStyle="bold"
-                            android:layout_marginStart="8dp" />
+                            android:layout_marginStart="3dp" />
                     </LinearLayout>
-
-
 
                     <!-- Kotak Tambah Tes Baru -->
                     <LinearLayout
+                        android:id="@+id/tambahTesBaruLayout"
                         android:layout_width="0dp"
                         android:layout_height="60dp"
                         android:layout_weight="1"
@@ -181,22 +152,23 @@
 
                         <!-- Ikon di kiri -->
                         <ImageView
+                            android:id="@+id/iconTambahTes"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/tambah"
-                             android:tint="#ffffff" />
+                            app:tint="#ffffff" />
 
                         <!-- Teks -->
                         <TextView
+                            android:id="@+id/tvTambahTesBaru"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
                             android:text="Tambah Tes Baru"
-                            android:textSize="10sp"
                             android:textColor="#ffffff"
-                            android:textStyle="bold"
-                            android:layout_marginStart="8dp" />
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
-
 
                 </LinearLayout>
 
@@ -205,6 +177,7 @@
 
         <!-- Garis Pemisah -->
         <View
+            android:id="@+id/dividerLine"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
@@ -212,6 +185,7 @@
 
         <!-- Header Tes Bk -->
         <TextView
+            android:id="@+id/headerTesBK"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tes Bk"
@@ -222,6 +196,7 @@
 
         <!-- Subheader Kelola Soal Tes -->
         <TextView
+            android:id="@+id/subheaderKelolaSoal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Kelola Soal Tes"
@@ -232,12 +207,14 @@
 
         <!-- Container untuk daftar tes -->
         <LinearLayout
+            android:id="@+id/containerDaftarTes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <!-- Tes Minat Belajar -->
             <LinearLayout
+                android:id="@+id/tesMinatBelajarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -249,6 +226,7 @@
 
                 <!-- Kotakan untuk icon -->
                 <LinearLayout
+                    android:id="@+id/iconContainerMinat"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:background="@drawable/icon_backgorund"
@@ -268,6 +246,7 @@
 
                         <!-- GAMBAR (di atas kotak biru) -->
                         <ImageView
+                            android:id="@+id/iconMinatBelajar"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/orang"
@@ -279,12 +258,14 @@
 
                 <!-- Container untuk teks -->
                 <LinearLayout
+                    android:id="@+id/textContainerMinat"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvTesMinatBelajar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tes Minat Belajar"
@@ -294,6 +275,7 @@
                         android:layout_marginBottom="4dp" />
 
                     <TextView
+                        android:id="@+id/tvDeskripsiMinat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Mengukur minat belajar siswa"
@@ -302,6 +284,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:id="@+id/tvJumlahSoalMinat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="50 soal"
@@ -315,17 +298,19 @@
 
             <!-- Tes Personalitas -->
             <LinearLayout
+                android:id="@+id/tesPersonalitasLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="12dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:padding="16dp"
+                android:padding="15dp"
                 android:background="@drawable/card_background">
 
                 <!-- Kotakan untuk icon -->
                 <LinearLayout
+                    android:id="@+id/iconContainerPersonalitas"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:background="@drawable/icon_backgorund"
@@ -345,6 +330,7 @@
 
                         <!-- GAMBAR (di atas kotak biru) -->
                         <ImageView
+                            android:id="@+id/iconPersonalitas"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/orang"
@@ -356,12 +342,14 @@
 
                 <!-- Container untuk teks -->
                 <LinearLayout
+                    android:id="@+id/textContainerPersonalitas"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvTesPersonalitas"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tes Personalitas"
@@ -371,6 +359,7 @@
                         android:layout_marginBottom="4dp" />
 
                     <TextView
+                        android:id="@+id/tvDeskripsiPersonalitas"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Mengukur kecenderungan kepribadian siswa"
@@ -379,6 +368,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:id="@+id/tvJumlahSoalPersonalitas"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="60 soal"
@@ -392,6 +382,7 @@
 
             <!-- Tes Penjurusan -->
             <LinearLayout
+                android:id="@+id/tesPenjurusanLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -403,6 +394,7 @@
 
                 <!-- Kotakan untuk icon -->
                 <LinearLayout
+                    android:id="@+id/iconContainerPenjurusan"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:background="@drawable/icon_backgorund"
@@ -422,6 +414,7 @@
 
                         <!-- GAMBAR (di atas kotak biru) -->
                         <ImageView
+                            android:id="@+id/iconPenjurusan"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/orang"
@@ -433,12 +426,14 @@
 
                 <!-- Container untuk teks -->
                 <LinearLayout
+                    android:id="@+id/textContainerPenjurusan"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvTesPenjurusan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tes Penjurusan"
@@ -448,6 +443,7 @@
                         android:layout_marginBottom="4dp" />
 
                     <TextView
+                        android:id="@+id/tvDeskripsiPenjurusan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Mengukur kecenderungan kejuruan"
@@ -456,6 +452,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:id="@+id/tvJumlahSoalPenjurusan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="60 soal"
@@ -469,6 +466,7 @@
 
             <!-- Tes Kematangan Emosi -->
             <LinearLayout
+                android:id="@+id/tesKematanganEmosiLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -480,6 +478,7 @@
 
                 <!-- Kotakan untuk icon -->
                 <LinearLayout
+                    android:id="@+id/iconContainerKematangan"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:background="@drawable/icon_backgorund"
@@ -499,6 +498,7 @@
 
                         <!-- GAMBAR (di atas kotak biru) -->
                         <ImageView
+                            android:id="@+id/iconKematanganEmosi"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:src="@drawable/orang"
@@ -510,12 +510,14 @@
 
                 <!-- Container untuk teks -->
                 <LinearLayout
+                    android:id="@+id/textContainerKematangan"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvTesKematanganEmosi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tes Kematangan Emosi"
@@ -525,6 +527,7 @@
                         android:layout_marginBottom="4dp" />
 
                     <TextView
+                        android:id="@+id/tvDeskripsiKematangan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Mengukur kemampuan mengelola emosi"
@@ -533,6 +536,7 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
+                        android:id="@+id/tvJumlahSoalKematangan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="60 soal"
