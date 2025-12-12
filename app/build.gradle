@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
-    id 'com.google.gms.google-services'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services' // 🔥 Tambahkan ini untuk Firebase
 }
 
 android {
@@ -10,37 +10,23 @@ android {
 
     defaultConfig {
         applicationId "com.example.login"
-        minSdk 24
+        minSdk 23
         targetSdk 34
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // ✅ TAMBAHKAN BUILD CONFIG DI SINI
-        buildConfigField "String", "BASE_URL", '"http://10.0.2.2:8000/api/"'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        debug {
-            // ⬇️ HAPUS applicationIdSuffix, tapi bisa pakai versionNameSuffix
-            // applicationIdSuffix ".debug"  // ⬅️ KOMENTAR INI
-            versionNameSuffix "-DEBUG"
-            debuggable true
-            minifyEnabled false
-
-            // ✅ OVERRIDE BUILD CONFIG UNTUK DEBUG
-            buildConfigField "String", "BASE_URL", '"http://10.0.2.2:8000/api/"'
-            buildConfigField "boolean", "IS_DEBUG", "true"
-        }
-
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            // ✅ BUILD CONFIG UNTUK RELEASE
-            buildConfigField "String", "BASE_URL", '"https://bksmaliska.com/api/"'
-            buildConfigField "boolean", "IS_DEBUG", "false"
         }
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 
     compileOptions {
@@ -51,43 +37,43 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
-    buildFeatures {
-        viewBinding true
-        buildConfig true
-    }
 }
 
 dependencies {
-    // ========== CORE ANDROID ==========
+    // AndroidX Core
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    // LIFECYCLE - WAJIB untuk viewModelScope
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-
-    // ========== API NETWORKING ==========
+    // Retrofit & Networking
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 
-    // ========== COROUTINES ==========
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    // Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
 
-    // ========== FIREBASE ==========
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    implementation 'com.google.firebase:firebase-auth-ktx'
-    // implementation 'com.google.firebase:firebase-analytics-ktx'  // ⬅️ OPSIONAL
+    // CardView
+    implementation 'androidx.cardview:cardview:1.0.0'
 
-    // ========== GOOGLE SIGN-IN ==========
-    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    // 🔥 FIREBASE & GOOGLE SIGN-IN (TAMBAHAN UNTUK LOGIN)
+    implementation platform('com.google.firebase:firebase-bom:33.1.0') // Firebase BoM
+    implementation 'com.google.firebase:firebase-auth-ktx' // Firebase Auth
+    implementation 'com.google.android.gms:play-services-auth:21.1.0' // Google Sign-In
 
-    // ========== TESTING ==========
+    // Test
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    // Lifecycle components
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
 }

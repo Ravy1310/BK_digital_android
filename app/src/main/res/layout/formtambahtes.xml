@@ -126,12 +126,13 @@
             <Button
                 android:id="@+id/btn_batal"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="59dp"
                 android:layout_weight="1"
                 android:text="Batal"
                 android:textSize="15sp"
                 android:textColor="#ffffff"
-                android:background="@drawable/bgbatal"
+
+                android:backgroundTint="#FF0000"
                 android:layout_marginRight="16dp"/>
 
             <Button

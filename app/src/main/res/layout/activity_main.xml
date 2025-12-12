@@ -32,7 +32,7 @@
             <!-- Konten default (dashboard) akan dimuat di sini -->
             <include
                 android:id="@+id/default_dashboard_content"
-                layout="@layout/dasboarddlagii" />
+                layout="@layout/activity_dashboard" />
 
         </LinearLayout>
 
