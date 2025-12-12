@@ -6,8 +6,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.PopupMenu
-import android.widget.TextView
 import android.widget.Toast
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -23,26 +23,21 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var profileIcon: ImageView
+    private lateinit var fragmentContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) // Ganti ke layout dengan drawer
+        setContentView(R.layout.activity_main)
 
         // Initialize views
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_view)
-
-        // Profile icon di header (bukan di navigation drawer)
         profileIcon = findViewById(R.id.profile_icon)
+        fragmentContainer = findViewById(R.id.fragment_container)
 
         // Setup navigation
         navigationView.setNavigationItemSelectedListener(this)
-
-        // Set default selected item
         navigationView.setCheckedItem(R.id.nav_dashboard)
-
-        // Setup header dengan data user
-        setupNavHeader()
 
         // Menu icon click to open drawer
         val menuIcon = findViewById<ImageView>(R.id.menu_icon)
@@ -55,45 +50,11 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             showProfileMenu(view)
         }
 
-        // Setup click listeners untuk konten dashboard
-        setupDashboardListeners()
+        // Tampilkan dashboard sebagai default
+        showDashboardContent()
 
-        // Setup back button handler (CARA BARU)
+        // Setup back button handler
         setupBackPressedHandler()
-    }
-
-    private fun setupBackPressedHandler() {
-        // Create callback for handling back button press
-        val onBackPressedCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // Tutup drawer jika terbuka, jika tidak, biarkan sistem menutup activity
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    // Biarkan sistem menangani back press
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        }
-
-        // Add callback to the dispatcher
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-    }
-
-    private fun setupNavHeader() {
-        // Ambil data user dari SharedPreferences
-        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val userName = sharedPref.getString("user_name", "Guest") ?: "Guest"
-        val userEmail = sharedPref.getString("user_email", "user@example.com") ?: "user@example.com"
-
-        // Update header navigation drawer
-        val headerView = navigationView.getHeaderView(0)
-        val tvUserName = headerView.findViewById<TextView>(R.id.tv_user_name)
-        val tvUserEmail = headerView.findViewById<TextView>(R.id.tv_user_email)
-
-        tvUserName?.text = userName
-        tvUserEmail?.text = userEmail
     }
 
     private fun showProfileMenu(view: View) {
@@ -119,59 +80,24 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         popupMenu.show()
     }
 
-    private fun setupDashboardListeners() {
-        // Setup click listeners untuk elemen di dashboard
-
-        // "Lihat Semua" text
-        val tvLihatSemua = findViewById<TextView>(R.id.tv_lihat_semua)
-        tvLihatSemua?.setOnClickListener {
-            Toast.makeText(this, "Lihat semua tes", Toast.LENGTH_SHORT).show()
-            // Intent ke halaman semua tes
-            // startActivity(Intent(this, AllTestsActivity::class.java))
-        }
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks
         when (item.itemId) {
             R.id.nav_dashboard -> {
-                // Sudah di dashboard
-                Toast.makeText(this, "Dashboard", Toast.LENGTH_SHORT).show()
+                showDashboardContent()
+                navigationView.setCheckedItem(R.id.nav_dashboard)
             }
-
             R.id.nav_siswa -> {
                 Toast.makeText(this, "Kelola Data Siswa", Toast.LENGTH_SHORT).show()
-                // Intent ke SiswaActivity
-                // val intent = Intent(this, SiswaActivity::class.java)
-                // startActivity(intent)
+                navigationView.setCheckedItem(R.id.nav_siswa)
             }
-
             R.id.nav_guru -> {
                 Toast.makeText(this, "Kelola Data Guru", Toast.LENGTH_SHORT).show()
-                // Intent ke GuruActivity
-                // val intent = Intent(this, GuruActivity::class.java)
-                // startActivity(intent)
+                navigationView.setCheckedItem(R.id.nav_guru)
             }
-
             R.id.nav_tes -> {
-                Toast.makeText(this, "Kelola Tes", Toast.LENGTH_SHORT).show()
-                // Intent ke TesActivity
-                // val intent = Intent(this, TesActivity::class.java)
-                // startActivity(intent)
-            }
-
-            R.id.nav_settings -> {
-                Toast.makeText(this, "Pengaturan", Toast.LENGTH_SHORT).show()
-                // Intent ke SettingsActivity
-                // val intent = Intent(this, SettingsActivity::class.java)
-                // startActivity(intent)
-            }
-
-            R.id.nav_help -> {
-                Toast.makeText(this, "Bantuan", Toast.LENGTH_SHORT).show()
-                // Intent ke HelpActivity
-                // val intent = Intent(this, HelpActivity::class.java)
-                // startActivity(intent)
+                // FOKUS: Ketika menu Tes diklik, tampilkan kelolasoaltes.xml
+                showKelolaTesContent()
+                navigationView.setCheckedItem(R.id.nav_tes)
             }
         }
 
@@ -180,21 +106,65 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         return true
     }
 
+    /**
+     * Fungsi SEDERHANA untuk menampilkan konten dashboard default
+     */
+    private fun showDashboardContent() {
+        fragmentContainer.removeAllViews()
+
+        // Inflate dengan attachToRoot = false
+        val dashboardView = layoutInflater.inflate(
+            R.layout.dasboarddlagii,
+            fragmentContainer,
+            false
+        )
+        fragmentContainer.addView(dashboardView)
+        Toast.makeText(this, "Dashboard", Toast.LENGTH_SHORT).show()
+    }
+    /**
+     * Fungsi SEDERHANA untuk menampilkan konten kelola soal tes
+     * FOKUS: Hanya ganti content ke kelolasoaltes.xml
+     */
+    private fun showKelolaTesContent() {
+        // 1. Hapus semua view yang ada di container
+        fragmentContainer.removeAllViews()
+
+        // 2. Inflate layout kelola soal tes
+        val kelolaTesView = layoutInflater.inflate(R.layout.kelolasoaltes, null)
+
+        // 3. Tambahkan ke container
+        fragmentContainer.addView(kelolaTesView)
+
+        // 4. Tampilkan pesan
+        Toast.makeText(this, "Kelola Tes", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupBackPressedHandler() {
+        val onBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        }
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+    }
+
     private fun logoutUser() {
         try {
-            // 1. Logout dari Firebase
             Firebase.auth.signOut()
 
-            // 2. Hapus semua data dari SharedPreferences
             val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
             val editor = sharedPref.edit()
             editor.clear()
             editor.apply()
 
-            // 3. Tampilkan pesan
             Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show()
 
-            // 4. Redirect ke LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -204,6 +174,4 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             Toast.makeText(this, "Error saat logout: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 }

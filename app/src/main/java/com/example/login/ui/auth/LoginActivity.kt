@@ -2,13 +2,10 @@ package com.example.login.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.login.R
-import com.example.login.api.ApiClient
-import com.example.login.api.models.LoginRequest
 import com.example.login.ui.dashboard.DashboardActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -18,13 +15,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import android.view.View
 
 class LoginActivity : AppCompatActivity() {
 
+    // UI Components
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var passwordToggle: ImageView
@@ -32,13 +27,13 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var googleLoginButton: LinearLayout
     private lateinit var registerTextView: TextView
     private lateinit var progressBar: ProgressBar
-    private lateinit var forgotPasswordTextView: TextView  // ✅ TAMBAHKAN INI
+    private lateinit var forgotPasswordTextView: TextView
 
+    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    private val TAG = "LoginActivity"
-
+    // Google Sign In Launcher
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -58,13 +53,17 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // Initialize Firebase Auth
         auth = Firebase.auth
-        initializeViews()
-        setupGoogleSignIn()
-        setupClickListeners()
 
-        // ✅ TEST API CONNECTION SAAT APP START
-        testApiConnection()
+        // Initialize UI Components
+        initializeViews()
+
+        // Setup Google Sign In
+        setupGoogleSignIn()
+
+        // Setup Click Listeners
+        setupClickListeners()
     }
 
     private fun initializeViews() {
@@ -75,28 +74,29 @@ class LoginActivity : AppCompatActivity() {
         googleLoginButton = findViewById(R.id.googleLoginButton)
         registerTextView = findViewById(R.id.registerTextView)
         progressBar = findViewById(R.id.progressBar)
-        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView)  // ✅ INISIALISASI
+        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView)
     }
 
     private fun setupClickListeners() {
+        // Toggle Password Visibility
         passwordToggle.setOnClickListener { togglePasswordVisibility() }
+
+        // Login Button
         loginButton.setOnClickListener { loginWithEmailPassword() }
+
+        // Google Login Button
         googleLoginButton.setOnClickListener { signInWithGoogle() }
 
-        // ✅ INTENT KE REGISTER ACTIVITY
+        // Register Text (Navigate to RegisterActivity)
         registerTextView.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
-            // Tambahkan animasi jika mau
-            // overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
-        // ✅ INTENT KE FORGOT PASSWORD (jika ada activity-nya)
+        // Forgot Password Text
         forgotPasswordTextView.setOnClickListener {
             Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show()
-            // Jika ada ForgotPasswordActivity:
-            // val intent = Intent(this, ForgotPasswordActivity::class.java)
-            // startActivity(intent)
+            // Add ForgotPasswordActivity implementation if needed
         }
     }
 
@@ -109,8 +109,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun togglePasswordVisibility() {
-        if (passwordEditText.inputType == 129) {
-            passwordEditText.inputType = 1
+        if (passwordEditText.inputType == 129) { // 129 = TYPE_TEXT_VARIATION_PASSWORD
+            passwordEditText.inputType = 1 // TYPE_CLASS_TEXT
             passwordToggle.setImageResource(android.R.drawable.ic_lock_idle_lock)
         } else {
             passwordEditText.inputType = 129
@@ -123,7 +123,7 @@ class LoginActivity : AppCompatActivity() {
         val email = usernameEditText.text.toString().trim()
         val password = passwordEditText.text.toString().trim()
 
-        // Validasi input
+        // Input Validation
         if (email.isEmpty()) {
             usernameEditText.error = "Email harus diisi"
             usernameEditText.requestFocus()
@@ -142,126 +142,56 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ OPTION 1: PAKAI API BACKEND (RECOMMENDED)
-        loginWithApi(email, password)
-
-        // ✅ OPTION 2: PAKAI FIREBASE (Jika mau tetap pakai Firebase)
-        // loginWithFirebase(email, password)
+        // Start Firebase Authentication
+        performFirebaseLogin(email, password)
     }
 
-    // ✅ METHOD BARU: LOGIN DENGAN API BACKEND
-    private fun loginWithApi(email: String, password: String) {
+    private fun performFirebaseLogin(email: String, password: String) {
+        // Show loading state
         progressBar.visibility = View.VISIBLE
         loginButton.isEnabled = false
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val apiService = ApiClient.getApiService(this@LoginActivity)
-                val response = apiService.login(LoginRequest(email, password))
-
-                withContext(Dispatchers.Main) {
-                    progressBar.visibility = View.GONE
-                    loginButton.isEnabled = true
-
-                    if (response.isSuccessful && response.body() != null) {
-                        val loginResponse = response.body()!!
-
-                        if (loginResponse.success) {
-                            // Login berhasil via API
-                            Toast.makeText(
-                                this@LoginActivity,
-                                "Login berhasil via API!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            // Simpan token dan user data
-                            saveApiUserData(loginResponse)
-
-                            // Navigate ke Dashboard
-                            navigateToDashboard()
-                        } else {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                "Login gagal: ${loginResponse.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    } else {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Error: ${response.code()} - ${response.message()}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    progressBar.visibility = View.GONE
-                    loginButton.isEnabled = true
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Network error: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-
-                    // Fallback ke Firebase jika API gagal
-                    loginWithFirebase(email, password)
-                }
-            }
-        }
-    }
-
-    // ✅ METHOD BARU: SIMPAN DATA USER DARI API
-    private fun saveApiUserData(loginResponse: com.example.login.api.models.LoginResponse) {
-        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val editor = sharedPref.edit()
-
-        editor.putBoolean("is_logged_in", true)
-        editor.putString("auth_type", "api")  // Tandai login via API
-
-        // Simpan token jika ada
-        loginResponse.token?.let { token ->
-            editor.putString("api_token", token)
-        }
-
-        // Simpan user data jika ada
-        loginResponse.user?.let { user ->
-            editor.putString("user_name", user.name)
-            editor.putString("user_email", user.email)
-            editor.putInt("user_id", user.id)
-        }
-
-        editor.apply()
-
-        // Simpan juga di TokenManager jika ada
-        loginResponse.token?.let { token ->
-            com.example.login.utils.TokenManager.saveToken(this, token)
-        }
-    }
-
-    // ✅ METHOD LAMA: LOGIN DENGAN FIREBASE
-    private fun loginWithFirebase(email: String, password: String) {
-        loginButton.isEnabled = false
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
+                // Hide loading state
+                progressBar.visibility = View.GONE
+                loginButton.isEnabled = true
+
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Login berhasil via Firebase!", Toast.LENGTH_SHORT).show()
-                    saveFirebaseUserData(email)
+                    // Login successful
+                    Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
+
+                    // Save user data to SharedPreferences
+                    saveUserData(email)
+
+                    // Navigate to Dashboard
                     navigateToDashboard()
                 } else {
-                    Toast.makeText(this, "Login gagal: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    // Login failed
+                    val errorMessage = task.exception?.message ?: "Login gagal"
+                    Toast.makeText(this, "Error: $errorMessage", Toast.LENGTH_LONG).show()
                 }
-                loginButton.isEnabled = true
             }
     }
 
-    private fun saveFirebaseUserData(email: String) {
+    private fun saveUserData(email: String) {
         val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
         val editor = sharedPref.edit()
+
+        // Basic user info
         editor.putBoolean("is_logged_in", true)
-        editor.putString("auth_type", "firebase")  // Tandai login via Firebase
-        editor.putString("user_name", email.split("@")[0])
         editor.putString("user_email", email)
+        editor.putString("user_name", email.split("@")[0]) // Extract name from email
+
+        // Additional info if needed
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            editor.putString("user_id", user.uid)
+            user.displayName?.let { name ->
+                editor.putString("user_display_name", name)
+            }
+        }
+
         editor.apply()
     }
 
@@ -271,62 +201,92 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
+        // Show loading state
+        progressBar.visibility = View.VISIBLE
+        googleLoginButton.isEnabled = false
+
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
+                // Hide loading state
+                progressBar.visibility = View.GONE
+                googleLoginButton.isEnabled = true
+
                 if (task.isSuccessful) {
+                    // Google Sign In successful
                     val user = auth.currentUser
+
+                    Toast.makeText(this, "Login dengan Google berhasil!", Toast.LENGTH_SHORT).show()
+
+                    // Save user data
                     user?.let {
-                        saveFirebaseUserData(it.email ?: "Google User")
+                        saveGoogleUserData(it.email ?: "Google User", it.displayName ?: "Google User")
                     }
+
+                    // Navigate to Dashboard
                     navigateToDashboard()
+                } else {
+                    // Google Sign In failed
+                    Toast.makeText(this, "Google sign in failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
+    private fun saveGoogleUserData(email: String, displayName: String) {
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val editor = sharedPref.edit()
+
+        editor.putBoolean("is_logged_in", true)
+        editor.putString("user_email", email)
+        editor.putString("user_name", displayName)
+        editor.putString("auth_provider", "google")
+
+        editor.apply()
+    }
+
     private fun navigateToDashboard() {
         val intent = Intent(this, DashboardActivity::class.java)
+        // Clear back stack so user can't go back to login with back button
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
 
-        // Tambahkan animasi transisi
+        // Optional: Add transition animation
         // overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-    }
-
-    // ✅ METHOD BARU: TEST API CONNECTION
-    private fun testApiConnection() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val apiService = ApiClient.getApiService(this@LoginActivity)
-                Log.d(TAG, "✅ ApiClient created successfully")
-
-                // Optional: Test dengan dummy request
-                // val response = apiService.login(LoginRequest("test", "test"))
-                // Log.d(TAG, "Test response code: ${response.code()}")
-
-            } catch (e: Exception) {
-                Log.e(TAG, "❌ ApiClient error: ${e.message}")
-            }
-        }
     }
 
     override fun onStart() {
         super.onStart()
 
-        // Cek jika sudah login
-        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        if (sharedPref.getBoolean("is_logged_in", false)) {
-            // Auto redirect ke Dashboard
-            val intent = Intent(this, DashboardActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        // Check if user is already logged in
+        checkAutoLogin()
+    }
 
-        // Atau cek dengan TokenManager
-        if (com.example.login.utils.TokenManager.isLoggedIn(this)) {
+    private fun checkAutoLogin() {
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("is_logged_in", false)
+
+        // Alternatively check Firebase current user
+        val currentUser = auth.currentUser
+
+        if (isLoggedIn || currentUser != null) {
+            // User is already logged in, redirect to dashboard
             val intent = Intent(this, DashboardActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
         }
+    }
+
+    // Optional: Add back button handling
+    private var backPressedTime: Long = 0
+    override fun onBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            super.onBackPressed()
+            return
+        } else {
+            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show()
+        }
+        backPressedTime = System.currentTimeMillis()
     }
 }

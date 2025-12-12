@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#BFD6E9">
+    android:background="#BFD6E9"> <!-- SAMAKAN dengan kelolasoaltes.xml -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,14 +50,14 @@
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahsiswa"
                             app:tint="#FFFFFF"
-                            android:contentDescription="@string/icon_jumlah_siswa" />
+                            android:contentDescription="icon jumlah siswa" />
 
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/jumlah_siswa"
+                        android:text="Jumlah Siswa"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="12sp"
@@ -106,14 +106,14 @@
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahguru"
                             app:tint="#FFFFFF"
-                            android:contentDescription="@string/icon_jumlah_guru"/>
+                            android:contentDescription="icon jumlah guru"/>
 
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/jumlah_guru"
+                        android:text="Jumlah Guru"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="12sp"
@@ -160,7 +160,7 @@
                             android:layout_height="30dp"
                             android:src="@drawable/jumlahtes"
                             app:tint="#ffffff"
-                            android:contentDescription="@string/icon_jumlah_tes" />
+                            android:contentDescription="icon jumlah tes" />
 
                     </LinearLayout>
 
@@ -168,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/jumlah_tes"
+                        android:text="Jumlah Tes"
                         android:textColor="#000000"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -196,10 +196,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tes_terpopuler"
+                android:text="Tes Terpopuler"
                 android:textStyle="bold"
                 android:textSize="20sp"
-                android:textColor="@android:color/black"/>
+                android:textColor="#000000"/>
 
             <View
                 android:layout_width="0dp"
@@ -212,7 +212,7 @@
                 android:layout_height="wrap_content"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
-                android:text="@string/lihat_semua"
+                android:text="Lihat Semua"
                 android:textSize="14sp"
                 android:textColor="#1E40AF"
                 android:textStyle="bold"
@@ -220,16 +220,16 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/lihat_semua_desc" />
+                android:contentDescription="lihat semua tes" />
 
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/deskripsi_tes_terpopuler"
+            android:text="Tes yang paling banyak dikerjakan siswa"
             android:textSize="12sp"
-            android:textColor="#666"
+            android:textColor="#666666"
             android:layout_marginBottom="16dp"/>
 
         <!-- LIST ITEM -->
@@ -256,16 +256,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tes_minat_belajar"
-                        android:textColor="@android:color/black"
+                        android:text="Tes Minat Belajar"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/dikerjakan_oleh_50_siswa"
-                        android:textColor="#666"
+                        android:text="Dikerjakan oleh 50 siswa"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -289,16 +289,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tes_minat_belajar"
-                        android:textColor="@android:color/black"
+                        android:text="Tes Minat Belajar"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/dikerjakan_oleh_50_siswa"
-                        android:textColor="#666"
+                        android:text="Dikerjakan oleh 50 siswa"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -322,16 +322,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tes_minat_belajar"
-                        android:textColor="@android:color/black"
+                        android:text="Tes Minat Belajar"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/dikerjakan_oleh_50_siswa"
-                        android:textColor="#666"
+                        android:text="Dikerjakan oleh 50 siswa"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
@@ -355,16 +355,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tes_minat_belajar"
-                        android:textColor="@android:color/black"
+                        android:text="Tes Minat Belajar"
+                        android:textColor="#000000"
                         android:textStyle="bold"
                         android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/dikerjakan_oleh_50_siswa"
-                        android:textColor="#666"
+                        android:text="Dikerjakan oleh 50 siswa"
+                        android:textColor="#666666"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
