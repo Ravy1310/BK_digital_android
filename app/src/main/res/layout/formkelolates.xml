@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- Header dengan background putih -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#ffffff"
+        android:padding="12dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kelola Tes : Tes Minat Belajar"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Daftar semua soal yang terkait dengan tes ini."
+            android:textSize="11sp"
+            android:textColor="#000000"
+            android:layout_marginTop="2dp"/>
+    </LinearLayout>
+
+    <!-- Container untuk konten soal - TANPA SCROLLVIEW -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#F5F5F5">
+
+        <!-- Satu kotak besar berisi semua soal - DIPERKECIL -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:elevation="0.5dp">
+
+            <!-- Judul "Total 3 soal untuk tes ini" di bagian atas kotak -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total 3 soal untuk tes ini"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="10dp"/>
+
+            <!-- Soal 1 - DIPERKECIL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+
+                <!-- Pertanyaan dengan nomor -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. Ketika mencoba mengingat petunjuk arah, cara apa yang paling efektif bagi anda?"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="6dp"
+                    android:lineSpacingExtra="2dp"/>
+
+                <!-- Jawaban A -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="A. (Bobot 3) Membayangkan peta"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp"
+                    android:paddingLeft="2dp"/>
+
+                <!-- Jawaban B -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="B. (Bobot 1) Mengulang dengan suara keras"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp"
+                    android:paddingLeft="2dp"/>
+
+                <!-- Jawaban C -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="C. (Bobot 2) Bergerak atau menunjuk"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:paddingLeft="2dp"/>
+            </LinearLayout>
+
+            <!-- Garis pemisah antar soal - DIPERKECIL -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Soal 2 - DIPERKECIL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+
+                <!-- Pertanyaan dengan nomor -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="2. Ketika mencoba mengingat petunjuk arah, cara apa yang paling efektif bagi anda?"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="6dp"
+                    android:lineSpacingExtra="2dp"/>
+
+                <!-- Jawaban A -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="A. (Bobot 3) Membayangkan peta"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp"
+                    android:paddingLeft="2dp"/>
+
+                <!-- Jawaban B -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="B. (Bobot 1) Mengulang dengan suara keras"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp"
+                    android:paddingLeft="2dp"/>
+
+                <!-- Jawaban C -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="C. (Bobot 2) Bergerak atau menunjuk"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:paddingLeft="2dp"/>
+            </LinearLayout>
+
+            <!-- Garis pemisah antar soal - DIPERKECIL -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Soal 3 - DIPERKECIL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+
+                <!-- Pertanyaan dengan nomor -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="3. Ketika mencoba mengingat petunjuk arah, cara apa yang paling efektif bagi anda?"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="6dp"
+                    android:lineSpacingExtra="2dp"/>
+
+                <!-- Jawaban A -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="A. (Bobot 3) Membayangkan peta"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp"
+                    android:paddingLeft="2dp"/>
+
+                <!-- Jawaban B -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="B. (Bobot 1) Mengulang dengan suara keras"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp"
+                    android:paddingLeft="2dp"/>
+
+                <!-- Jawaban C -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="C. (Bobot 2) Bergerak atau menunjuk"
+                    android:textSize="11sp"
+                    android:textColor="#333333"
+                    android:paddingLeft="2dp"/>
+            </LinearLayout>
+
+            <!-- Garis horizontal tipis - DIPERKECIL -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Tombol Edit dan label "Inputs" dalam satu baris - DIPERKECIL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit"
+                    android:textSize="10sp"
+                    android:textColor="#666666"
+                    android:layout_marginRight="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Inputs"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Footer dengan tombol - DIPERKECIL -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#FFFFFF">
+
+        <!-- Garis pemisah -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- Tombol Tambah Soal Baru dengan ikon + -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:gravity="center">
+
+            <!-- Tombol Tambah Soal Baru dengan ikon + -->
+            <Button
+                android:id="@+id/btnTambahSoal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="+ Tambah soal baru"
+                android:textSize="13sp"
+                android:textColor="#4CAF50"
+                android:background="@android:color/transparent"
+                android:padding="8dp"
+                android:textAllCaps="false"
+                android:drawablePadding="4dp"
+                android:drawableLeft="@drawable/ic_plus_green"/>
+
+            <!-- Tombol Batal -->
+            <Button
+                android:id="@+id/btnBatal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Batal"
+                android:textSize="13sp"
+                android:textColor="#666666"
+                android:background="@android:color/transparent"
+                android:padding="8dp"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
