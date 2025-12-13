@@ -1,241 +1,253 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- File: app/src/main/res/layout/kelolasoaltes.xml -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/kelola_tes_content"
+    android:id="@+id/swipeRefreshTes"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BFD6E9"
-    android:padding="16dp"
-    android:scrollbars="none">
+    android:background="#BFD6E9">
 
     <LinearLayout
-        android:id="@+id/kelolaTesMainLayout"
+        android:id="@+id/kelola_tes_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:scrollbars="none"
         android:orientation="vertical">
 
-        <!-- Container utama untuk semua informasi -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/info_background"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp">
-
-            <!-- Container untuk 4 kotak dalam grid 2x2 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Baris 1: Total Soal dan Jenis Tes -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Kotak Total Soal -->
-                    <LinearLayout
-                        android:id="@+id/totalSoalCard"
-                        android:layout_width="0dp"
-                        android:layout_height="120dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/card_background"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Total Soal"
-                            android:textSize="16sp"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="8dp"/>
-
-                        <TextView
-                            android:id="@+id/tvTotalSoal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="28sp"
-                            android:textColor="#2196F3"
-                            android:textStyle="bold"/>
-
-                    </LinearLayout>
-
-                    <!-- Kotak Jenis Tes -->
-                    <LinearLayout
-                        android:id="@+id/jenisTesCard"
-                        android:layout_width="0dp"
-                        android:layout_height="120dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/card_background"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Jenis Tes"
-                            android:textSize="16sp"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="8dp"/>
-
-                        <TextView
-                            android:id="@+id/tvJenisTes"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="28sp"
-                            android:textColor="#2196F3"
-                            android:textStyle="bold"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Baris 2: Kelola Tes BK dan Tambah Tes Baru -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <!-- Kotak Kelola Tes BK -->
-                    <LinearLayout
-                        android:id="@+id/kelolaTesBKLayout"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:background="@drawable/card_background_blue"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
-
-                        <!-- Ikon di kiri -->
-                        <ImageView
-                            android:id="@+id/iconKelolaTes"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:src="@drawable/kelolates"
-                            app:tint="#ffffff" />
-
-                        <!-- Teks -->
-                        <TextView
-                            android:id="@+id/tvKelolaTesBK"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Kelola Tes BK"
-                            android:textSize="10sp"
-                            android:textColor="#ffffff"
-                            android:textStyle="bold"
-                            android:layout_marginStart="3dp" />
-                    </LinearLayout>
-
-                    <!-- Kotak Tambah Tes Baru -->
-                    <LinearLayout
-                        android:id="@+id/tambahTesBaruLayout"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:background="@drawable/card_background_blue"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
-
-                        <!-- Ikon di kiri -->
-                        <ImageView
-                            android:id="@+id/iconTambahTes"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/tambah"
-                            app:tint="#ffffff" />
-
-                        <!-- Teks -->
-                        <TextView
-                            android:id="@+id/tvTambahTesBaru"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:text="Tambah Tes Baru"
-                            android:textColor="#ffffff"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Garis Pemisah -->
-        <View
-            android:id="@+id/dividerLine"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Header Tes Bk -->
-        <TextView
-            android:id="@+id/headerTesBK"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tes BK"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Subheader Kelola Soal Tes -->
-        <TextView
-            android:id="@+id/subheaderKelolaSoal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Kelola Soal Tes"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="16dp" />
-
-        <!-- RecyclerView untuk daftar tes -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvDaftarTes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:padding="8dp" />
-
-        <!-- Loading indicator -->
+        <!-- ProgressBar saat loading (untuk initial load) -->
         <ProgressBar
-            android:id="@+id/progressBarTes"
+            android:id="@+id/progressBarInitial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone" />
+            android:layout_marginTop="100dp"
+            android:visibility="visible"/>
 
-        <!-- Error message -->
-        <TextView
-            android:id="@+id/tvErrorTes"
+        <!-- Container utama (akan diatur visibility) -->
+        <LinearLayout
+            android:id="@+id/kelolaTesMainLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gagal memuat data"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:padding="16dp"
-            android:visibility="gone" />
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Container utama untuk semua informasi -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/info_background"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp">
+
+                <!-- Container untuk 4 kotak dalam grid 2x2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Baris 1: Total Soal dan Jenis Tes -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Kotak Total Soal -->
+                        <LinearLayout
+                            android:id="@+id/totalSoalCard"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:background="@drawable/card_background"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total Soal"
+                                android:textSize="16sp"
+                                android:textColor="#000000"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
+
+                            <TextView
+                                android:id="@+id/tvTotalSoal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="28sp"
+                                android:textColor="#2196F3"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                        <!-- Kotak Jenis Tes -->
+                        <LinearLayout
+                            android:id="@+id/jenisTesCard"
+                            android:layout_width="0dp"
+                            android:layout_height="120dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:background="@drawable/card_background"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Jenis Tes"
+                                android:textSize="16sp"
+                                android:textColor="#000000"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp"/>
+
+                            <TextView
+                                android:id="@+id/tvJenisTes"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="28sp"
+                                android:textColor="#2196F3"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Baris 2: Kelola Tes BK dan Tambah Tes Baru -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Kotak Kelola Tes BK -->
+                        <LinearLayout
+                            android:id="@+id/kelolaTesBKLayout"
+                            android:layout_width="0dp"
+                            android:layout_height="60dp"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:background="@drawable/card_background_blue"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
+
+                            <!-- Ikon di kiri -->
+                            <ImageView
+                                android:id="@+id/iconKelolaTes"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:src="@drawable/kelolates"
+                                app:tint="#ffffff" />
+
+                            <!-- Teks -->
+                            <TextView
+                                android:id="@+id/tvKelolaTesBK"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Kelola Tes BK"
+                                android:textSize="10sp"
+                                android:textColor="#ffffff"
+                                android:textStyle="bold"
+                                android:layout_marginStart="3dp" />
+                        </LinearLayout>
+
+                        <!-- Kotak Tambah Tes Baru -->
+                        <LinearLayout
+                            android:id="@+id/tambahTesBaruLayout"
+                            android:layout_width="0dp"
+                            android:layout_height="60dp"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:background="@drawable/card_background_blue"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <!-- Ikon di kiri -->
+                            <ImageView
+                                android:id="@+id/iconTambahTes"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/tambah"
+                                app:tint="#ffffff" />
+
+                            <!-- Teks -->
+                            <TextView
+                                android:id="@+id/tvTambahTesBaru"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:text="Tambah Tes Baru"
+                                android:textColor="#ffffff"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Garis Pemisah -->
+            <View
+                android:id="@+id/dividerLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@drawable/divider_line"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Header Tes Bk -->
+            <TextView
+                android:id="@+id/headerTesBK"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tes BK"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Subheader Kelola Soal Tes -->
+            <TextView
+                android:id="@+id/subheaderKelolaSoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kelola Soal Tes"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="16dp" />
+
+            <!-- RecyclerView untuk daftar tes -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDaftarTes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:padding="8dp" />
+
+            <!-- Error message -->
+            <TextView
+                android:id="@+id/tvErrorTes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gagal memuat data"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

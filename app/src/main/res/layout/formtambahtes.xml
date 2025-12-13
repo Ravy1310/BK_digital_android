@@ -1,149 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
+    android:fillViewport="true"
     android:background="#FFFFFF">
 
-    <!-- Header dengan 2 baris teks -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tambah Tes Baru &amp; Import soal"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginBottom="4dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Buat Kategori tes baru dan masukkan soal secara manual"
-        android:textSize="12sp"
-        android:textColor="#666666"
-        android:layout_marginLeft="4dp"
-        android:layout_marginBottom="32dp"/>
-
-    <!-- Form Field 1: Nama Tes Baru -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/edittext_background"
-        android:padding="24dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="24dp">
 
-        <!-- Judul Form -->
+        <!-- Header dengan 2 baris teks -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nama Tes Baru (Kategori Baru)"
-            android:textSize="14sp"
+            android:text="Tambah Tes Baru &amp; Import soal"
+            android:textSize="22sp"
+            android:textStyle="bold"
             android:textColor="#000000"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="4dp"/>
 
-        <EditText
-            android:id="@+id/et_nama_tes_baru"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/info_background"
-            android:padding="12dp"
-            android:gravity="top"
-            android:hint="Masukkan deskripsi tes"
-            android:textSize="14sp"
-            android:inputType="textMultiLine"
-            android:layout_marginBottom="20dp"/>
-
-        <!-- Form Field 1: Deskripsi Tes -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Deskripsi Tes"
-            android:textSize="14sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp"/>
+            android:text="Buat Kategori tes baru dan masukkan soal secara manual"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="32dp"/>
 
-        <EditText
-            android:id="@+id/et_deskripsi_tes"
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:background="@drawable/info_background"
-            android:padding="12dp"
-            android:gravity="top"
-            android:hint="Masukkan deskripsi tes"
-            android:textSize="14sp"
-            android:inputType="textMultiLine"
-            android:layout_marginBottom="20dp"/>
-
-        <!-- Form Field 2: Unggah File Soal -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unggah File Soal (csv)"
-            android:textSize="14sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- File Upload Container -->
+        <!-- Form Field Container -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/info_background"
-            android:gravity="center_vertical"
-            android:padding="12dp"
-            android:layout_marginBottom="20dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/edittext_background"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp">
 
+            <!-- Nama Tes Baru -->
             <TextView
-                android:id="@+id/tv_file_status"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="[Pilih file CSV]"
+                android:text="Nama Tes Baru (Kategori Baru)"
                 android:textSize="14sp"
-                android:textColor="#888888"/>
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp"/>
 
-            <Button
-                android:id="@+id/btn_browse"
-                android:layout_width="95dp"
-                android:layout_height="48dp"
-                android:text="Browse"
-                android:textSize="13sp"
-                android:textColor="#4CAF50"
-                android:background="@android:color/transparent"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"/>
-        </LinearLayout>
+            <EditText
+                android:id="@+id/et_nama_tes_baru"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/info_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:hint="Masukkan nama tes"
+                android:textSize="14sp"
+                android:inputType="text"
+                android:layout_marginBottom="20dp"/>
 
+            <!-- Deskripsi Tes -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deskripsi Tes"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp"/>
 
-        <!-- Button Container -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:paddingHorizontal="0dp">
+            <EditText
+                android:id="@+id/et_deskripsi_tes"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/info_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="12dp"
+                android:gravity="top"
+                android:hint="Masukkan deskripsi tes"
+                android:textSize="14sp"
+                android:inputType="textMultiLine"
+                android:layout_marginBottom="20dp"/>
 
-            <Button
-                android:id="@+id/btn_batal"
-                android:layout_width="0dp"
-                android:layout_height="59dp"
-                android:layout_weight="1"
-                android:text="Batal"
-                android:textSize="15sp"
-                android:textColor="#ffffff"
+            <!-- Unggah File Soal -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Unggah File Soal (csv)"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp"/>
 
-                android:backgroundTint="#FF0000"
-                android:layout_marginRight="16dp"/>
+            <!-- File Upload Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@drawable/info_background"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:layout_marginBottom="32dp"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_simpan"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="Simpan"
-                android:textSize="15sp"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/bgbatal" />
+                <TextView
+                    android:id="@+id/tv_file_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="[Pilih file CSV]"
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <Button
+                    android:id="@+id/btn_browse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Browse"
+                    android:textSize="13sp"
+                    android:textColor="#4CAF50"
+                    android:background="@android:color/transparent"
+                    android:paddingHorizontal="16dp"
+                    android:minWidth="0dp"/>
+            </LinearLayout>
+
+            <!-- Button Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_batal"
+                    android:layout_width="0dp"
+                    android:layout_height="55dp"
+                    android:layout_weight="1"
+                    android:text="Batal"
+                    android:textSize="15sp"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#FF0000"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="4dp"/>
+
+                <Button
+                    android:id="@+id/btn_simpan"
+                    android:layout_width="0dp"
+                    android:layout_height="55dp"
+                    android:layout_weight="1"
+                    android:text="Simpan"
+                    android:textSize="15sp"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#215CF3"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
@@ -36,7 +37,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private lateinit var profileIcon: ImageView
     private lateinit var menuIcon: ImageView
     private lateinit var titleText: TextView
-    private lateinit var fragmentContainer: LinearLayout
+    private lateinit var fragmentContainer: FrameLayout
 
     // ViewModels
     private lateinit var dashboardViewModel: DashboardViewModel
@@ -143,12 +144,24 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showDashboardContent() {
         Log.d(TAG, "showDashboardContent called")
 
+        // Debug: cek jumlah child sebelum clear
+        Log.d(TAG, "Dashboard - Child count before: ${fragmentContainer.childCount}")
+
         // Kosongkan container
         fragmentContainer.removeAllViews()
+
+        // Debug: cek jumlah child setelah clear
+        Log.d(TAG, "Dashboard - Child count after: ${fragmentContainer.childCount}")
 
         // Tambahkan layout dashboard
         val dashboardView = layoutInflater.inflate(R.layout.activity_dashboard, null)
         fragmentContainer.addView(dashboardView)
+
+        // Debug: cek ukuran view
+        dashboardView.post {
+            Log.d(TAG, "Dashboard view width: ${dashboardView.width}, height: ${dashboardView.height}")
+            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
+        }
 
         // Setup dashboard content dengan ViewModel
         setupDashboardContent(dashboardView)
@@ -292,7 +305,8 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             Log.d(TAG, "Tes list is empty, showing placeholder")
             val textView = TextView(this).apply {
                 text = "Belum ada tes yang dikerjakan"
-                setTextColor(resources.getColor(android.R.color.darker_gray, theme))
+                // Menggunakan ContextCompat.getColor dengan this@DashboardActivity
+                setTextColor(ContextCompat.getColor(this@DashboardActivity, android.R.color.darker_gray))
                 textSize = 14f
                 setPadding(0, dpToPx(32), 0, 0)
                 gravity = Gravity.CENTER
@@ -353,12 +367,122 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showTes() {
         Log.d(TAG, "showTes called")
 
+        // Debug: cek jumlah child sebelum clear
+        Log.d(TAG, "Tes - Child count before: ${fragmentContainer.childCount}")
+
         fragmentContainer.removeAllViews()
+
+        // Debug: cek jumlah child setelah clear
+        Log.d(TAG, "Tes - Child count after: ${fragmentContainer.childCount}")
+
         val tesView = layoutInflater.inflate(R.layout.kelolasoaltes, null)
         fragmentContainer.addView(tesView)
 
+        // Debug: cek ukuran view
+        tesView.post {
+            Log.d(TAG, "Tes view width: ${tesView.width}, height: ${tesView.height}")
+            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
+        }
+
         // Setup ViewModel dan load data dari API
         setupKelolaTesContent(tesView)
+    }
+
+    /**
+     * Fungsi untuk menampilkan form tambah tes baru
+     */
+    private fun showTambahTesForm() {
+        Log.d(TAG, "showTambahTesForm called")
+
+        // Debug: cek jumlah child sebelum clear
+        Log.d(TAG, "Form - Child count before: ${fragmentContainer.childCount}")
+
+        fragmentContainer.removeAllViews()
+
+        // Debug: cek jumlah child setelah clear
+        Log.d(TAG, "Form - Child count after: ${fragmentContainer.childCount}")
+
+        val tambahTesView = layoutInflater.inflate(R.layout.formtambahtes, null)
+        fragmentContainer.addView(tambahTesView)
+
+        // Debug: cek ukuran view
+        tambahTesView.post {
+            Log.d(TAG, "Form view width: ${tambahTesView.width}, height: ${tambahTesView.height}")
+            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
+        }
+
+        // Tetapkan menu navigasi tes sebagai aktif
+        navigationView.setCheckedItem(R.id.nav_tes)
+
+        // Update judul
+        titleText.text = "Tambah Tes Baru"
+
+        // Setup form tambah tes
+        setupTambahTesForm(tambahTesView)
+    }
+
+    /**
+     * Setup form tambah tes dengan semua fungsi dan listeners
+     */
+    private fun setupTambahTesForm(tambahTesView: View) {
+        Log.d(TAG, "setupTambahTesForm called")
+
+        try {
+            // Temukan views
+            val etNamaTesBaru = tambahTesView.findViewById<EditText>(R.id.et_nama_tes_baru)
+            val etDeskripsiTes = tambahTesView.findViewById<EditText>(R.id.et_deskripsi_tes)
+            val tvFileStatus = tambahTesView.findViewById<TextView>(R.id.tv_file_status)
+            val btnBrowse = tambahTesView.findViewById<Button>(R.id.btn_browse)
+            val btnBatal = tambahTesView.findViewById<Button>(R.id.btn_batal)
+            val btnSimpan = tambahTesView.findViewById<Button>(R.id.btn_simpan)
+
+            // Setup browse button untuk memilih file CSV
+            btnBrowse.setOnClickListener {
+                Toast.makeText(this, "Membuka file picker untuk CSV", Toast.LENGTH_SHORT).show()
+                // TODO: Implement file picker untuk CSV
+                tvFileStatus.text = "file_contoh.csv (Dipilih)"
+                tvFileStatus.setTextColor(Color.parseColor("#4CAF50"))
+            }
+
+            // Setup button batal (kembali ke halaman kelola tes)
+            btnBatal.setOnClickListener {
+                Log.d(TAG, "Batal button clicked")
+                showTes() // Kembali ke halaman kelola tes
+            }
+
+            // Setup button simpan
+            btnSimpan.setOnClickListener {
+                Log.d(TAG, "Simpan button clicked")
+
+                val namaTes = etNamaTesBaru.text.toString().trim()
+                val deskripsi = etDeskripsiTes.text.toString().trim()
+
+                if (namaTes.isEmpty()) {
+                    etNamaTesBaru.error = "Nama tes harus diisi"
+                    etNamaTesBaru.requestFocus()
+                    return@setOnClickListener
+                }
+
+                if (deskripsi.isEmpty()) {
+                    etDeskripsiTes.error = "Deskripsi tes harus diisi"
+                    etDeskripsiTes.requestFocus()
+                    return@setOnClickListener
+                }
+
+                // TODO: Implement save logic ke API
+                Toast.makeText(this,
+                    "Menyimpan tes:\n$namaTes\n$deskripsi",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Kembali ke halaman kelola tes setelah simpan
+                showTes()
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupTambahTesForm: ${e.message}", e)
+            Toast.makeText(this, "Error setup form: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupKelolaTesContent(tesView: View) {
@@ -371,25 +495,52 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val kelolaTesBKLayout = tesView.findViewById<LinearLayout>(R.id.kelolaTesBKLayout)
             val tambahTesBaruLayout = tesView.findViewById<LinearLayout>(R.id.tambahTesBaruLayout)
             val rvDaftarTes = tesView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvDaftarTes)
-            val progressBarTes = tesView.findViewById<ProgressBar>(R.id.progressBarTes)
+            val progressBarInitial = tesView.findViewById<ProgressBar>(R.id.progressBarInitial)
+            val mainLayout = tesView.findViewById<LinearLayout>(R.id.kelolaTesMainLayout)
             val tvErrorTes = tesView.findViewById<TextView>(R.id.tvErrorTes)
+            val swipeRefreshTes = tesView.findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipeRefreshTes)
+
+            // Temukan TextView "Tambah Tes Baru"
+            val tvTambahTesBaru = tesView.findViewById<TextView>(R.id.tvTambahTesBaru)
 
             // Setup RecyclerView
             rvDaftarTes.layoutManager = LinearLayoutManager(this)
             rvDaftarTes.setHasFixedSize(true)
+
+            // Setup SwipeRefreshLayout
+            swipeRefreshTes.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light
+            )
+
+            swipeRefreshTes.setOnRefreshListener {
+                Log.d(TAG, "Swipe refresh triggered for kelola tes")
+                kelolaTesViewModel.fetchKelolaTesData()
+            }
 
             // Setup click listeners untuk tombol aksi
             kelolaTesBKLayout.setOnClickListener {
                 Toast.makeText(this, "Membuka Kelola Soal Tes", Toast.LENGTH_SHORT).show()
             }
 
+            // Listener untuk layout Tambah Tes Baru
             tambahTesBaruLayout.setOnClickListener {
-                Toast.makeText(this, "Menambah Tes Baru", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "TambahTesBaruLayout clicked")
+                showTambahTesForm()
+            }
+
+            // Listener untuk TextView "Tambah Tes Baru"
+            tvTambahTesBaru.setOnClickListener {
+                Log.d(TAG, "tvTambahTesBaru clicked")
+                showTambahTesForm()
             }
 
             // Setup observers untuk ViewModel
             kelolaTesViewModel.kelolaTesData.observe(this) { response ->
-                progressBarTes.visibility = View.GONE
+                swipeRefreshTes.isRefreshing = false
+                progressBarInitial.visibility = View.GONE
 
                 if (response != null && response.success && response.data != null) {
                     val data = response.data
@@ -398,6 +549,10 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     Log.d(TAG, "  - Total Soal: ${data.totalSoal}")
                     Log.d(TAG, "  - Jenis Tes: ${data.jenisTes}")
                     Log.d(TAG, "  - Jumlah Tes: ${data.daftarTes.size}")
+
+                    // Tampilkan main layout
+                    mainLayout.visibility = View.VISIBLE
+                    tvErrorTes.visibility = View.GONE
 
                     // Update statistik
                     tvTotalSoal.text = data.totalSoal.toString()
@@ -414,7 +569,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                             ).show()
                         }
                         rvDaftarTes.adapter = adapter
-                        tvErrorTes.visibility = View.GONE
                     } else {
                         tvErrorTes.text = "Belum ada tes tersedia"
                         tvErrorTes.visibility = View.VISIBLE
@@ -423,6 +577,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     Toast.makeText(this, "Data tes berhasil dimuat", Toast.LENGTH_SHORT).show()
                 } else if (response != null && !response.success) {
                     Log.e(TAG, "API returned error: ${response.message}")
+                    mainLayout.visibility = View.VISIBLE
                     tvErrorTes.text = "Error: ${response.message}"
                     tvErrorTes.visibility = View.VISIBLE
 
@@ -434,14 +589,23 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
             kelolaTesViewModel.isLoading.observe(this) { isLoading ->
                 Log.d(TAG, "KelolaTes isLoading: $isLoading")
-                progressBarTes.visibility = if (isLoading) View.VISIBLE else View.GONE
+
+                if (isLoading && !swipeRefreshTes.isRefreshing) {
+                    progressBarInitial.visibility = View.VISIBLE
+                    mainLayout.visibility = View.GONE
+                }
+
+                // Nonaktifkan swipe refresh saat loading initial
+                swipeRefreshTes.isEnabled = !isLoading
             }
 
             kelolaTesViewModel.errorMessage.observe(this) { errorMessage ->
-                progressBarTes.visibility = View.GONE
+                swipeRefreshTes.isRefreshing = false
+                progressBarInitial.visibility = View.GONE
 
                 if (errorMessage != null) {
                     Log.e(TAG, "KelolaTes error: $errorMessage")
+                    mainLayout.visibility = View.VISIBLE
                     tvErrorTes.text = "Error: $errorMessage"
                     tvErrorTes.visibility = View.VISIBLE
 
@@ -452,7 +616,8 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
 
             // Tampilkan loading saat awal
-            progressBarTes.visibility = View.VISIBLE
+            progressBarInitial.visibility = View.VISIBLE
+            mainLayout.visibility = View.GONE
 
             // Load data dari API
             Log.d(TAG, "Fetching kelola tes data...")
@@ -463,9 +628,14 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             Toast.makeText(this, "Error setup: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun showSiswa() {
+        Log.d(TAG, "showSiswa called")
+
+        // Debug: cek jumlah child sebelum clear
+        Log.d(TAG, "Siswa - Child count before: ${fragmentContainer.childCount}")
+
         fragmentContainer.removeAllViews()
+
         val textView = TextView(this)
         textView.text = "Halaman Kelola Siswa\n\nFitur akan segera tersedia"
         textView.textSize = 18f
@@ -475,7 +645,13 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     private fun showGuru() {
+        Log.d(TAG, "showGuru called")
+
+        // Debug: cek jumlah child sebelum clear
+        Log.d(TAG, "Guru - Child count before: ${fragmentContainer.childCount}")
+
         fragmentContainer.removeAllViews()
+
         val textView = TextView(this)
         textView.text = "Halaman Kelola Guru\n\nFitur akan segera tersedia"
         textView.textSize = 18f
@@ -489,11 +665,27 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             override fun handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
+                } else if (titleText.text == "Tambah Tes Baru") {
+                    // Jika sedang di form tambah tes, kembali ke kelola tes
+                    showTes()
+                } else if (titleText.text == "Kelola Tes") {
+                    // Jika sedang di kelola tes, cek apakah ingin keluar app
                     if (System.currentTimeMillis() - backPressedTime < 2000) {
                         finish()
                     } else {
-                        Toast.makeText(this@DashboardActivity, "Tekan kembali sekali lagi untuk keluar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DashboardActivity,
+                            "Tekan kembali sekali lagi untuk keluar",
+                            Toast.LENGTH_SHORT).show()
+                        backPressedTime = System.currentTimeMillis()
+                    }
+                } else {
+                    // Untuk halaman lain, cek apakah ingin keluar app
+                    if (System.currentTimeMillis() - backPressedTime < 2000) {
+                        finish()
+                    } else {
+                        Toast.makeText(this@DashboardActivity,
+                            "Tekan kembali sekali lagi untuk keluar",
+                            Toast.LENGTH_SHORT).show()
                         backPressedTime = System.currentTimeMillis()
                     }
                 }
