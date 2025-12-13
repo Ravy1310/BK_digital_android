@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debug_info">Drawables yang harus ada:
+        1. jumlahsiswa
+        2. jumlahguru
+        3. jumlahtes
+        4. rectangle_2
+        5. logo_bk_digital
+        6. edittext_background
+        7. rounded_button
+        8. google_button_background
+        9. googlebutton
+        10. ic_plus_green
+    </string>
+</resources>

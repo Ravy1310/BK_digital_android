@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- File: app/src/main/res/layout/kelolasoaltes.xml -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/kelola_tes_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#BFD6E9"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:scrollbars="none">
 
     <LinearLayout
         android:id="@+id/kelolaTesMainLayout"
@@ -60,7 +62,7 @@
                             android:id="@+id/tvTotalSoal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="500"
+                            android:text="0"
                             android:textSize="28sp"
                             android:textColor="#2196F3"
                             android:textStyle="bold"/>
@@ -92,7 +94,7 @@
                             android:id="@+id/tvJenisTes"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10"
+                            android:text="0"
                             android:textSize="28sp"
                             android:textColor="#2196F3"
                             android:textStyle="bold"/>
@@ -189,7 +191,7 @@
             android:id="@+id/headerTesBK"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tes Bk"
+            android:text="Tes BK"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#000000"
@@ -206,350 +208,33 @@
             android:textColor="#000000"
             android:layout_marginBottom="16dp" />
 
-        <!-- Container untuk daftar tes -->
-        <LinearLayout
-            android:id="@+id/containerDaftarTes"
+        <!-- RecyclerView untuk daftar tes -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvDaftarTes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="16dp"
+            android:padding="8dp" />
 
-            <!-- Tes Minat Belajar -->
-            <LinearLayout
-                android:id="@+id/tesMinatBelajarLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:padding="16dp"
-                android:background="@drawable/card_background">
+        <!-- Loading indicator -->
+        <ProgressBar
+            android:id="@+id/progressBarTes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
-                <!-- Kotakan untuk icon -->
-                <LinearLayout
-                    android:id="@+id/iconContainerMinat"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/icon_backgorund"
-                    android:gravity="center"
-                    android:layout_marginEnd="16dp">
-
-                    <!-- FrameLayout untuk menumpuk elemen -->
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp">
-
-                        <!-- KOTAK BIRU (background) -->
-                        <View
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="#2196F3" />
-
-                        <!-- GAMBAR (di atas kotak biru) -->
-                        <ImageView
-                            android:id="@+id/iconMinatBelajar"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@drawable/orang"
-                            android:scaleType="centerInside"
-                            android:layout_gravity="center" />
-
-                    </FrameLayout>
-                </LinearLayout>
-
-                <!-- Container untuk teks -->
-                <LinearLayout
-                    android:id="@+id/textContainerMinat"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvTesMinatBelajar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Tes Minat Belajar"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvDeskripsiMinat"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Mengukur minat belajar siswa"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/tvJumlahSoalMinat"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="50 soal"
-                        android:textSize="14sp"
-                        android:textColor="#2196F3"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Tes Personalitas -->
-            <LinearLayout
-                android:id="@+id/tesPersonalitasLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:padding="15dp"
-                android:background="@drawable/card_background">
-
-                <!-- Kotakan untuk icon -->
-                <LinearLayout
-                    android:id="@+id/iconContainerPersonalitas"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/icon_backgorund"
-                    android:gravity="center"
-                    android:layout_marginEnd="16dp">
-
-                    <!-- FrameLayout untuk menumpuk elemen -->
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp">
-
-                        <!-- KOTAK BIRU (background) -->
-                        <View
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="#2196F3" />
-
-                        <!-- GAMBAR (di atas kotak biru) -->
-                        <ImageView
-                            android:id="@+id/iconPersonalitas"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@drawable/orang"
-                            android:scaleType="centerInside"
-                            android:layout_gravity="center" />
-
-                    </FrameLayout>
-                </LinearLayout>
-
-                <!-- Container untuk teks -->
-                <LinearLayout
-                    android:id="@+id/textContainerPersonalitas"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvTesPersonalitas"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Tes Personalitas"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvDeskripsiPersonalitas"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Mengukur kecenderungan kepribadian siswa"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/tvJumlahSoalPersonalitas"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="60 soal"
-                        android:textSize="14sp"
-                        android:textColor="#2196F3"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Tes Penjurusan -->
-            <LinearLayout
-                android:id="@+id/tesPenjurusanLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:padding="16dp"
-                android:background="@drawable/card_background">
-
-                <!-- Kotakan untuk icon -->
-                <LinearLayout
-                    android:id="@+id/iconContainerPenjurusan"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/icon_backgorund"
-                    android:gravity="center"
-                    android:layout_marginEnd="16dp">
-
-                    <!-- FrameLayout untuk menumpuk elemen -->
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp">
-
-                        <!-- KOTAK BIRU (background) -->
-                        <View
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="#2196F3" />
-
-                        <!-- GAMBAR (di atas kotak biru) -->
-                        <ImageView
-                            android:id="@+id/iconPenjurusan"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@drawable/orang"
-                            android:scaleType="centerInside"
-                            android:layout_gravity="center" />
-
-                    </FrameLayout>
-                </LinearLayout>
-
-                <!-- Container untuk teks -->
-                <LinearLayout
-                    android:id="@+id/textContainerPenjurusan"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvTesPenjurusan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Tes Penjurusan"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvDeskripsiPenjurusan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Mengukur kecenderungan kejuruan"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/tvJumlahSoalPenjurusan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="60 soal"
-                        android:textSize="14sp"
-                        android:textColor="#2196F3"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Tes Kematangan Emosi -->
-            <LinearLayout
-                android:id="@+id/tesKematanganEmosiLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:padding="16dp"
-                android:background="@drawable/card_background">
-
-                <!-- Kotakan untuk icon -->
-                <LinearLayout
-                    android:id="@+id/iconContainerKematangan"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@drawable/icon_backgorund"
-                    android:gravity="center"
-                    android:layout_marginEnd="16dp">
-
-                    <!-- FrameLayout untuk menumpuk elemen -->
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp">
-
-                        <!-- KOTAK BIRU (background) -->
-                        <View
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="#2196F3" />
-
-                        <!-- GAMBAR (di atas kotak biru) -->
-                        <ImageView
-                            android:id="@+id/iconKematanganEmosi"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@drawable/orang"
-                            android:scaleType="centerInside"
-                            android:layout_gravity="center" />
-
-                    </FrameLayout>
-                </LinearLayout>
-
-                <!-- Container untuk teks -->
-                <LinearLayout
-                    android:id="@+id/textContainerKematangan"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvTesKematanganEmosi"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Tes Kematangan Emosi"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvDeskripsiKematangan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Mengukur kemampuan mengelola emosi"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/tvJumlahSoalKematangan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="60 soal"
-                        android:textSize="14sp"
-                        android:textColor="#2196F3"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        <!-- Error message -->
+        <TextView
+            android:id="@+id/tvErrorTes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gagal memuat data"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

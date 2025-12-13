@@ -1,6 +1,8 @@
+// File: app/src/main/java/com/example/login/ui/dashboard/DashboardActivity.kt
 package com.example.login.ui.dashboard
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -13,9 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.login.R
+import com.example.login.adapter.TesAdapter
 import com.example.login.ui.auth.LoginActivity
 import com.example.login.viewmodel.DashboardViewModel
+import com.example.login.viewmodel.KelolaTesViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -33,8 +38,9 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private lateinit var titleText: TextView
     private lateinit var fragmentContainer: LinearLayout
 
-    // ViewModel
-    private lateinit var viewModel: DashboardViewModel
+    // ViewModels
+    private lateinit var dashboardViewModel: DashboardViewModel
+    private lateinit var kelolaTesViewModel: KelolaTesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +50,10 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // Initialize Navigation Views
         initializeViews()
 
-        // Setup ViewModel
-        viewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
-        Log.d(TAG, "ViewModel initialized")
+        // Setup ViewModels
+        dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
+        kelolaTesViewModel = ViewModelProvider(this).get(KelolaTesViewModel::class.java)
+        Log.d(TAG, "ViewModels initialized")
 
         // Setup navigation
         setupNavigation()
@@ -172,22 +179,22 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
             swipeRefresh.setOnRefreshListener {
                 Log.d(TAG, "Swipe refresh triggered")
-                viewModel.fetchDashboardData()
+                dashboardViewModel.fetchDashboardData()
             }
 
             btnRetry.setOnClickListener {
                 Log.d(TAG, "Retry button clicked")
-                viewModel.fetchDashboardData()
+                dashboardViewModel.fetchDashboardData()
             }
 
             // Setup ViewModel observers
-            setupViewModelObservers(tvJumlahSiswa, tvJumlahGuru, tvJumlahTes,
+            setupDashboardViewModelObservers(tvJumlahSiswa, tvJumlahGuru, tvJumlahTes,
                 containerTesTerpopuler, swipeRefresh,
                 progressBar, errorLayout, tvErrorMessage)
 
             // Load initial data
             Log.d(TAG, "Calling fetchDashboardData()")
-            viewModel.fetchDashboardData()
+            dashboardViewModel.fetchDashboardData()
 
         } catch (e: Exception) {
             Log.e(TAG, "Error in setupDashboardContent: ${e.message}", e)
@@ -195,7 +202,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
     }
 
-    private fun setupViewModelObservers(
+    private fun setupDashboardViewModelObservers(
         tvJumlahSiswa: TextView,
         tvJumlahGuru: TextView,
         tvJumlahTes: TextView,
@@ -207,7 +214,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     ) {
         Log.d(TAG, "Setting up ViewModel observers")
 
-        viewModel.dashboardData.observe(this) { data ->
+        dashboardViewModel.dashboardData.observe(this) { data ->
             Log.d(TAG, "dashboardData observer triggered, data: ${data != null}")
 
             swipeRefresh.isRefreshing = false
@@ -246,7 +253,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
         }
 
-        viewModel.isLoading.observe(this) { isLoading ->
+        dashboardViewModel.isLoading.observe(this) { isLoading ->
             Log.d(TAG, "isLoading observer: $isLoading")
 
             if (isLoading && !swipeRefresh.isRefreshing) {
@@ -255,7 +262,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
         }
 
-        viewModel.errorMessage.observe(this) { errorMessage ->
+        dashboardViewModel.errorMessage.observe(this) { errorMessage ->
             Log.d(TAG, "errorMessage observer: $errorMessage")
 
             swipeRefresh.isRefreshing = false
@@ -341,10 +348,120 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     /**
-     * Konversi dp ke px
+     * Fungsi untuk menampilkan halaman Kelola Tes dengan data dari API
      */
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
+    private fun showTes() {
+        Log.d(TAG, "showTes called")
+
+        fragmentContainer.removeAllViews()
+        val tesView = layoutInflater.inflate(R.layout.kelolasoaltes, null)
+        fragmentContainer.addView(tesView)
+
+        // Setup ViewModel dan load data dari API
+        setupKelolaTesContent(tesView)
+    }
+
+    private fun setupKelolaTesContent(tesView: View) {
+        Log.d(TAG, "setupKelolaTesContent called")
+
+        try {
+            // Temukan semua views dari XML
+            val tvTotalSoal = tesView.findViewById<TextView>(R.id.tvTotalSoal)
+            val tvJenisTes = tesView.findViewById<TextView>(R.id.tvJenisTes)
+            val kelolaTesBKLayout = tesView.findViewById<LinearLayout>(R.id.kelolaTesBKLayout)
+            val tambahTesBaruLayout = tesView.findViewById<LinearLayout>(R.id.tambahTesBaruLayout)
+            val rvDaftarTes = tesView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvDaftarTes)
+            val progressBarTes = tesView.findViewById<ProgressBar>(R.id.progressBarTes)
+            val tvErrorTes = tesView.findViewById<TextView>(R.id.tvErrorTes)
+
+            // Setup RecyclerView
+            rvDaftarTes.layoutManager = LinearLayoutManager(this)
+            rvDaftarTes.setHasFixedSize(true)
+
+            // Setup click listeners untuk tombol aksi
+            kelolaTesBKLayout.setOnClickListener {
+                Toast.makeText(this, "Membuka Kelola Soal Tes", Toast.LENGTH_SHORT).show()
+            }
+
+            tambahTesBaruLayout.setOnClickListener {
+                Toast.makeText(this, "Menambah Tes Baru", Toast.LENGTH_SHORT).show()
+            }
+
+            // Setup observers untuk ViewModel
+            kelolaTesViewModel.kelolaTesData.observe(this) { response ->
+                progressBarTes.visibility = View.GONE
+
+                if (response != null && response.success && response.data != null) {
+                    val data = response.data
+
+                    Log.d(TAG, "✓ Data tes berhasil dimuat:")
+                    Log.d(TAG, "  - Total Soal: ${data.totalSoal}")
+                    Log.d(TAG, "  - Jenis Tes: ${data.jenisTes}")
+                    Log.d(TAG, "  - Jumlah Tes: ${data.daftarTes.size}")
+
+                    // Update statistik
+                    tvTotalSoal.text = data.totalSoal.toString()
+                    tvJenisTes.text = data.jenisTes.toString()
+
+                    // Update daftar tes di RecyclerView
+                    if (data.daftarTes.isNotEmpty()) {
+                        val adapter = TesAdapter(data.daftarTes) { tes ->
+                            val statusText = if (tes.status == "aktif") "Aktif" else "Nonaktif"
+                            Toast.makeText(
+                                this,
+                                "${tes.namaTes}\n${tes.jumlahSoal} soal - Status: $statusText",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        rvDaftarTes.adapter = adapter
+                        tvErrorTes.visibility = View.GONE
+                    } else {
+                        tvErrorTes.text = "Belum ada tes tersedia"
+                        tvErrorTes.visibility = View.VISIBLE
+                    }
+
+                    Toast.makeText(this, "Data tes berhasil dimuat", Toast.LENGTH_SHORT).show()
+                } else if (response != null && !response.success) {
+                    Log.e(TAG, "API returned error: ${response.message}")
+                    tvErrorTes.text = "Error: ${response.message}"
+                    tvErrorTes.visibility = View.VISIBLE
+
+                    // Tampilkan data default jika error
+                    tvTotalSoal.text = "0"
+                    tvJenisTes.text = "0"
+                }
+            }
+
+            kelolaTesViewModel.isLoading.observe(this) { isLoading ->
+                Log.d(TAG, "KelolaTes isLoading: $isLoading")
+                progressBarTes.visibility = if (isLoading) View.VISIBLE else View.GONE
+            }
+
+            kelolaTesViewModel.errorMessage.observe(this) { errorMessage ->
+                progressBarTes.visibility = View.GONE
+
+                if (errorMessage != null) {
+                    Log.e(TAG, "KelolaTes error: $errorMessage")
+                    tvErrorTes.text = "Error: $errorMessage"
+                    tvErrorTes.visibility = View.VISIBLE
+
+                    // Tampilkan data default jika error
+                    tvTotalSoal.text = "0"
+                    tvJenisTes.text = "0"
+                }
+            }
+
+            // Tampilkan loading saat awal
+            progressBarTes.visibility = View.VISIBLE
+
+            // Load data dari API
+            Log.d(TAG, "Fetching kelola tes data...")
+            kelolaTesViewModel.fetchKelolaTesData()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupKelolaTesContent: ${e.message}", e)
+            Toast.makeText(this, "Error setup: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showSiswa() {
@@ -367,13 +484,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Toast.makeText(this, "Kelola Data Guru", Toast.LENGTH_SHORT).show()
     }
 
-    private fun showTes() {
-        fragmentContainer.removeAllViews()
-        val tesView = layoutInflater.inflate(R.layout.kelolasoaltes, null)
-        fragmentContainer.addView(tesView)
-        Toast.makeText(this, "Kelola Tes", Toast.LENGTH_SHORT).show()
-    }
-
     private fun setupBackPressedHandler() {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -393,6 +503,13 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     private var backPressedTime: Long = 0
+
+    /**
+     * Konversi dp ke px
+     */
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
 
     private fun logoutUser() {
         try {

@@ -2,6 +2,7 @@
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -271,13 +272,24 @@
                 android:padding="32dp"
                 android:visibility="gone">
 
-                <ImageView
+                <!-- Solusi 1: Ganti dengan AppCompatImageView -->
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iv_error_icon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:src="@android:drawable/ic_dialog_alert"
-                    android:tint="#FF6B6B"
+                    app:tint="#FF6B6B"
                     android:layout_marginBottom="16dp"/>
+
+                <!-- Solusi 2: Atau gunakan ImageView biasa tanpa tint -->
+                <!--
+                <ImageView
+                    android:id="@+id/iv_error_icon"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_error"  // Gunakan drawable custom
+                    android:layout_marginBottom="16dp"/>
+                -->
 
                 <TextView
                     android:id="@+id/tv_error_message"
@@ -296,8 +308,8 @@
                     android:text="Coba Lagi"
                     android:paddingHorizontal="24dp"
                     android:paddingVertical="12dp"
-                    android:backgroundTint="#1E40AF"
-                    android:textColor="#FFFFFF"/>
+                    app:backgroundTint="#1E40AF"
+                    android:textColor="#FFFFFF" />
 
             </LinearLayout>
 
