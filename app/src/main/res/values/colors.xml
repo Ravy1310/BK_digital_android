@@ -36,4 +36,30 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="purple_200">#FFBB86FC</color>
+
+
+
+        <!-- Warna utama -->
+        <color name="red_primary">#C60000</color>
+        <color name="red_dark">#710303</color>
+
+        <!-- Warna status -->
+        <color name="green_light">#D4EDDA</color>
+        <color name="green_dark">#155724</color>
+        <color name="red_light">#F8D7DA</color>
+        <color name="red_status">#721C24</color>
+        <color name="green_success">#198754</color>
+        <!-- Warna teks -->
+    <color name="gray_500">#6B7280</color>
+    <color name="gray_600">#4B5563</color>
+    <color name="gray_700">#374151</color>
+    <color name="gray_800">#1F2937</color>
+
+
+
+        <!-- Warna warning (kuning/orange seperti di web) -->
+        <color name="yellow_warning">#FFC107</color>
+        <color name="yellow_warning_dark">#E0A800</color>
+
+
 </resources>

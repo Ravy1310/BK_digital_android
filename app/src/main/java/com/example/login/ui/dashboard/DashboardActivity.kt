@@ -1,9 +1,14 @@
 // File: app/src/main/java/com/example/login/ui/dashboard/DashboardActivity.kt
 package com.example.login.ui.dashboard
 
+import android.app.ProgressDialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
@@ -19,13 +24,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.login.R
 import com.example.login.adapter.TesAdapter
+import com.example.login.api.ApiClient
+import com.example.login.models.TambahTesRequest
 import com.example.login.ui.auth.LoginActivity
 import com.example.login.viewmodel.DashboardViewModel
 import com.example.login.viewmodel.KelolaTesViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import android.os.Handler
+import android.os.Looper
+import java.io.ByteArrayInputStream
 class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     // TAG untuk debugging
@@ -42,6 +57,15 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     // ViewModels
     private lateinit var dashboardViewModel: DashboardViewModel
     private lateinit var kelolaTesViewModel: KelolaTesViewModel
+
+    // Variables untuk file CSV
+    private var selectedFileUri: Uri? = null
+    private var selectedFileName: String? = null
+
+    // Request codes
+    companion object {
+        private const val REQUEST_CODE_PICK_CSV = 1001
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -384,6 +408,10 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
         }
 
+        // Reset selected file
+        selectedFileUri = null
+        selectedFileName = null
+
         // Setup ViewModel dan load data dari API
         setupKelolaTesContent(tesView)
     }
@@ -436,12 +464,16 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val btnBatal = tambahTesView.findViewById<Button>(R.id.btn_batal)
             val btnSimpan = tambahTesView.findViewById<Button>(R.id.btn_simpan)
 
+            // Reset status file
+            selectedFileUri = null
+            selectedFileName = null
+            tvFileStatus.text = "[Pilih file CSV]"
+            tvFileStatus.setTextColor(Color.parseColor("#888888"))
+
             // Setup browse button untuk memilih file CSV
             btnBrowse.setOnClickListener {
-                Toast.makeText(this, "Membuka file picker untuk CSV", Toast.LENGTH_SHORT).show()
-                // TODO: Implement file picker untuk CSV
-                tvFileStatus.text = "file_contoh.csv (Dipilih)"
-                tvFileStatus.setTextColor(Color.parseColor("#4CAF50"))
+                Log.d(TAG, "Browse button clicked")
+                openFilePicker()
             }
 
             // Setup button batal (kembali ke halaman kelola tes)
@@ -457,6 +489,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 val namaTes = etNamaTesBaru.text.toString().trim()
                 val deskripsi = etDeskripsiTes.text.toString().trim()
 
+                // Validasi input
                 if (namaTes.isEmpty()) {
                     etNamaTesBaru.error = "Nama tes harus diisi"
                     etNamaTesBaru.requestFocus()
@@ -469,14 +502,177 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     return@setOnClickListener
                 }
 
-                // TODO: Implement save logic ke API
-                Toast.makeText(this,
-                    "Menyimpan tes:\n$namaTes\n$deskripsi",
-                    Toast.LENGTH_LONG
-                ).show()
+                if (selectedFileUri == null) {
+                    Toast.makeText(
+                        this,
+                        "Silakan pilih file CSV terlebih dahulu",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
 
-                // Kembali ke halaman kelola tes setelah simpan
-                showTes()
+                // Tampilkan progress dialog
+                val progressDialog = ProgressDialog(this).apply {
+                    setMessage("Mengupload tes ke server...")
+                    setCancelable(false)
+                }
+                progressDialog.show()
+
+                // Baca file CSV dan kirim ke API
+                try {
+                    val csvContent = readCSVFile(selectedFileUri!!)
+                    if (csvContent == null) {
+                        progressDialog.dismiss()
+                        Toast.makeText(
+                            this,
+                            "Gagal membaca file CSV",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@setOnClickListener
+                    }
+
+                    // Validasi minimal CSV memiliki header
+                    if (!csvContent.contains("PERTANYAAN") || !csvContent.contains("OPSI_A")) {
+                        progressDialog.dismiss()
+                        Toast.makeText(
+                            this,
+                            "Format CSV tidak valid. Pastikan file memiliki header yang benar",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@setOnClickListener
+                    }
+
+                    Log.d(TAG, "CSV content length: ${csvContent.length}")
+                    Log.d(TAG, "First 500 chars of CSV: ${csvContent.take(500)}...")
+
+                    // Kirim ke API SEDERHANA tanpa token
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val request = TambahTesRequest(
+                                nama_tes = namaTes,
+                                deskripsi_tes = deskripsi,
+                                csv_content = csvContent
+                            )
+
+                            Log.d(TAG, "Mengirim request ke API...")
+                            Log.d(TAG, "Nama Tes: ${request.nama_tes}")
+                            Log.d(TAG, "Deskripsi length: ${request.deskripsi_tes.length}")
+                            Log.d(TAG, "CSV lines: ${csvContent.lines().size}")
+
+                            // Gunakan API sederhana tanpa token
+                            val response = ApiClient.apiService.tambahTes(request)
+
+                            withContext(Dispatchers.Main) {
+                                progressDialog.dismiss()
+
+                                if (response.isSuccessful) {
+                                    val result = response.body()
+                                    Log.d(TAG, "API Response Status: ${response.code()}")
+                                    Log.d(TAG, "API Response Body: $result")
+
+                                    if (result != null) {
+                                        if (result.status == "success") {
+                                            Toast.makeText(
+                                                this@DashboardActivity,
+                                                "✅ ${result.message}\nID Tes: ${result.tes_id}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+
+                                            // Refresh halaman kelola tes setelah 2 detik
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                showTes()
+                                            }, 2000)
+
+                                        } else {
+                                            Toast.makeText(
+                                                this@DashboardActivity,
+                                                "❌ ${result.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    } else {
+                                        Log.e(TAG, "Response body is null")
+                                        Toast.makeText(
+                                            this@DashboardActivity,
+                                            "❌ Tidak ada response dari server",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                } else {
+                                    val errorCode = response.code()
+                                    val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                                    Log.e(TAG, "API Error Code: $errorCode")
+                                    Log.e(TAG, "API Error Body: $errorBody")
+
+                                    val errorMessage = when (errorCode) {
+                                        400 -> "Bad Request: Data tidak valid"
+                                        404 -> "Endpoint tidak ditemukan"
+                                        500 -> "Server error: Silakan coba lagi nanti"
+                                        502 -> "Bad Gateway: Server sedang maintenance"
+                                        503 -> "Service Unavailable: Server sedang sibuk"
+                                        else -> "Error $errorCode: $errorBody"
+                                    }
+
+                                    Toast.makeText(
+                                        this@DashboardActivity,
+                                        "❌ $errorMessage",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        } catch (e: java.net.SocketTimeoutException) {
+                            withContext(Dispatchers.Main) {
+                                progressDialog.dismiss()
+                                Log.e(TAG, "Socket timeout: ${e.message}", e)
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ Timeout: Koneksi ke server terlalu lama",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } catch (e: java.net.UnknownHostException) {
+                            withContext(Dispatchers.Main) {
+                                progressDialog.dismiss()
+                                Log.e(TAG, "Unknown host: ${e.message}", e)
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ Tidak dapat terhubung ke server. Cek koneksi internet",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } catch (e: java.io.IOException) {
+                            withContext(Dispatchers.Main) {
+                                progressDialog.dismiss()
+                                Log.e(TAG, "IO Error: ${e.message}", e)
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ Network error: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                progressDialog.dismiss()
+                                Log.e(TAG, "Unexpected error: ${e.message}", e)
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ Error: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error processing CSV: ${e.message}", e)
+                    Toast.makeText(
+                        this,
+                        "❌ Error membaca file: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
         } catch (e: Exception) {
@@ -484,6 +680,201 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             Toast.makeText(this, "Error setup form: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
+
+    /**
+     * Fungsi untuk membuka file picker
+     */
+    private fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "*/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
+
+            // Filter untuk file CSV
+            val mimeTypes = arrayOf(
+                "text/csv",
+                "text/comma-separated-values",
+                "application/csv",
+                "application/vnd.ms-excel",
+                "text/plain"
+            )
+
+            putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        }
+
+        try {
+            startActivityForResult(
+                Intent.createChooser(intent, "Pilih File CSV"),
+                REQUEST_CODE_PICK_CSV
+            )
+        } catch (ex: ActivityNotFoundException) {
+            Toast.makeText(
+                this,
+                "Silakan install file manager untuk memilih file",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    /**
+     * Fungsi untuk membaca file CSV menjadi string
+     */
+    /**
+     * Fungsi untuk membaca file CSV menjadi string (VERSI DIPERBAIKI)
+     */
+    private fun readCSVFile(uri: Uri): String? {
+        return try {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                // BACA SEMUA BYTE DULU ke ByteArray (ini mendukung reset)
+                val bytes = inputStream.readBytes()
+
+                // Coba berbagai encoding
+                val encodings = listOf("UTF-8", "ISO-8859-1", "Windows-1252")
+                var content: String? = null
+
+                for (encoding in encodings) {
+                    try {
+                        // Buat ByteArrayInputStream baru untuk setiap encoding
+                        val byteArrayStream = ByteArrayInputStream(bytes)
+                        val reader = BufferedReader(InputStreamReader(byteArrayStream, encoding))
+                        val stringBuilder = StringBuilder()
+                        var line: String?
+
+                        while (reader.readLine().also { line = it } != null) {
+                            stringBuilder.append(line)
+                            stringBuilder.append("\n")
+                        }
+
+                        reader.close()
+
+                        val testContent = stringBuilder.toString()
+                        // Validasi sederhana: pastikan tidak banyak karakter aneh
+                        if (testContent.isNotEmpty() && !testContent.contains("�")) {
+                            content = testContent
+                            Log.d(TAG, "Successfully read CSV with encoding: $encoding")
+                            break
+                        }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed with encoding $encoding: ${e.message}")
+                        // Lanjut ke encoding berikutnya
+                    }
+                }
+
+                // Fallback ke UTF-8 jika semua gagal
+                if (content == null) {
+                    content = String(bytes, Charsets.UTF_8)
+                    Log.d(TAG, "Using UTF-8 fallback")
+                }
+
+                // Log untuk debugging
+                if (content != null) {
+                    Log.d(TAG, "CSV Content loaded: ${content.length} characters")
+                    Log.d(TAG, "First 3 lines of CSV:")
+                    content.lines().take(3).forEachIndexed { index, line ->
+                        Log.d(TAG, "Line $index: $line")
+                    }
+
+                    // Hapus BOM character jika ada
+                    if (content.startsWith("\uFEFF")) {
+                        Log.d(TAG, "Detected BOM character, removing...")
+                        content = content.substring(1)
+                    }
+                }
+
+                content
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading CSV file: ${e.message}", e)
+            null
+        }
+    }
+    /**
+     * Handle activity result untuk file picker
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_PICK_CSV && resultCode == RESULT_OK) {
+            data?.data?.let { uri ->
+                try {
+                    // Simpan URI file
+                    selectedFileUri = uri
+
+                    // Dapatkan nama file
+                    selectedFileName = getFileNameFromUri(uri)
+
+                    // Update UI
+                    val tambahTesView = fragmentContainer.getChildAt(0)
+                    val tvFileStatus = tambahTesView.findViewById<TextView?>(R.id.tv_file_status)
+
+                    if (tvFileStatus != null && selectedFileName != null) {
+                        tvFileStatus.text = "$selectedFileName (Dipilih)"
+                        tvFileStatus.setTextColor(Color.parseColor("#4CAF50"))
+
+                        // Set nama file sebagai nama tes default jika kosong
+                        val etNamaTesBaru = tambahTesView.findViewById<EditText?>(R.id.et_nama_tes_baru)
+                        if (etNamaTesBaru != null && etNamaTesBaru.text.toString().trim().isEmpty()) {
+                            val baseName = selectedFileName!!.substringBeforeLast(".")
+                            if (baseName.isNotEmpty()) {
+                                etNamaTesBaru.setText(baseName)
+                            }
+                        }
+                    }
+
+//                    // Preview CSV content (opsional)
+//                    try {
+//                        val csvPreview = readCSVFile(uri)?.lines()?.take(3)?.joinToString("\n")
+//                        Log.d(TAG, "CSV Preview:\n$csvPreview")
+//                    } catch (e: Exception) {
+//                        Log.w(TAG, "Could not preview CSV: ${e.message}")
+//                    }
+
+                    Toast.makeText(
+                        this,
+                        "File dipilih: $selectedFileName",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    Log.d(TAG, "File selected: $selectedFileName")
+
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error processing selected file: ${e.message}", e)
+                    Toast.makeText(
+                        this,
+                        "Error memilih file: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Fungsi untuk mendapatkan nama file dari URI
+     */
+    private fun getFileNameFromUri(uri: Uri): String? {
+        var fileName: String? = null
+
+        // Coba dapatkan nama file dari cursor
+        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (displayNameIndex != -1) {
+                    fileName = cursor.getString(displayNameIndex)
+                }
+            }
+        }
+
+        // Jika tidak dapat dari cursor, coba dari path
+        if (fileName.isNullOrEmpty()) {
+            val path = uri.path
+            if (path != null) {
+                fileName = path.substringAfterLast("/")
+            }
+        }
+
+        return fileName ?: "unknown.csv"
+    }
+
 
     private fun setupKelolaTesContent(tesView: View) {
         Log.d(TAG, "setupKelolaTesContent called")
@@ -628,6 +1019,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             Toast.makeText(this, "Error setup: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun showSiswa() {
         Log.d(TAG, "showSiswa called")
 
