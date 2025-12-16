@@ -4,16 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF">
+    android:background="#D6E6F3">
 
-    <!-- Header dengan background putih -->
+    <!-- Header tanpa background putih -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#ffffff"
         android:padding="12dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        android:background="#D6E6F3">
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,17 +38,18 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="12dp"
-        android:background="#F5F5F5">
+        android:background="#BFD6E9">
 
         <!-- Satu kotak besar berisi semua soal - DIPERKECIL -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#FFFFFF"
             android:padding="10dp"
-            android:elevation="0.5dp">
+            android:layout_margin="12dp"
+            android:elevation="0.5dp"
+            android:minHeight="800dp"
+            android:background="@drawable/kotaksoal">
 
             <!-- Judul "Total 3 soal untuk tes ini" di bagian atas kotak -->
             <TextView
@@ -105,6 +106,49 @@
                     android:textSize="11sp"
                     android:textColor="#333333"
                     android:paddingLeft="2dp"/>
+
+                <!-- Tombol Edit dan Hapus untuk Soal 1 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <!-- TextView Edit -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/edit"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="Edit"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp"
+                        android:drawableLeft="@drawable/edttttt"
+                        android:drawablePadding="2dp"
+                        android:drawableWidth="12dp"
+                        android:drawableHeight="12dp" />
+
+                    <!-- TextView Hapus -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/hapus"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="hapus"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp"
+                        android:drawableLeft="@drawable/hpss"
+                        android:drawablePadding="2dp"
+                        android:drawableWidth="12dp"
+                        android:drawableHeight="12dp" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Garis pemisah antar soal - DIPERKECIL -->
@@ -159,6 +203,49 @@
                     android:textSize="11sp"
                     android:textColor="#333333"
                     android:paddingLeft="2dp"/>
+
+                <!-- Tombol Edit dan Hapus untuk Soal 2 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <!-- TextView Edit -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/edit"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="Edit"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp"
+                        android:drawableLeft="@drawable/edttttt"
+                        android:drawablePadding="2dp"
+                        android:drawableWidth="12dp"
+                        android:drawableHeight="12dp" />
+
+                    <!-- TextView Hapus -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/hapus"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="hapus"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp"
+                        android:drawableLeft="@drawable/hpss"
+                        android:drawablePadding="2dp"
+                        android:drawableWidth="12dp"
+                        android:drawableHeight="12dp" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Garis pemisah antar soal - DIPERKECIL -->
@@ -213,6 +300,48 @@
                     android:textSize="11sp"
                     android:textColor="#333333"
                     android:paddingLeft="2dp"/>
+
+                <!-- Tombol Edit dan Hapus untuk Soal 3 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <!-- TextView Edit -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/edit"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="Edit"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp"
+                        android:drawableLeft="@drawable/edttttt"
+                        android:drawablePadding="2dp"
+                        android:drawableWidth="12dp"
+                        android:drawableHeight="12dp" />
+
+                    <!-- TextView Hapus -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/hapus"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="hapus"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp"
+                        android:drawableLeft="@drawable/hpss"
+                        android:drawablePadding="2dp"
+                        android:drawableWidth="12dp"
+                        android:drawableHeight="12dp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Garis horizontal tipis - DIPERKECIL -->
@@ -223,82 +352,49 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="6dp"/>
 
-            <!-- Tombol Edit dan label "Inputs" dalam satu baris - DIPERKECIL -->
+            <!-- Garis pemisah sebelum tombol -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Tombol Tambah Soal Baru dan Batal dalam satu baris -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="0dp">
 
-                <TextView
+                <!-- Tombol Tambah Soal Baru dengan ikon + -->
+                <Button
+                    android:id="@+id/btnTambahSoal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Edit"
-                    android:textSize="10sp"
+                    android:layout_marginEnd="8dp"
+                    android:text="+ Tambah soal baru"
+                    android:textSize="12sp"
+                    android:textColor="#4CAF50"
+                    android:background="@android:color/transparent"
+                    android:padding="6dp"
+                    android:textAllCaps="false"
+                    android:drawablePadding="3dp"
+                    android:drawableLeft="@drawable/tambah"/>
+
+                <!-- Tombol Batal -->
+                <Button
+                    android:id="@+id/btnBatal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Batal"
+                    android:textSize="12sp"
                     android:textColor="#666666"
-                    android:layout_marginRight="4dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Inputs"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#333333"/>
+                    android:background="@drawable/batal"
+                    android:padding="6dp"
+                    android:textAllCaps="false"/>
             </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Footer dengan tombol - DIPERKECIL -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp"
-        android:background="#FFFFFF">
-
-        <!-- Garis pemisah -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="#E0E0E0"
-            android:layout_marginBottom="10dp"/>
-
-        <!-- Tombol Tambah Soal Baru dengan ikon + -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:background="#FFFFFF"
-            android:gravity="center">
-
-            <!-- Tombol Tambah Soal Baru dengan ikon + -->
-            <Button
-                android:id="@+id/btnTambahSoal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:text="+ Tambah soal baru"
-                android:textSize="13sp"
-                android:textColor="#4CAF50"
-                android:background="@android:color/transparent"
-                android:padding="8dp"
-                android:textAllCaps="false"
-                android:drawablePadding="4dp"
-                android:drawableLeft="@drawable/ic_plus_green"/>
-
-            <!-- Tombol Batal -->
-            <Button
-                android:id="@+id/btnBatal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Batal"
-                android:textSize="13sp"
-                android:textColor="#666666"
-                android:background="@android:color/transparent"
-                android:padding="8dp"
-                android:textAllCaps="false"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
