@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BFD6E9"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tambah Data Guru"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp" />
+
+        <!-- Form Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:elevation="4dp"
+            android:gravity="center_horizontal">
+
+            <!-- Nama Field -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nama"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:hint="Masukkan nama guru"
+                android:layout_marginBottom="24dp" />
+
+            <!-- No.Tlp Field -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No.Tlp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:hint="Masukkan nomor telepon"
+                android:inputType="phone"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Alamat Field -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alamat"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@drawable/edittext_background"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:hint="Masukkan alamat"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Buttons Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <!-- Button Batal -->
+                <Button
+                    android:id="@+id/btnBatal"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Batal"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/buttonbatal"
+                    android:elevation="2dp" />
+
+                <!-- Button Simpan -->
+                <Button
+                    android:id="@+id/btnSimpan"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Simpan"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_background"
+                    android:elevation="4dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
