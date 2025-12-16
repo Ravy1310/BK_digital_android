@@ -1,15 +1,19 @@
 // File: app/src/main/java/com/example/login/adapter/KelolaSoalAdapter.kt
 package com.example.login.adapter
 
+import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.login.R
 import com.example.login.api.ApiClient
+import com.example.login.models.HapusTesRequest  // Import model
 import com.example.login.models.TesDetail
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -18,8 +22,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class KelolaSoalAdapter(
-    private val tesList: List<TesDetail>, // Gunakan TesDetail bukan KelolaSoalResponse
-    private val onItemClick: (TesDetail) -> Unit // Callback dengan parameter TesDetail
+    private val tesList: List<TesDetail>,
+    private val onItemClick: (TesDetail) -> Unit,
+    private val onEditClick: (TesDetail) -> Unit
 ) : RecyclerView.Adapter<KelolaSoalAdapter.TesViewHolder>() {
 
     private val TAG = "KelolaSoalAdapter"
@@ -71,16 +76,18 @@ class KelolaSoalAdapter(
 
         // Setup edit button
         holder.btnEditTes.setOnClickListener {
-            Toast.makeText(holder.itemView.context,
-                "Edit tes: ${tes.kategoriTes}",
-                Toast.LENGTH_SHORT).show()
+            if (holder.adapterPosition != RecyclerView.NO_POSITION) {
+                val currentTes = currentList[holder.adapterPosition]
+                onEditClick(currentTes)
+            }
         }
 
         // Setup hapus button
         holder.btnHapusTes.setOnClickListener {
-            Toast.makeText(holder.itemView.context,
-                "Hapus tes: ${tes.kategoriTes}",
-                Toast.LENGTH_SHORT).show()
+            if (holder.adapterPosition != RecyclerView.NO_POSITION) {
+                val tesToDelete = currentList[holder.adapterPosition]
+                showDeleteConfirmation(holder.itemView.context, tesToDelete, holder.adapterPosition)
+            }
         }
     }
 
@@ -161,6 +168,80 @@ class KelolaSoalAdapter(
                 withContext(Dispatchers.Main) {
                     holder.btnToggleStatus.isEnabled = true
                     holder.btnToggleStatus.text = originalText
+                    Toast.makeText(context,
+                        "❌ Error: ${e.message}",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // Konfirmasi hapus
+    private fun showDeleteConfirmation(context: Context, tes: TesDetail, position: Int) {
+        AlertDialog.Builder(context)
+            .setTitle("Konfirmasi Hapus")
+            .setMessage("Apakah Anda yakin ingin menghapus tes \"${tes.kategoriTes}\"?")
+            .setPositiveButton("Hapus") { dialog, _ ->
+                deleteTes(context, tes.idTes, position)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // Hapus tes - PERBAIKAN DI SINI
+    private fun deleteTes(context: Context, idTes: Int, position: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Gunakan model HapusTesRequest yang konkret
+                val request = HapusTesRequest(
+                    id_tes = idTes  // Perhatikan: menggunakan underscore
+                )
+
+                Log.d(TAG, "Mengirim request hapus tes: $request")
+
+                val response = ApiClient.apiService.hapusTes(request)
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        Log.d(TAG, "Response hapus tes: $result")
+
+                        if (result != null && result.success) {
+                            // Hapus dari list lokal
+                            currentList.removeAt(position)
+                            notifyItemRemoved(position)
+                            notifyItemRangeChanged(position, currentList.size - position)
+
+                            Toast.makeText(context,
+                                "✅ ${result.message}",
+                                Toast.LENGTH_SHORT).show()
+                        } else {
+                            val errorMsg = result?.message ?: "Gagal menghapus tes"
+                            Toast.makeText(context, "❌ $errorMsg", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+                        Log.e(TAG, "Error hapus tes: $errorCode - $errorBody")
+
+                        val errorMessage = when (errorCode) {
+                            400 -> "Bad Request: Data tidak valid"
+                            404 -> "Tes tidak ditemukan"
+                            500 -> "Server error"
+                            else -> "Error $errorCode: $errorBody"
+                        }
+
+                        Toast.makeText(context,
+                            "❌ $errorMessage",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception hapus tes: ${e.message}", e)
+                withContext(Dispatchers.Main) {
                     Toast.makeText(context,
                         "❌ Error: ${e.message}",
                         Toast.LENGTH_SHORT).show()

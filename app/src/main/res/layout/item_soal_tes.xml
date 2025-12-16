@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemSoalLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_rounded_white">
+
+    <!-- Nomor dan Pertanyaan -->
+    <TextView
+        android:id="@+id/tvNomorSoal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1."
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#2196F3"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvPertanyaan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pertanyaan akan muncul di sini..."
+        android:textSize="12sp"
+        android:textColor="#333333"
+        android:lineSpacingExtra="2dp"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Opsi Jawaban -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvOpsiA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="A. (Bobot 0) Opsi A"
+            android:textSize="11sp"
+            android:textColor="#555555"
+            android:layout_marginBottom="4dp"
+            android:paddingLeft="8dp"/>
+
+        <TextView
+            android:id="@+id/tvOpsiB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="B. (Bobot 0) Opsi B"
+            android:textSize="11sp"
+            android:textColor="#555555"
+            android:layout_marginBottom="4dp"
+            android:paddingLeft="8dp"/>
+
+        <TextView
+            android:id="@+id/tvOpsiC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="C. (Bobot 0) Opsi C"
+            android:textSize="11sp"
+            android:textColor="#555555"
+            android:paddingLeft="8dp"/>
+        <!-- Tambahkan di item_soal_tes.xml jika perlu 5 opsi -->
+        <TextView
+            android:id="@+id/tvOpsiD"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="D. (Bobot 0) Opsi D"
+            android:textSize="11sp"
+            android:textColor="#555555"
+            android:layout_marginBottom="4dp"
+            android:paddingLeft="8dp"/>
+
+        <TextView
+            android:id="@+id/tvOpsiE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="E. (Bobot 0) Opsi E"
+            android:textSize="11sp"
+            android:textColor="#555555"
+            android:layout_marginBottom="4dp"
+            android:paddingLeft="8dp"/>
+    </LinearLayout>
+
+    <!-- Tombol Aksi -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal">
+
+        <!-- Tombol Edit -->
+        <TextView
+            android:id="@+id/btnEditSoal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/edit"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="Edit"
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            android:drawableStart="@drawable/ic_edit"
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/white"/>
+
+        <!-- Tombol Hapus -->
+        <TextView
+            android:id="@+id/btnHapusSoal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/hapus"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="hapus"
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            android:drawableStart="@drawable/hpss"
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/white"/>
+    </LinearLayout>
+
+    <!-- Garis pemisah antar soal - TAMBAHKAN ID DI SINI -->
+    <View
+        android:id="@+id/garisPemisah"
+    android:layout_width="match_parent"
+    android:layout_height="0.5dp"
+    android:background="#E0E0E0"
+    android:layout_marginTop="12dp"
+    android:visibility="gone"/>
+</LinearLayout>

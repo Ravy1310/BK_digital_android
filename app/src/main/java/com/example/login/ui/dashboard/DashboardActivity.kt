@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.login.R
 import com.example.login.adapter.KelolaSoalAdapter
+import com.example.login.adapter.SoalTesAdapter
 import com.example.login.adapter.TesAdapter
 import com.example.login.api.ApiClient
 import com.example.login.models.*
@@ -459,9 +460,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showKelolaSoalTes() {
         Log.d(TAG, "showKelolaSoalTes called")
 
-
-
-
         fragmentContainer.removeAllViews()
 
         // Debug: cek jumlah child setelah clear
@@ -567,10 +565,15 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
                             if (data.daftarTes.isNotEmpty()) {
                                 // Setup adapter - gunakan data.daftarTes (List<TesDetail>)
-                                val adapter = KelolaSoalAdapter(data.daftarTes) { tes ->
-                                    // Handle item click
-                                    showTesDetailDialog(tes)
-                                }
+                                val adapter = KelolaSoalAdapter(
+                                    data.daftarTes,
+                                    { tes -> // Callback untuk detail
+                                        showTesDetailDialog(tes)
+                                    },
+                                    { tes -> // Callback untuk edit
+                                        showEditTesForm(tes)
+                                    }
+                                )
                                 recyclerView.adapter = adapter
                                 emptyStateLayout.visibility = View.GONE
 
@@ -615,6 +618,398 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 }
             }
         }
+    }
+
+    /**
+     * FUNGSI BARU: Menampilkan form edit tes (formkelolates.xml)
+     */
+    private fun showEditTesForm(tes: TesDetail) {
+        Log.d(TAG, "showEditTesForm called for tes: ${tes.kategoriTes} (ID: ${tes.idTes})")
+
+        fragmentContainer.removeAllViews()
+
+        val editTesView = layoutInflater.inflate(R.layout.formkelolates, null)
+        fragmentContainer.addView(editTesView)
+
+        // Tetapkan menu navigasi tes sebagai aktif
+        navigationView.setCheckedItem(R.id.nav_tes)
+
+        // Update judul dengan nama tes yang sedang diedit
+        titleText.text = "Edit Tes: ${tes.kategoriTes}"
+
+        // Setup form edit tes dengan data dari API
+        setupEditTesForm(editTesView, tes)
+    }
+
+    /**
+     * FUNGSI BARU: Setup form edit tes dengan RecyclerView
+     */
+    private fun setupEditTesForm(editTesView: View, tes: TesDetail) {
+        Log.d(TAG, "setupEditTesForm called for tes: ${tes.kategoriTes} (ID: ${tes.idTes})")
+
+        try {
+            // Temukan semua views dari formkelolates.xml
+            val headerText = editTesView.findViewById<TextView>(R.id.tvHeaderTes)
+            val subtitleText = editTesView.findViewById<TextView>(R.id.tvSubtitleTes)
+            val totalSoalText = editTesView.findViewById<TextView>(R.id.tvTotalSoalTes)
+            val btnTambahSoal = editTesView.findViewById<Button>(R.id.btnTambahSoal)
+            val btnBatal = editTesView.findViewById<Button>(R.id.btnBatal)
+            val rvSoalTes = editTesView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvSoalTes)
+
+            // Update header dengan nama tes
+            headerText.text = "Kelola Tes : ${tes.kategoriTes}"
+
+            // Setup RecyclerView
+            rvSoalTes.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+            rvSoalTes.setHasFixedSize(true)
+
+            // Setup tombol tambah soal
+            btnTambahSoal.setOnClickListener {
+                Toast.makeText(this, "Menambah soal baru untuk ${tes.kategoriTes}", Toast.LENGTH_SHORT).show()
+                // Implementasi tambah soal nanti
+            }
+
+            // Setup tombol batal
+            btnBatal.setOnClickListener {
+                Log.d(TAG, "Batal button clicked from edit tes form")
+                showKelolaSoalTes() // Kembali ke halaman kelola soal
+            }
+
+            // Tampilkan loading
+            val progressDialog = ProgressDialog(this).apply {
+                setMessage("Memuat data soal...")
+                setCancelable(false)
+            }
+            progressDialog.show()
+
+            // Fetch data soal dari API
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    Log.d(TAG, "🔍 Mengambil data soal untuk tes ID: ${tes.idTes}")
+
+                    val response = ApiClient.apiService.getSoalByTes(tes.idTes)
+                    Log.d(TAG, "✅ Response code: ${response.code()}")
+
+                    withContext(Dispatchers.Main) {
+                        progressDialog.dismiss()
+
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            Log.d(TAG, "📊 Response body ada: ${result != null}")
+
+                            if (result != null) {
+                                Log.d(TAG, "✅ Success status: ${result.success}")
+                                Log.d(TAG, "✅ Error message: ${result.error}")
+
+                                if (result.success && result.data != null) {
+                                    val data = result.data
+                                    val soalList = data.soal_list ?: emptyList()
+
+                                    Log.d(TAG, "🎯 Jumlah soal diterima: ${soalList.size}")
+
+                                    // Debug detail setiap soal - DENGAN PENANGANAN NULL
+                                    if (soalList.isNotEmpty()) {
+                                        Log.d(TAG, "=== DETAIL SOAL ===")
+                                        for (i in soalList.indices) {
+                                            val soal = soalList[i]
+                                            Log.d(TAG, "\n📝 Soal ${i + 1}:")
+                                            Log.d(TAG, "   - ID: ${soal.id_soal}")
+                                            Log.d(TAG, "   - Pertanyaan: ${soal.pertanyaan}")
+                                            Log.d(TAG, "   - ID Tes: ${soal.id_tes}")
+
+                                            // Cek apakah opsi_list ada dan tidak null
+                                            val opsiList = soal.opsi_list
+                                            if (opsiList != null) {
+                                                Log.d(TAG, "   - Jumlah opsi: ${opsiList.size}")
+
+                                                if (opsiList.isNotEmpty()) {
+                                                    for (j in opsiList.indices) {
+                                                        val opsi = opsiList[j]
+                                                        Log.d(TAG, "     ○ Opsi ${j + 1}:")
+                                                        Log.d(TAG, "       ID: ${opsi.id_opsi}")
+                                                        Log.d(TAG, "       Text: ${opsi.opsi_text}")
+                                                        Log.d(TAG, "       Bobot: ${opsi.bobot}")
+                                                    }
+                                                } else {
+                                                    Log.w(TAG, "   ⚠ Opsi list KOSONG (size: 0)")
+                                                }
+                                            } else {
+                                                Log.e(TAG, "   ❌ Opsi list is NULL!")
+                                            }
+                                        }
+                                        Log.d(TAG, "=== END DETAIL ===")
+                                    } else {
+                                        Log.w(TAG, "⚠ Soal list KOSONG")
+                                    }
+
+                                    // Update total soal
+                                    totalSoalText.text = "Total ${data.jumlah_soal} soal untuk tes ini"
+
+                                    // Cek apakah ada soal
+                                    if (soalList.isNotEmpty()) {
+                                        // Setup adapter untuk RecyclerView
+                                        val adapter = SoalTesAdapter(
+                                            soalList = soalList,
+                                            onEditClick = { soal ->
+                                                // Handle edit soal - langsung pakai data yang sudah ada
+                                                showEditSoalFormDialog(soal)
+                                            },
+                                            onDeleteClick = { soal ->
+                                                // Handle delete soal
+                                                showDeleteSoalDialog(soal.id_soal, soal.pertanyaan)
+                                            }
+                                        )
+                                        rvSoalTes.adapter = adapter
+
+                                        Toast.makeText(
+                                            this@DashboardActivity,
+                                            "✅ ${soalList.size} soal dimuat",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        // Tampilkan pesan jika tidak ada soal
+                                        Toast.makeText(
+                                            this@DashboardActivity,
+                                            "ℹ️ Belum ada soal untuk tes ini",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                } else {
+                                    // Data null atau success = false
+                                    val errorMsg = result.error ?: "Data tidak valid atau kosong"
+                                    Log.e(TAG, "❌ API Error: $errorMsg")
+                                    Log.e(TAG, "❌ Data field is null: ${result.data == null}")
+
+                                    Toast.makeText(
+                                        this@DashboardActivity,
+                                        "❌ $errorMsg",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            } else {
+                                // Result null
+                                Log.e(TAG, "❌ Response body is NULL")
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ Tidak ada data yang diterima dari server",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Log.e(TAG, "❌ HTTP Error: ${response.code()} - ${response.message()}")
+
+                            // Coba baca error body
+                            try {
+                                val errorBody = response.errorBody()?.string()
+                                Log.e(TAG, "❌ Error body: $errorBody")
+                            } catch (e: Exception) {
+                                Log.e(TAG, "❌ Cannot read error body: ${e.message}")
+                            }
+
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Error ${response.code()}: ${response.message()}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        progressDialog.dismiss()
+                        Log.e(TAG, "❌ Exception fetching soal data: ${e.message}", e)
+
+                        // Tampilkan error lebih detail
+                        val errorMsg = when (e) {
+                            is java.net.UnknownHostException -> "Tidak dapat terhubung ke server. Cek koneksi internet."
+                            is java.net.SocketTimeoutException -> "Timeout. Server terlalu lama merespon."
+                            is javax.net.ssl.SSLHandshakeException -> "Error SSL. Pastikan URL HTTPS valid."
+                            else -> "Error: ${e.message}"
+                        }
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ $errorMsg",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error in setupEditTesForm: ${e.message}", e)
+            Toast.makeText(this, "❌ Error setup form edit: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Menampilkan dialog form edit soal dengan model SoalData
+     */
+    private fun showEditSoalFormDialog(soal: SoalData) {
+        try {
+            // Buat dialog custom
+            val dialog = android.app.AlertDialog.Builder(this)
+                .setTitle("Edit Soal")
+                .setCancelable(false)
+                .create()
+
+            // Inflate layout dialog
+            val dialogView = layoutInflater.inflate(R.layout.dialog_edit_soal, null)
+            dialog.setView(dialogView)
+
+            // Temukan views dalam dialog
+            val etPertanyaan = dialogView.findViewById<EditText>(R.id.etPertanyaan)
+            val etOpsiA = dialogView.findViewById<EditText>(R.id.etOpsiA)
+            val etBobotA = dialogView.findViewById<EditText>(R.id.etBobotA)
+            val etOpsiB = dialogView.findViewById<EditText>(R.id.etOpsiB)
+            val etBobotB = dialogView.findViewById<EditText>(R.id.etBobotB)
+            val etOpsiC = dialogView.findViewById<EditText>(R.id.etOpsiC)
+            val etBobotC = dialogView.findViewById<EditText>(R.id.etBobotC)
+            val btnSimpan = dialogView.findViewById<Button>(R.id.btnSimpan)
+            val btnBatal = dialogView.findViewById<Button>(R.id.btnBatal)
+
+            // Set data ke form
+            etPertanyaan.setText(soal.pertanyaan)
+
+            // Set opsi dari soal.opsi_list
+            val opsiList = soal.opsi_list ?: emptyList()
+            if (opsiList.isNotEmpty()) {
+                etOpsiA.setText(opsiList[0].opsi_text)
+                etBobotA.setText(opsiList[0].bobot.toString())
+            } else {
+                etOpsiA.setText("")
+                etBobotA.setText("0")
+            }
+
+            if (opsiList.size > 1) {
+                etOpsiB.setText(opsiList[1].opsi_text)
+                etBobotB.setText(opsiList[1].bobot.toString())
+            } else {
+                etOpsiB.setText("")
+                etBobotB.setText("0")
+            }
+
+            if (opsiList.size > 2) {
+                etOpsiC.setText(opsiList[2].opsi_text)
+                etBobotC.setText(opsiList[2].bobot.toString())
+            } else {
+                etOpsiC.setText("")
+                etBobotC.setText("0")
+            }
+
+            // Setup tombol simpan
+            btnSimpan.setOnClickListener {
+                val pertanyaanBaru = etPertanyaan.text.toString().trim()
+                val opsiABaru = etOpsiA.text.toString().trim()
+                val bobotABaru = etBobotA.text.toString().toIntOrNull() ?: 0
+                val opsiBBaru = etOpsiB.text.toString().trim()
+                val bobotBBaru = etBobotB.text.toString().toIntOrNull() ?: 0
+                val opsiCBaru = etOpsiC.text.toString().trim()
+                val bobotCBaru = etBobotC.text.toString().toIntOrNull() ?: 0
+
+                if (pertanyaanBaru.isEmpty()) {
+                    etPertanyaan.error = "Pertanyaan tidak boleh kosong"
+                    return@setOnClickListener
+                }
+
+                if (opsiABaru.isEmpty() || opsiBBaru.isEmpty() || opsiCBaru.isEmpty()) {
+                    Toast.makeText(this, "Semua opsi harus diisi", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                // Panggil API update soal
+                updateSoal(
+                    soal.id_soal,
+                    pertanyaanBaru,
+                    opsiABaru, bobotABaru,
+                    opsiBBaru, bobotBBaru,
+                    opsiCBaru, bobotCBaru,
+                    dialog
+                )
+            }
+
+            // Setup tombol batal
+            btnBatal.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error showing edit dialog: ${e.message}", e)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Update soal ke server
+     */
+    private fun updateSoal(
+        idSoal: Int,
+        pertanyaan: String,
+        opsiA: String, bobotA: Int,
+        opsiB: String, bobotB: Int,
+        opsiC: String, bobotC: Int,
+        dialog: android.app.AlertDialog
+    ) {
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menyimpan perubahan...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Untuk sekarang, tampilkan data yang akan dikirim
+        progressDialog.dismiss()
+        dialog.dismiss()
+
+        Log.d(TAG, "Mengupdate soal ID: $idSoal")
+        Log.d(TAG, "Pertanyaan: $pertanyaan")
+        Log.d(TAG, "Opsi A: $opsiA (Bobot: $bobotA)")
+        Log.d(TAG, "Opsi B: $opsiB (Bobot: $bobotB)")
+        Log.d(TAG, "Opsi C: $opsiC (Bobot: $bobotC)")
+
+        Toast.makeText(
+            this,
+            "Fitur update soal akan segera tersedia",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    /**
+     * FUNGSI BARU: Menampilkan dialog konfirmasi hapus soal
+     */
+    private fun showDeleteSoalDialog(idSoal: Int, pertanyaan: String) {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Hapus Soal")
+            .setMessage("Apakah Anda yakin ingin menghapus soal ini?\n\n\"${pertanyaan.take(50)}...\"")
+            .setPositiveButton("Ya, Hapus") { dialog, which ->
+                // Panggil API hapus soal
+                deleteSoal(idSoal)
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    /**
+     * FUNGSI BARU: Hapus soal dari server
+     */
+    private fun deleteSoal(idSoal: Int) {
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menghapus soal...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Untuk sekarang, tampilkan konfirmasi
+        progressDialog.dismiss()
+
+        Log.d(TAG, "Menghapus soal ID: $idSoal")
+
+        Toast.makeText(
+            this,
+            "Fitur hapus soal akan segera tersedia",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     /**
@@ -1265,13 +1660,16 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             override fun handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START)
-                } else if (titleText.text == "Tambah Tes Baru") {
+                } else if (titleText.text.toString().startsWith("Tambah Tes Baru")) {
                     // Jika sedang di form tambah tes, kembali ke kelola tes
                     showTes()
-                } else if (titleText.text == "Kelola Tes BK") {
+                } else if (titleText.text.toString().startsWith("Kelola Tes BK")) {
                     // Jika sedang di form kelola tes BK, kembali ke kelola tes
                     showTes()
-                } else if (titleText.text == "Kelola Tes") {
+                } else if (titleText.text.toString().startsWith("Edit Tes:")) {
+                    // Jika sedang di form edit tes, kembali ke kelola soal
+                    showKelolaSoalTes()
+                } else if (titleText.text.toString() == "Kelola Tes") {
                     // Jika sedang di kelola tes, cek apakah ingin keluar app
                     if (System.currentTimeMillis() - backPressedTime < 2000) {
                         finish()
