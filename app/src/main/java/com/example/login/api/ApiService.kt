@@ -14,9 +14,17 @@ interface ApiService {
     @GET("api_kelola_tes.php")
     suspend fun getKelolaTesData(): Response<KelolaTesResponse>
 
-    // Endpoint sederhana tanpa token
     @POST("api_tambah_tes_simple.php")
     suspend fun tambahTes(
         @Body request: TambahTesRequest
     ): Response<TambahTesResponse>
+
+    @GET("api_kelola_soal.php")
+    suspend fun getKelolaSoalData(): Response<KelolaSoalResponse>
+
+    // API untuk update status tes
+    @POST("api_update_status_tes.php")
+    suspend fun updateStatusTes(
+        @Body request: UpdateStatusRequest
+    ): Response<UpdateStatusResponse>
 }
