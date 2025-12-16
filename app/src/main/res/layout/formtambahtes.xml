@@ -59,6 +59,7 @@
                 android:hint="Masukkan nama tes"
                 android:textSize="14sp"
                 android:inputType="text"
+                android:singleLine="true"
                 android:layout_marginBottom="20dp"/>
 
             <!-- Deskripsi Tes -->
@@ -81,6 +82,7 @@
                 android:hint="Masukkan deskripsi tes"
                 android:textSize="14sp"
                 android:inputType="textMultiLine"
+                android:lines="5"
                 android:layout_marginBottom="20dp"/>
 
             <!-- Unggah File Soal -->
@@ -111,7 +113,8 @@
                     android:textSize="14sp"
                     android:textColor="#888888"
                     android:maxLines="1"
-                    android:ellipsize="end"/>
+                    android:ellipsize="end"
+                    android:singleLine="true"/>
 
                 <Button
                     android:id="@+id/btn_browse"
@@ -122,7 +125,8 @@
                     android:textColor="#4CAF50"
                     android:background="@android:color/transparent"
                     android:paddingHorizontal="16dp"
-                    android:minWidth="0dp"/>
+                    android:minWidth="0dp"
+                    android:focusableInTouchMode="true"/>
             </LinearLayout>
 
             <!-- Button Container -->
