@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f5f5f5"
+    android:padding="16dp">
+
+    <!-- Card Container -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bgbaru"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Header dengan ikon -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Ikon Tambah -->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/tambahhitam" />
+
+                    <!-- Teks Header -->
+                    <TextView
+                        android:id="@+id/tvHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tambah Soal Baru"
+                        android:textColor="#333333"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Pertanyaan -->
+                <TextView
+                    android:id="@+id/tvPertanyaanLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Pertanyaan"
+                    android:textColor="#333333"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etPertanyaan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="32dp"
+                    android:background="@drawable/bgbaru"
+                    android:gravity="top|start"
+                    android:hint="Masukkan pertanyaan soal"
+                    android:inputType="textMultiLine"
+                    android:minHeight="120dp"
+                    android:padding="12dp"
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
+
+                <!-- Opsi Jawaban + Bobot -->
+                <TextView
+                    android:id="@+id/tvOpsiLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="Opsi Jawaban + Bobot:"
+                    android:textColor="#333333"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <!-- Container untuk opsi dinamis -->
+                <LinearLayout
+                    android:id="@+id/containerOpsi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
+
+                    <!-- Opsi 1 -->
+                    <LinearLayout
+                        android:id="@+id/opsiItem1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/etOpsi1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bgbaru"
+                            android:hint="Opsi jawaban"
+                            android:padding="12dp"
+                            android:textColor="#333333"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/etBobot1"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:background="@drawable/bgbaru"
+                            android:gravity="center"
+                            android:hint="1"
+                            android:inputType="number"
+                            android:padding="12dp"
+                            android:text="1"
+                            android:textColor="#333333"
+                            android:textSize="14sp" />
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/btnHapus1"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:visibility="gone"
+                            app:cardBackgroundColor="#F44336"
+                            app:cardCornerRadius="20dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text="×"
+                                android:textColor="@android:color/white"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                    <!-- Opsi 2 -->
+                    <LinearLayout
+                        android:id="@+id/opsiItem2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/etOpsi2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bgbaru"
+                            android:hint="Opsi jawaban"
+                            android:padding="12dp"
+                            android:textColor="#333333"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/etBobot2"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:background="@drawable/bgbaru"
+                            android:gravity="center"
+                            android:hint="1"
+                            android:inputType="number"
+                            android:padding="12dp"
+                            android:text="1"
+                            android:textColor="#333333"
+                            android:textSize="14sp" />
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/btnHapus2"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:layout_marginStart="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="#F44336"
+                            app:cardCornerRadius="5dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/cros"
+                                android:tint="@android:color/white" />
+
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Tombol Tambah Opsi -->
+                <LinearLayout
+                    android:id="@+id/btnTambahOpsi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="32dp"
+                    android:background="@drawable/bgtambahopsi"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <!-- Icon Tambah -->
+                    <ImageView
+                        android:id="@+id/iconTambah"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="8dp"
+                        android:contentDescription="Icon tambah"
+                        android:src="@drawable/tambah" />
+
+                    <!-- Teks -->
+                    <TextView
+                        android:id="@+id/textTambahOpsi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tambah Opsi"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- Garis pemisah -->
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="#E0E0E0" />
+
+                <!-- Tombol Footer -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="16dp">
+
+                    <!-- Tombol Batal (Kiri) -->
+                    <LinearLayout
+                        android:id="@+id/btnBatal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/batalabu"
+                        android:paddingStart="24dp"
+                        android:paddingTop="12dp"
+                        android:paddingEnd="24dp"
+                        android:paddingBottom="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <!-- Icon (di kiri) -->
+                        <ImageView
+                            android:id="@+id/iconBatal"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/cros"
+                            android:layout_marginEnd="8dp"
+                            android:tint="@android:color/white"/>
+
+                        <!-- Teks -->
+                        <TextView
+                            android:id="@+id/textBatal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Batal"
+                            android:textSize="14sp"
+                            android:textColor="#ffffff"
+                            android:textAllCaps="false" />
+
+                    </LinearLayout>
+
+                    <!-- Tombol Simpan Soal (Kanan) -->
+                    <LinearLayout
+                        android:id="@+id/btnSimpan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/simpansoal"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="24dp"
+                        android:paddingTop="12dp"
+                        android:paddingEnd="24dp"
+                        android:paddingBottom="12dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <!-- Icon (di kiri) -->
+                        <ImageView
+                            android:id="@+id/iconSimpan"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_marginEnd="8dp"
+                            android:contentDescription="Icon simpan"
+                            android:src="@drawable/save"
+                            android:tint="@android:color/white" />
+
+                        <!-- Teks -->
+                        <TextView
+                            android:id="@+id/textSimpan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Simpan Soal"
+                            android:textAllCaps="false"
+                            android:textColor="#ffffff"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
