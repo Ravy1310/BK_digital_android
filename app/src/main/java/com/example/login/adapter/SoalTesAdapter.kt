@@ -22,8 +22,8 @@ class SoalTesAdapter(
         val tvOpsiA: TextView = itemView.findViewById(R.id.tvOpsiA)
         val tvOpsiB: TextView = itemView.findViewById(R.id.tvOpsiB)
         val tvOpsiC: TextView = itemView.findViewById(R.id.tvOpsiC)
-        val tvOpsiD: TextView = itemView.findViewById(R.id.tvOpsiD)  // ADA SEKARANG
-        val tvOpsiE: TextView = itemView.findViewById(R.id.tvOpsiE)  // ADA SEKARANG
+        val tvOpsiD: TextView = itemView.findViewById(R.id.tvOpsiD)
+        val tvOpsiE: TextView = itemView.findViewById(R.id.tvOpsiE)
         val btnEditSoal: TextView = itemView.findViewById(R.id.btnEditSoal)
         val btnHapusSoal: TextView = itemView.findViewById(R.id.btnHapusSoal)
         val garisPemisah: View = itemView.findViewById(R.id.garisPemisah)
@@ -37,13 +37,17 @@ class SoalTesAdapter(
 
     override fun onBindViewHolder(holder: SoalViewHolder, position: Int) {
         val soal = soalList[position]
-        val opsiList = soal.opsi_list ?: emptyList()
+        val opsiList = soal.opsi_list
 
         // Set nomor soal
         holder.tvNomorSoal.text = "${position + 1}."
 
         // Set pertanyaan
-        holder.tvPertanyaan.text = soal.pertanyaan ?: "[Pertanyaan tidak tersedia]"
+        holder.tvPertanyaan.text = if (soal.pertanyaan.isNullOrEmpty()) {
+            "[Pertanyaan tidak tersedia]"
+        } else {
+            soal.pertanyaan
+        }
 
         // Set opsi jawaban (mendukung hingga 5 opsi)
         setOpsiText(holder.tvOpsiA, "A", opsiList, 0)
@@ -93,20 +97,22 @@ class SoalTesAdapter(
      * Helper function untuk mendapatkan teks opsi dari berbagai field
      */
     private fun getOpsiText(opsi: OpsiData): String {
-        // Coba semua kemungkinan field
-        val text = when {
-            !opsi.opsi_text.isNullOrEmpty() -> opsi.opsi_text
-            !opsi.opsi.isNullOrEmpty() -> opsi.opsi
-            !opsi.jawaban.isNullOrEmpty() -> opsi.jawaban
-            !opsi.teks_opsi.isNullOrEmpty() -> opsi.teks_opsi
-            else -> "Opsi ${opsi.id_opsi}"  // Fallback jika semua kosong
+        // Cek semua kemungkinan field secara berurutan
+        val possibleFields = listOf(
+            opsi.opsi_text,
+            opsi.opsi,
+            opsi.jawaban,
+            opsi.teks_opsi
+        )
+
+        // Ambil field pertama yang tidak null dan tidak kosong
+        for (field in possibleFields) {
+            if (!field.isNullOrEmpty()) {
+                return field
+            }
         }
 
-        // Jika masih kosong, beri placeholder
-        return if (text.trim().isEmpty()) {
-            "Opsi ${opsi.id_opsi}"
-        } else {
-            text
-        }
+        // Fallback jika semua kosong
+        return "Opsi ${opsi.id_opsi}"
     }
 }

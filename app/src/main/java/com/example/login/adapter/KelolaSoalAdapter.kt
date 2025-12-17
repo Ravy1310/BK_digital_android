@@ -13,7 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.login.R
 import com.example.login.api.ApiClient
-import com.example.login.models.HapusTesRequest  // Import model
+import com.example.login.models.HapusTesRequest
 import com.example.login.models.TesDetail
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -41,8 +41,9 @@ class KelolaSoalAdapter(
 
         init {
             itemView.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    onItemClick(currentList[adapterPosition])
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClick(currentList[position])
                 }
             }
         }
@@ -72,28 +73,30 @@ class KelolaSoalAdapter(
         }
 
         // Setup toggle status button
-        setupToggleButton(holder, tes)
+        setupToggleButton(holder, tes, position)
 
         // Setup edit button
         holder.btnEditTes.setOnClickListener {
-            if (holder.adapterPosition != RecyclerView.NO_POSITION) {
-                val currentTes = currentList[holder.adapterPosition]
+            val currentPosition = holder.bindingAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                val currentTes = currentList[currentPosition]
                 onEditClick(currentTes)
             }
         }
 
         // Setup hapus button
         holder.btnHapusTes.setOnClickListener {
-            if (holder.adapterPosition != RecyclerView.NO_POSITION) {
-                val tesToDelete = currentList[holder.adapterPosition]
-                showDeleteConfirmation(holder.itemView.context, tesToDelete, holder.adapterPosition)
+            val currentPosition = holder.bindingAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                val tesToDelete = currentList[currentPosition]
+                showDeleteConfirmation(holder.itemView.context, tesToDelete, currentPosition)
             }
         }
     }
 
     override fun getItemCount(): Int = currentList.size
 
-    private fun setupToggleButton(holder: TesViewHolder, tes: TesDetail) {
+    private fun setupToggleButton(holder: TesViewHolder, tes: TesDetail, position: Int) {
         if (tes.status == "aktif") {
             holder.btnToggleStatus.text = "Nonaktifkan"
             holder.btnToggleStatus.setIconResource(R.drawable.ic_pause)
@@ -107,8 +110,11 @@ class KelolaSoalAdapter(
         }
 
         holder.btnToggleStatus.setOnClickListener {
-            val newAction = if (tes.status == "aktif") "nonaktif" else "aktif"
-            updateTesStatus(holder, tes.idTes, newAction, holder.adapterPosition)
+            val currentPosition = holder.bindingAdapterPosition
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                val newAction = if (tes.status == "aktif") "nonaktif" else "aktif"
+                updateTesStatus(holder, tes.idTes, newAction, currentPosition)
+            }
         }
     }
 
@@ -191,13 +197,13 @@ class KelolaSoalAdapter(
             .show()
     }
 
-    // Hapus tes - PERBAIKAN DI SINI
+    // Hapus tes
     private fun deleteTes(context: Context, idTes: Int, position: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Gunakan model HapusTesRequest yang konkret
                 val request = HapusTesRequest(
-                    id_tes = idTes  // Perhatikan: menggunakan underscore
+                    id_tes = idTes
                 )
 
                 Log.d(TAG, "Mengirim request hapus tes: $request")
