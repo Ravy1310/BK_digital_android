@@ -1,13 +1,17 @@
 // File: app/src/main/java/com/example/login/ui/dashboard/DashboardActivity.kt
 package com.example.login.ui.dashboard
 
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.OpenableColumns
 import android.text.format.DateFormat
 import android.util.Log
@@ -24,9 +28,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.login.R
-import com.example.login.adapter.KelolaSoalAdapter
-import com.example.login.adapter.SoalTesAdapter
-import com.example.login.adapter.TesAdapter
+import com.example.login.adapter.*
 import com.example.login.api.ApiClient
 import com.example.login.models.*
 import com.example.login.ui.auth.LoginActivity
@@ -40,10 +42,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
-import java.io.InputStreamReader
-import android.os.Handler
-import android.os.Looper
 import java.io.ByteArrayInputStream
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -1463,12 +1463,439 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         fragmentContainer.removeAllViews()
 
-        val textView = TextView(this)
-        textView.text = "Halaman Kelola Guru\n\nFitur akan segera tersedia"
-        textView.textSize = 18f
-        textView.gravity = android.view.Gravity.CENTER
-        fragmentContainer.addView(textView)
+        // Ganti dengan layout kelolaguru.xml
+        val guruView = layoutInflater.inflate(R.layout.kelolaguru, null)
+        fragmentContainer.addView(guruView)
+
+        // Debug: cek ukuran view
+        guruView.post {
+            Log.d(TAG, "Guru view width: ${guruView.width}, height: ${guruView.height}")
+            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
+        }
+
+        // Tetapkan menu navigasi guru sebagai aktif (jika ada)
+        navigationView.setCheckedItem(R.id.nav_guru)
+
+        // Update judul
+        titleText.text = "Kelola Guru"
+
+        // Setup konten kelola guru
+        setupKelolaGuruContent(guruView)
+
         Toast.makeText(this, "Kelola Data Guru", Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * Setup konten kelola guru dengan data dari API
+     */
+    private fun setupKelolaGuruContent(guruView: View) {
+        Log.d(TAG, "setupKelolaGuruContent called")
+
+        try {
+            // Temukan semua views
+            val tvJumlahGuru = guruView.findViewById<TextView>(R.id.tv_jumlah_guru)
+            val tvAkunAktif = guruView.findViewById<TextView>(R.id.tv_akun_aktif)
+            val tvAkunNonaktif = guruView.findViewById<TextView>(R.id.tv_akun_nonaktif)
+            val btnTambahGuru = guruView.findViewById<Button>(R.id.btn_tambah_guru)
+            val rvGuru = guruView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvGuru)
+            val emptyStateLayout = guruView.findViewById<LinearLayout>(R.id.emptyStateLayout)
+            val loadingProgress = guruView.findViewById<ProgressBar>(R.id.loadingProgress)
+            val tvInfoJumlah = guruView.findViewById<TextView>(R.id.tvInfoJumlah)
+
+            // Setup RecyclerView
+            rvGuru.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+            rvGuru.setHasFixedSize(true)
+
+            // Setup adapter dengan data kosong dulu
+            val adapter = GuruAdapter(emptyList()) { guru ->
+                // Handle item click
+                showGuruDetailDialog(guru)
+            }
+            rvGuru.adapter = adapter
+
+            // Setup button tambah guru
+            btnTambahGuru?.setOnClickListener {
+                Toast.makeText(this, "Fitur tambah guru akan segera tersedia", Toast.LENGTH_SHORT).show()
+            }
+
+            // Tampilkan loading
+            loadingProgress.visibility = View.VISIBLE
+            emptyStateLayout.visibility = View.GONE
+            rvGuru.visibility = View.VISIBLE
+
+            // Fetch data dari API
+            fetchDataGuru(
+                tvJumlahGuru,
+                tvAkunAktif,
+                tvAkunNonaktif,
+                adapter,
+                emptyStateLayout,
+                loadingProgress,
+                rvGuru,
+                tvInfoJumlah
+            )
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupKelolaGuruContent: ${e.message}", e)
+            Toast.makeText(this, "Error setup: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Fungsi untuk mengambil data guru dari API - TANPA BATASAN 5 DATA
+     */
+    private fun fetchDataGuru(
+        tvJumlahGuru: TextView,
+        tvAkunAktif: TextView,
+        tvAkunNonaktif: TextView,
+        adapter: GuruAdapter,
+        emptyStateLayout: LinearLayout,
+        loadingProgress: ProgressBar,
+        rvGuru: androidx.recyclerview.widget.RecyclerView,
+        tvInfoJumlah: TextView
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengambil SEMUA data guru dari API...")
+
+                val response = ApiClient.apiService.getDataGuru()
+                Log.d(TAG, "Response code: ${response.code()}")
+
+                withContext(Dispatchers.Main) {
+                    loadingProgress.visibility = View.GONE
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        Log.d(TAG, "Response body ada: ${result != null}")
+
+                        if (result != null && result.success) {
+                            val data = result.data
+
+                            // DEBUG: Tampilkan data yang diterima
+                            Log.d(TAG, "Data guru diterima:")
+                            Log.d(TAG, "Total guru: ${data.statistik.totalGuru}")
+                            Log.d(TAG, "Aktif: ${data.statistik.akunAktif}")
+                            Log.d(TAG, "Nonaktif: ${data.statistik.akunNonaktif}")
+                            Log.d(TAG, "Jumlah daftar guru: ${data.daftarGuru.size}")
+
+                            // Update statistik
+                            tvJumlahGuru.text = data.statistik.totalGuru.toString()
+                            tvAkunAktif.text = data.statistik.akunAktif.toString()
+                            tvAkunNonaktif.text = data.statistik.akunNonaktif.toString()
+
+                            // **PERUBAHAN PENTING: Gunakan SEMUA data tanpa .take(5)**
+                            val daftarGuru = data.daftarGuru // Menghapus .take(5)
+
+                            if (daftarGuru.isNotEmpty()) {
+                                adapter.updateData(daftarGuru)
+                                emptyStateLayout.visibility = View.GONE
+                                rvGuru.visibility = View.VISIBLE
+
+                                // Update info jumlah - TAMPILKAN SEMUA DATA
+                                tvInfoJumlah.text = "Menampilkan SEMUA ${data.daftarGuru.size} data guru"
+
+                                Log.d(TAG, "✓ Menampilkan ${daftarGuru.size} data guru (SEMUA DATA)")
+                            } else {
+                                emptyStateLayout.visibility = View.VISIBLE
+                                rvGuru.visibility = View.GONE
+                                tvInfoJumlah.text = "Tidak ada data guru"
+                            }
+
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "✅ ${daftarGuru.size} data guru dimuat",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        } else {
+                            val errorMsg = result?.message ?: "Data tidak valid"
+                            Log.e(TAG, "API Response error: $errorMsg")
+
+                            // Tampilkan empty state
+                            emptyStateLayout.visibility = View.VISIBLE
+                            rvGuru.visibility = View.GONE
+                            tvInfoJumlah.text = "Error memuat data"
+
+                            // Tampilkan data default jika error
+                            tvJumlahGuru.text = "0"
+                            tvAkunAktif.text = "0"
+                            tvAkunNonaktif.text = "0"
+
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ $errorMsg",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        Log.e(TAG, "HTTP Error: $errorCode - ${response.message()}")
+
+                        // Tampilkan empty state
+                        emptyStateLayout.visibility = View.VISIBLE
+                        rvGuru.visibility = View.GONE
+                        tvInfoJumlah.text = "Error memuat data"
+
+                        // Tampilkan data default jika error
+                        tvJumlahGuru.text = "0"
+                        tvAkunAktif.text = "0"
+                        tvAkunNonaktif.text = "0"
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    loadingProgress.visibility = View.GONE
+                    Log.e(TAG, "Network error: ${e.message}", e)
+
+                    // Tampilkan empty state
+                    emptyStateLayout.visibility = View.VISIBLE
+                    rvGuru.visibility = View.GONE
+                    tvInfoJumlah.text = "Error koneksi"
+
+                    // Tampilkan data default jika error
+                    tvJumlahGuru.text = "0"
+                    tvAkunAktif.text = "0"
+                    tvAkunNonaktif.text = "0"
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ Network error: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+    /**
+     * Dialog custom untuk detail guru dengan tombol aksi
+     */
+    /**
+     * Dialog custom untuk detail guru dengan tombol aksi
+     */
+    private fun showGuruDetailDialog(guru: Guru) {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_detail_guru)
+        dialog.setCancelable(true)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0.7f) // Darken background
+
+        // Set data ke view
+        val tvNama = dialog.findViewById<TextView>(R.id.tvNama)
+        val tvTelepon = dialog.findViewById<TextView>(R.id.tvTelepon)
+        val tvAlamat = dialog.findViewById<TextView>(R.id.tvAlamat)
+        val tvStatus = dialog.findViewById<TextView>(R.id.tvStatus)
+        val tvUsername = dialog.findViewById<TextView>(R.id.tvUsername)
+        val tvEmail = dialog.findViewById<TextView>(R.id.tvEmail)
+        val btnEdit = dialog.findViewById<Button>(R.id.btnEdit)
+        val btnStatus = dialog.findViewById<Button>(R.id.btnStatus)
+        val btnClose = dialog.findViewById<ImageView>(R.id.btnClose)
+
+        // Set data
+        tvNama.text = guru.nama
+        tvTelepon.text = guru.telepon
+        tvAlamat.text = guru.alamat
+        tvUsername.text = guru.username ?: "-"
+        tvEmail.text = guru.email ?: "-"
+
+        // Set status HANYA "Aktif" atau "Nonaktif" (tanpa emoji di text)
+        val statusText = if (guru.status == "Aktif") "Aktif" else "Nonaktif"
+        tvStatus.text = statusText
+
+        // Set warna background status
+        if (guru.status == "Aktif") {
+            // Warna hijau untuk status aktif
+            tvStatus.setBackgroundResource(R.drawable.bg_status_aktif)
+            tvStatus.setTextColor(Color.WHITE)
+            btnStatus.text = "⛔ Nonaktifkan"
+            btnStatus.setBackgroundResource(R.drawable.buttonbatal) // Tombol merah untuk nonaktifkan
+        } else {
+            // Warna merah untuk status nonaktif
+            tvStatus.setBackgroundResource(R.drawable.bg_status_nonaktif)
+            tvStatus.setTextColor(Color.WHITE)
+            btnStatus.text = "✅ Aktifkan"
+            btnStatus.setBackgroundResource(R.drawable.button_green) // Tombol hijau untuk aktifkan
+        }
+
+        // Button listeners
+        btnEdit.setOnClickListener {
+            Toast.makeText(this, "Fitur edit data guru akan segera tersedia", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        btnStatus.setOnClickListener {
+            val currentStatus = if (guru.status == "Aktif") "Aktif" else "Nonaktif"
+            val newStatus = if (guru.status == "Aktif") "Nonaktif" else "Aktif"
+            val actionText = if (guru.status == "Aktif") "menonaktifkan" else "mengaktifkan"
+
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Konfirmasi Ubah Status")
+                .setMessage(
+                    """
+                Apakah Anda yakin ingin $actionText akun ini?
+                
+                👤 ${guru.nama}
+                📞 ${guru.telepon}
+                
+                Status: $currentStatus → $newStatus
+                
+                Guru tidak dapat login jika status Nonaktif.
+                """.trimIndent()
+                )
+                .setPositiveButton("Ya, Ubah Status") { confirmDialog, _ ->
+                    performUpdateStatus(guru.idGuru, guru.nama, currentStatus, newStatus, dialog)
+                    confirmDialog.dismiss()
+                }
+                .setNegativeButton("Batal") { confirmDialog, _ ->
+                    confirmDialog.dismiss()
+                }
+                .show()
+        }
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Tampilkan dialog
+        dialog.show()
+
+        // Atur ukuran dialog
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.9).toInt()
+        val height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+    }
+    /**
+     * Fungsi untuk melakukan update status ke server
+     */
+    private fun performUpdateStatus(
+        idGuru: Int,
+        namaGuru: String,
+        currentStatus: String,
+        newStatus: String,
+        dialog: Dialog? = null
+    ) {
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Mengubah status akun...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Buat request object
+                val request = UpdateStatusGuruRequest(
+                    id_guru = idGuru,
+                    action = "ubah_status"
+                )
+
+                Log.d(TAG, "Mengirim update status untuk guru ID: $idGuru ($currentStatus → $newStatus)")
+
+                // Panggil API menggunakan metode JSON
+                val response = ApiClient.apiService.updateStatusGuru(request)
+
+                // DEBUG: Log response
+                Log.d(TAG, "Response code: ${response.code()}")
+                Log.d(TAG, "Response message: ${response.message()}")
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        Log.d(TAG, "Response body: $result")
+
+                        if (result != null && result.status == "success") {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "✅ ${result.message ?: "Status berhasil diubah menjadi $newStatus"}",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            // Tutup dialog detail jika ada
+                            dialog?.dismiss()
+
+                            // Refresh data guru setelah 1 detik
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                refreshGuruData()
+                            }, 1000)
+
+                        } else {
+                            val errorMsg = result?.message ?: "Gagal mengubah status"
+                            Log.e(TAG, "API Response error: $errorMsg")
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ $errorMsg",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string()
+
+                        Log.e(TAG, "HTTP Error: $errorCode")
+                        Log.e(TAG, "Error body: $errorBody")
+
+                        val errorMsg = when (errorCode) {
+                            404 -> "Data guru tidak ditemukan"
+                            400 -> "Permintaan tidak valid"
+                            500 -> "Server error, coba lagi nanti"
+                            else -> "Error $errorCode: ${response.message()}"
+                        }
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ $errorMsg",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error updating status: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        is javax.net.ssl.SSLHandshakeException -> "Error SSL/TLS"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Refresh data guru setelah update
+     */
+    private fun refreshGuruData() {
+        try {
+            val currentView = fragmentContainer.getChildAt(0)
+            if (currentView != null) {
+                // Cek apakah kita di halaman kelola guru
+                val tvJumlahGuru = currentView.findViewById<TextView>(R.id.tv_jumlah_guru)
+                if (tvJumlahGuru != null) {
+                    // Panggil ulang setup untuk refresh data
+                    setupKelolaGuruContent(currentView)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error refreshing guru data: ${e.message}")
+        }
     }
 
     /**
