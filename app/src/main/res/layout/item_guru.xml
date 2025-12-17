@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="8dp"
+    android:minHeight="48dp"
+    android:weightSum="10"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Kolom No -->
+    <TextView
+        android:id="@+id/tv_no"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="1"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center" />
+
+    <!-- Kolom Nama -->
+    <TextView
+        android:id="@+id/tv_nama"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:text="John Doe"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <!-- Kolom Telepon -->
+    <TextView
+        android:id="@+id/tv_telepon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="08123456789"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center" />
+
+    <!-- Kolom Alamat -->
+    <TextView
+        android:id="@+id/tv_alamat"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:text="Jl. Contoh No. 123"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+    <!-- Kolom Status -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Aktif"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+</LinearLayout>
