@@ -8,6 +8,8 @@ import android.database.Cursor
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.OpenableColumns
 import android.text.format.DateFormat
 import android.util.Log
@@ -40,10 +42,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
-import java.io.InputStreamReader
-import android.os.Handler
-import android.os.Looper
 import java.io.ByteArrayInputStream
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -67,6 +67,28 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     // Variables untuk file CSV
     private var selectedFileUri: Uri? = null
     private var selectedFileName: String? = null
+
+    // Variables untuk Kelola Siswa
+    private lateinit var tvTotalSiswa: TextView
+    private lateinit var tvMaleCount: TextView
+    private lateinit var tvFemaleCount: TextView
+    private lateinit var tableRowsContainer: LinearLayout
+    private lateinit var emptyStateLayout: LinearLayout
+    private lateinit var progressBarSiswa: ProgressBar
+    private lateinit var btnAddStudentFloating: Button
+
+    // Data class untuk Siswa
+    data class Siswa(
+        val id: String,
+        val name: String,
+        val kelas: String,
+        val gender: String,
+        val status: String = "aktif"
+    )
+
+    // Sample data untuk siswa
+    private val siswaList = mutableListOf<Siswa>()
+    private var siswaIdCounter = 1
 
     // Request codes
     companion object {
@@ -171,6 +193,240 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         return true
     }
 
+    // ==================== FUNGSI KELOLA SISWA ====================
+    private fun showSiswa() {
+        Log.d(TAG, "showSiswa called")
+
+        // Debug: cek jumlah child sebelum clear
+        Log.d(TAG, "Siswa - Child count before: ${fragmentContainer.childCount}")
+
+        // Kosongkan container
+        fragmentContainer.removeAllViews()
+
+        // Debug: cek jumlah child setelah clear
+        Log.d(TAG, "Siswa - Child count after: ${fragmentContainer.childCount}")
+
+        // Tambahkan layout kelola siswa
+        val siswaView = layoutInflater.inflate(R.layout.activity_kelola_siswa, null)
+        fragmentContainer.addView(siswaView)
+
+        // Debug: cek ukuran view
+        siswaView.post {
+            Log.d(TAG, "Siswa view width: ${siswaView.width}, height: ${siswaView.height}")
+            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
+        }
+
+        // Setup konten kelola siswa
+        setupKelolaSiswaContent(siswaView)
+    }
+
+    private fun setupKelolaSiswaContent(siswaView: View) {
+        Log.d(TAG, "setupKelolaSiswaContent called")
+
+        try {
+            // Temukan semua views
+            tvTotalSiswa = siswaView.findViewById(R.id.tvTotalSiswa)
+            tvMaleCount = siswaView.findViewById(R.id.tvMaleCount)
+            tvFemaleCount = siswaView.findViewById(R.id.tvFemaleCount)
+            tableRowsContainer = siswaView.findViewById(R.id.tableRowsContainer)
+            emptyStateLayout = siswaView.findViewById(R.id.emptyStateLayout)
+            progressBarSiswa = siswaView.findViewById(R.id.progressBar)
+            btnAddStudentFloating = siswaView.findViewById(R.id.btnAddStudentFloating)
+
+            // Setup click listeners
+            btnAddStudentFloating.setOnClickListener {
+                addSampleStudent()
+            }
+
+            // Load initial data
+            loadInitialDataSiswa()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupKelolaSiswaContent: ${e.message}", e)
+            Toast.makeText(this, "Error setup kelola siswa: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun loadInitialDataSiswa() {
+        showLoadingSiswa()
+
+        // Simulate API call delay
+        Handler(Looper.getMainLooper()).postDelayed({
+            // Add sample data
+            siswaList.clear()
+            siswaList.addAll(getSampleDataSiswa())
+            siswaIdCounter = siswaList.size + 1
+
+            updateUISiswa()
+            hideLoadingSiswa()
+        }, 1000)
+    }
+
+    private fun getSampleDataSiswa(): List<Siswa> {
+        return listOf(
+            Siswa("001", "Ahmad Budiman", "XII IPA 1", "Laki-laki", "aktif"),
+            Siswa("002", "Siti Aisyah", "XI IPS 2", "Perempuan", "aktif"),
+            Siswa("003", "Rizki Pratama", "X IPA 3", "Laki-laki", "aktif"),
+            Siswa("004", "Dewi Anggraini", "XII IPA 2", "Perempuan", "aktif"),
+            Siswa("005", "Bambang Sugiarto", "XI IPA 1", "Laki-laki", "aktif"),
+            Siswa("006", "Maya Sari", "X IPS 1", "Perempuan", "aktif"),
+            Siswa("007", "Fajar Hidayat", "XII IPS 1", "Laki-laki", "nonaktif"),
+            Siswa("008", "Rina Melati", "XI IPA 3", "Perempuan", "aktif")
+        )
+    }
+
+    private fun addSampleStudent() {
+        val newId = siswaIdCounter.toString().padStart(3, '0')
+        val gender = if (siswaIdCounter % 2 == 0) "Perempuan" else "Laki-laki"
+        val kelas = when ((siswaIdCounter - 1) % 6) {
+            0 -> "X IPA 1"
+            1 -> "X IPA 2"
+            2 -> "XI IPA 1"
+            3 -> "XI IPA 2"
+            4 -> "XII IPA 1"
+            else -> "XII IPA 2"
+        }
+
+        val newSiswa = Siswa(
+            id = newId,
+            name = "Siswa Baru $newId",
+            kelas = kelas,
+            gender = gender,
+            status = "aktif"
+        )
+
+        siswaList.add(0, newSiswa) // Add to top
+        siswaIdCounter++
+
+        // Update UI
+        updateUISiswa()
+
+        // Show success message
+        Toast.makeText(
+            this,
+            "Siswa $newId berhasil ditambahkan",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun updateUISiswa() {
+        // Update statistics
+        updateStatisticsSiswa()
+
+        // Update table
+        updateTableSiswa()
+    }
+
+    private fun updateStatisticsSiswa() {
+        val total = siswaList.size
+        val male = siswaList.count { it.gender == "Laki-laki" }
+        val female = siswaList.count { it.gender == "Perempuan" }
+
+        tvTotalSiswa.text = total.toString()
+        tvMaleCount.text = male.toString()
+        tvFemaleCount.text = female.toString()
+    }
+
+    private fun updateTableSiswa() {
+        // Clear existing rows
+        tableRowsContainer.removeAllViews()
+
+        if (siswaList.isEmpty()) {
+            emptyStateLayout.visibility = View.VISIBLE
+            return
+        }
+
+        emptyStateLayout.visibility = View.GONE
+
+        // Add student rows
+        siswaList.forEachIndexed { index, siswa ->
+            addStudentRow(siswa, index + 1)
+        }
+    }
+
+    private fun addStudentRow(siswa: Siswa, position: Int) {
+        // Inflate row layout
+        val rowView = layoutInflater.inflate(R.layout.table_row_empty, tableRowsContainer, false)
+
+        // Set data
+        rowView.findViewById<TextView>(R.id.tvId).text = siswa.id
+        rowView.findViewById<TextView>(R.id.tvNama).text = siswa.name
+        rowView.findViewById<TextView>(R.id.tvKelas).text = siswa.kelas
+        rowView.findViewById<TextView>(R.id.tvGender).text = siswa.gender
+
+        // Set alternate background color
+        if (position % 2 == 0) {
+            rowView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white))
+        } else {
+            rowView.setBackgroundColor(ContextCompat.getColor(this, R.color.table_row_alternate))
+        }
+
+        // Add click listener for row
+        rowView.setOnClickListener {
+            showSiswaDetail(siswa)
+        }
+
+        // Add to container
+        tableRowsContainer.addView(rowView)
+    }
+
+    private fun showSiswaDetail(siswa: Siswa) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Detail Siswa")
+            .setMessage(
+                "ID: ${siswa.id}\n" +
+                        "Nama: ${siswa.name}\n" +
+                        "Kelas: ${siswa.kelas}\n" +
+                        "Jenis Kelamin: ${siswa.gender}\n" +
+                        "Status: ${if (siswa.status == "aktif") "Aktif" else "Nonaktif"}"
+            )
+            .setPositiveButton("OK", null)
+            .setNeutralButton("Edit") { _, _ ->
+                editSiswa(siswa)
+            }
+            .setNegativeButton("Hapus") { _, _ ->
+                deleteSiswa(siswa)
+            }
+            .show()
+    }
+
+    private fun editSiswa(siswa: Siswa) {
+        Toast.makeText(
+            this,
+            "Edit siswa: ${siswa.name}",
+            Toast.LENGTH_SHORT
+        ).show()
+        // Implement edit functionality here
+    }
+
+    private fun deleteSiswa(siswa: Siswa) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Konfirmasi Hapus")
+            .setMessage("Apakah Anda yakin ingin menghapus siswa ${siswa.name}?")
+            .setPositiveButton("Hapus") { _, _ ->
+                siswaList.remove(siswa)
+                updateUISiswa()
+                Toast.makeText(
+                    this,
+                    "Siswa ${siswa.name} berhasil dihapus",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun showLoadingSiswa() {
+        progressBarSiswa.visibility = View.VISIBLE
+        tableRowsContainer.visibility = View.GONE
+    }
+
+    private fun hideLoadingSiswa() {
+        progressBarSiswa.visibility = View.GONE
+        tableRowsContainer.visibility = View.VISIBLE
+    }
+
+    // ==================== FUNGSI DASHBOARD ====================
     private fun showDashboardContent() {
         Log.d(TAG, "showDashboardContent called")
 
@@ -377,7 +633,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 // Tambahkan click listener
                 cardView.setOnClickListener {
                     Toast.makeText(this, "Membuka: ${tes.namaTes}", Toast.LENGTH_SHORT).show()
-                    // Bisa ditambahkan intent ke detail tes nanti
                 }
 
                 Log.d(TAG, "✓ Card created successfully for: ${tes.namaTes}")
@@ -390,6 +645,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Log.d(TAG, "✓ Successfully added ${tesList.size} tes items to UI")
     }
 
+    // ==================== FUNGSI KELOLA TES ====================
     /**
      * Fungsi untuk menampilkan halaman Kelola Tes dengan data dari API
      */
@@ -1439,22 +1695,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
     }
 
-    private fun showSiswa() {
-        Log.d(TAG, "showSiswa called")
-
-        // Debug: cek jumlah child sebelum clear
-        Log.d(TAG, "Siswa - Child count before: ${fragmentContainer.childCount}")
-
-        fragmentContainer.removeAllViews()
-
-        val textView = TextView(this)
-        textView.text = "Halaman Kelola Siswa\n\nFitur akan segera tersedia"
-        textView.textSize = 18f
-        textView.gravity = android.view.Gravity.CENTER
-        fragmentContainer.addView(textView)
-        Toast.makeText(this, "Kelola Data Siswa", Toast.LENGTH_SHORT).show()
-    }
-
     private fun showGuru() {
         Log.d(TAG, "showGuru called")
 
@@ -1471,8 +1711,77 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Toast.makeText(this, "Kelola Data Guru", Toast.LENGTH_SHORT).show()
     }
 
+    private fun setupBackPressedHandler() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else if (titleText.text.toString().startsWith("Tambah Tes Baru")) {
+                    // Jika sedang di form tambah tes, kembali ke kelola tes
+                    showTes()
+                } else if (titleText.text.toString().startsWith("Kelola Tes BK")) {
+                    // Jika sedang di form kelola tes BK, kembali ke kelola tes
+                    showTes()
+                } else if (titleText.text.toString().startsWith("Edit Tes:")) {
+                    // Jika sedang di form edit tes, kembali ke kelola soal
+                    showKelolaSoalTes()
+                } else if (titleText.text.toString() == "Kelola Tes") {
+                    // Jika sedang di kelola tes, cek apakah ingin keluar app
+                    if (System.currentTimeMillis() - backPressedTime < 2000) {
+                        finish()
+                    } else {
+                        Toast.makeText(this@DashboardActivity,
+                            "Tekan kembali sekali lagi untuk keluar",
+                            Toast.LENGTH_SHORT).show()
+                        backPressedTime = System.currentTimeMillis()
+                    }
+                } else {
+                    // Untuk halaman lain, cek apakah ingin keluar app
+                    if (System.currentTimeMillis() - backPressedTime < 2000) {
+                        finish()
+                    } else {
+                        Toast.makeText(this@DashboardActivity,
+                            "Tekan kembali sekali lagi untuk keluar",
+                            Toast.LENGTH_SHORT).show()
+                        backPressedTime = System.currentTimeMillis()
+                    }
+                }
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    private var backPressedTime: Long = 0
+
+    /**
+     * Konversi dp ke px
+     */
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+
+    private fun logoutUser() {
+        try {
+            Firebase.auth.signOut()
+
+            val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+            sharedPref.edit().clear().apply()
+
+            Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error saat logout: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // ==================== FUNGSI FILE HANDLING ====================
     /**
      * Fungsi untuk membuka file picker
+     * HANYA SATU FUNGSI INI YANG ADA
      */
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -1506,7 +1815,8 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     /**
-     * Fungsi untuk membaca file CSV menjadi string (VERSI DIPERBAIKI)
+     * Fungsi untuk membaca file CSV menjadi string
+     * HANYA SATU FUNGSI INI YANG ADA
      */
     private fun readCSVFile(uri: Uri): String? {
         return try {
@@ -1577,6 +1887,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     /**
      * Handle activity result untuk file picker
+     * HANYA SATU FUNGSI INI YANG ADA
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -1630,6 +1941,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     /**
      * Fungsi untuk mendapatkan nama file dari URI
+     * HANYA SATU FUNGSI INI YANG ADA
      */
     private fun getFileNameFromUri(uri: Uri): String? {
         var fileName: String? = null
@@ -1653,72 +1965,5 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
 
         return fileName ?: "unknown.csv"
-    }
-
-    private fun setupBackPressedHandler() {
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                } else if (titleText.text.toString().startsWith("Tambah Tes Baru")) {
-                    // Jika sedang di form tambah tes, kembali ke kelola tes
-                    showTes()
-                } else if (titleText.text.toString().startsWith("Kelola Tes BK")) {
-                    // Jika sedang di form kelola tes BK, kembali ke kelola tes
-                    showTes()
-                } else if (titleText.text.toString().startsWith("Edit Tes:")) {
-                    // Jika sedang di form edit tes, kembali ke kelola soal
-                    showKelolaSoalTes()
-                } else if (titleText.text.toString() == "Kelola Tes") {
-                    // Jika sedang di kelola tes, cek apakah ingin keluar app
-                    if (System.currentTimeMillis() - backPressedTime < 2000) {
-                        finish()
-                    } else {
-                        Toast.makeText(this@DashboardActivity,
-                            "Tekan kembali sekali lagi untuk keluar",
-                            Toast.LENGTH_SHORT).show()
-                        backPressedTime = System.currentTimeMillis()
-                    }
-                } else {
-                    // Untuk halaman lain, cek apakah ingin keluar app
-                    if (System.currentTimeMillis() - backPressedTime < 2000) {
-                        finish()
-                    } else {
-                        Toast.makeText(this@DashboardActivity,
-                            "Tekan kembali sekali lagi untuk keluar",
-                            Toast.LENGTH_SHORT).show()
-                        backPressedTime = System.currentTimeMillis()
-                    }
-                }
-            }
-        }
-        onBackPressedDispatcher.addCallback(this, callback)
-    }
-
-    private var backPressedTime: Long = 0
-
-    /**
-     * Konversi dp ke px
-     */
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-
-    private fun logoutUser() {
-        try {
-            Firebase.auth.signOut()
-
-            val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-            sharedPref.edit().clear().apply()
-
-            Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error saat logout: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
     }
 }
