@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.example.login'
-    compileSdk 34
+    compileSdk 33  // ✅ Konsisten dengan targetSdk 33
 
     defaultConfig {
         applicationId "com.example.login"
-        minSdk 21  // 🔥 TURUNKAN KE 21 (lebih stabil)
-        targetSdk 33  // 🔥 TURUNKAN KE 33 (kompatibel dengan AGP 7.4.2)
+        minSdk 21
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -26,15 +26,19 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable true
         }
         release {
-            minifyEnabled false
+            minifyEnabled true  // ✅ Diubah ke true untuk release
+            shrinkResources true  // ✅ Diubah ke true untuk release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
         }
     }
 
     buildFeatures {
         viewBinding true
+        buildConfig true  // ✅ Tambahkan untuk BuildConfig
     }
 
     compileOptions {
@@ -45,46 +49,80 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    // ✅ Tambahkan untuk menghindari duplikat resource
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += 'META-INF/DEPENDENCIES'
+        }
+    }
 }
 
 dependencies {
-    // AndroidX Core - VERSI STABIL untuk AGP 7.4.2
-    implementation 'androidx.core:core-ktx:1.9.0'
+    // ✅ AndroidX Core - Versi yang kompatibel dengan compileSdk 33
+    implementation 'androidx.core:core-ktx:1.10.1'  // ✅ Update dari 1.9.0
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'  // ✅ Update dari 1.8.0
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    // Retrofit & Networking
+    // ✅ Navigation Component
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+
+    // ✅ Retrofit & Networking
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'  // ✅ Update dari 4.10.0
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
 
-    // Lifecycle
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    // ✅ Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'  // ✅ Update dari 2.5.1
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.6.1'
 
-    // UI Components
+    // ✅ UI Components
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'  // ✅ Update dari 1.2.1
 
-    // Firebase - VERSI KOMPATIBEL
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')  // 🔥 VERSI STABIL
-    implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.4.5'
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    // ✅ Firebase - Versi yang lebih update tapi tetap stabil
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')  // ✅ Update dari 31.2.3
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'  // ✅ Update dari 20.4.1
 
-    // Kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    // ✅ Kotlin
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'  // ✅ Sesuai dengan plugin version
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'  // ✅ Update dari 1.6.4
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
 
-    // MultiDex
+    // ✅ MultiDex
     implementation 'androidx.multidex:multidex:2.0.1'
 
-    // Testing
+    // ✅ Image Loading (jika perlu)
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
+
+    // ✅ Testing
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // ✅ Mockito untuk testing
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.1.0'
+
+    // ✅ Coroutine Test
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+}
+
+// ✅ Konfigurasi untuk detektif dependency (opsional)
+configurations.all {
+    resolutionStrategy {
+        // Force specific versions jika ada konflik
+        force 'androidx.core:core-ktx:1.10.1'
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+    }
 }
