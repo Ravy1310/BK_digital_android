@@ -1,410 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="16dp">
+        android:orientation="vertical">
 
-        <!-- Icon Edit (di kiri) -->
-        <ImageView
-            android:id="@+id/iconEdit"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/editt"
-            android:layout_marginEnd="12dp" />
-
-        <!-- Teks "Edit Soal #1" -->
-        <TextView
-            android:id="@+id/tvEditSoal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Edit Soal #1"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333" />
-
-        <!-- Icon X (close) di kanan -->
-        <ImageView
-            android:id="@+id/iconClose"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/close"
-            android:contentDescription="Tutup"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:padding="4dp" />
-
-    </LinearLayout>
-
-    <!-- Pertanyaan -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="24dp">
-
-        <!-- Label Pertanyaan -->
-        <TextView
-            android:id="@+id/tvPertanyaanLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" Pertanyaan"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp" />
-
-        <!-- EditText untuk pertanyaan -->
-        <EditText
-            android:id="@+id/etPertanyaan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="120dp"
-            android:gravity="top|start"
-            android:inputType="textMultiLine"
-            android:text="Apa hobi utama Anda?"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:background="@drawable/bgbaru"
-            android:padding="12dp"
-            android:lineSpacingExtra="4dp" />
-
-    </LinearLayout>
-
-    <!-- Opsi Jawaban -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="24dp">
-
-        <!-- Header Pilihan Jawaban -->
-        <TextView
-            android:id="@+id/tvPilihanJawaban"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" Pilihan Jawaban:"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Opsi A -->
+        <!-- Header dengan tombol close -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="8dp">
-
-            <!-- Label Opsi A -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Opsi A"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Container untuk opsi dan bobot -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Input Opsi A -->
-                <EditText
-                    android:id="@+id/etOpsiA"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Membaca"
-                    android:textSize="14sp"
-                    android:textColor="#333333"
-                    android:background="@drawable/bgbaru"
-                    android:padding="12dp"
-                    android:layout_marginEnd="12dp" />
-
-                <!-- Container Bobot A -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bgbaru"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bobot:"
-                        android:textSize="12sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/etBobotA"
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:text="2"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:gravity="center"
-                        android:background="@drawable/bgbaru"
-                        android:padding="4dp"
-                        android:maxLength="1" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Opsi B -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="8dp">
-
-            <!-- Label Opsi B -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Opsi B"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Container untuk opsi dan bobot -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Input Opsi B -->
-                <EditText
-                    android:id="@+id/etOpsiB"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Olahraga"
-                    android:textSize="14sp"
-                    android:textColor="#333333"
-                    android:background="@drawable/bgbaru"
-                    android:padding="12dp"
-                    android:layout_marginEnd="12dp" />
-
-                <!-- Container Bobot B -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bgbaru"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bobot:"
-                        android:textSize="12sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/etBobotB"
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:text="4"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:gravity="center"
-                        android:background="@drawable/bgbaru"
-                        android:padding="4dp"
-                        android:maxLength="1" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Opsi C -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="16dp">
-
-            <!-- Label Opsi C -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="Opsi C"
-                android:textColor="#333333"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <!-- Container untuk opsi dan bobot -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Input Opsi C -->
-                <EditText
-                    android:id="@+id/etOpsiC"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Musik"
-                    android:textSize="14sp"
-                    android:textColor="#333333"
-                    android:background="@drawable/bgbaru"
-                    android:padding="12dp"
-                    android:layout_marginEnd="12dp" />
-
-                <!-- Container Bobot C -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/bgbaru"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bobot:"
-                        android:textSize="12sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/etBobotC"
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:text="3"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:gravity="center"
-                        android:background="@drawable/bgbaru"
-                        android:padding="4dp"
-                        android:maxLength="1" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- Tombol Batal dan Simpan -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="16dp">
-
-        <!-- Tombol Batal (Kiri) -->
-        <LinearLayout
-            android:id="@+id/btnBatal"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="@drawable/batalabu"
-            android:paddingStart="24dp"
-            android:paddingTop="12dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="12dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:paddingBottom="16dp">
 
-            <!-- Icon (di kiri) -->
+            <!-- Icon Edit (di kiri) -->
             <ImageView
-                android:id="@+id/iconBatal"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/cros"
-                android:layout_marginEnd="8dp"
-                app:tint="@android:color/white" />
+                android:id="@+id/iconEdit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/editt"
+                android:layout_marginEnd="12dp" />
 
-            <!-- Teks -->
+            <!-- Teks "Edit Soal #1" -->
             <TextView
-                android:id="@+id/textBatal"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvEditSoal"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Batal"
-                android:textSize="14sp"
-                android:textColor="#ffffff"
-                android:textAllCaps="false" />
+                android:layout_weight="1"
+                android:text="Edit Soal"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333" />
+
+            <!-- Icon X (close) di kanan -->
+            <ImageView
+                android:id="@+id/iconClose"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/close"
+                android:contentDescription="Tutup"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="4dp" />
 
         </LinearLayout>
 
-        <!-- Tombol Simpan Soal (Kanan) -->
+        <!-- Pertanyaan -->
         <LinearLayout
-            android:id="@+id/btnSimpan"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/simpansoal"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="24dp"
-            android:paddingTop="12dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
 
-            <!-- Icon (di kiri) -->
-            <ImageView
-                android:id="@+id/iconSimpan"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="Icon simpan"
-                android:src="@drawable/save"
-                app:tint="@android:color/white" />
-
-            <!-- Teks -->
+            <!-- Label Pertanyaan -->
             <TextView
-                android:id="@+id/textSimpan"
+                android:id="@+id/tvPertanyaanLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Simpan Soal"
-                android:textAllCaps="false"
-                android:textColor="#ffffff"
-                android:textSize="14sp" />
+                android:text="Pertanyaan"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="8dp" />
+
+            <!-- EditText untuk pertanyaan -->
+            <EditText
+                android:id="@+id/etPertanyaan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:background="@drawable/bgbaru"
+                android:padding="12dp"
+                android:lineSpacingExtra="4dp" />
 
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Opsi Jawaban -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
 
-</LinearLayout>
+            <!-- Header Pilihan Jawaban -->
+            <TextView
+                android:id="@+id/tvPilihanJawaban"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pilihan Jawaban:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Container untuk Opsi Dinamis -->
+            <LinearLayout
+                android:id="@+id/containerOpsi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Opsi akan ditambahkan secara dinamis di sini -->
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Tombol Batal dan Simpan -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp">
+
+            <!-- Tombol Batal -->
+            <LinearLayout
+                android:id="@+id/btnBatal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/batalabu"
+                android:paddingVertical="12dp"
+                android:paddingHorizontal="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/iconBatal"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/cros"
+                    android:layout_marginEnd="8dp"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/textBatal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Batal"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
+
+            <!-- Tombol Simpan Soal -->
+            <LinearLayout
+                android:id="@+id/btnSimpan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/simpansoal"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:id="@+id/iconSimpan"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Icon simpan"
+                    android:src="@drawable/save"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/textSimpan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Simpan Soal"
+                    android:textAllCaps="false"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,4 +1,3 @@
-// File: app/src/main/java/com/example/login/ui/dashboard/DashboardActivity.kt
 package com.example.login.ui.dashboard
 
 import android.app.Dialog
@@ -16,6 +15,7 @@ import android.provider.OpenableColumns
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.*
 
 class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -89,6 +90,9 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     // Sample data untuk siswa
     private val siswaList = mutableListOf<Siswa>()
     private var siswaIdCounter = 1
+
+    // Variables untuk Tes
+    private var currentTes: TesDetail? = null
 
     // Request codes
     companion object {
@@ -209,12 +213,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // Tambahkan layout kelola siswa
         val siswaView = layoutInflater.inflate(R.layout.activity_kelola_siswa, null)
         fragmentContainer.addView(siswaView)
-
-        // Debug: cek ukuran view
-        siswaView.post {
-            Log.d(TAG, "Siswa view width: ${siswaView.width}, height: ${siswaView.height}")
-            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
-        }
 
         // Setup konten kelola siswa
         setupKelolaSiswaContent(siswaView)
@@ -396,7 +394,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             "Edit siswa: ${siswa.name}",
             Toast.LENGTH_SHORT
         ).show()
-        // Implement edit functionality here
     }
 
     private fun deleteSiswa(siswa: Siswa) {
@@ -428,28 +425,9 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     // ==================== FUNGSI DASHBOARD ====================
     private fun showDashboardContent() {
-        Log.d(TAG, "showDashboardContent called")
-
-        // Debug: cek jumlah child sebelum clear
-        Log.d(TAG, "Dashboard - Child count before: ${fragmentContainer.childCount}")
-
-        // Kosongkan container
         fragmentContainer.removeAllViews()
-
-        // Debug: cek jumlah child setelah clear
-        Log.d(TAG, "Dashboard - Child count after: ${fragmentContainer.childCount}")
-
-        // Tambahkan layout dashboard
         val dashboardView = layoutInflater.inflate(R.layout.activity_dashboard, null)
         fragmentContainer.addView(dashboardView)
-
-        // Debug: cek ukuran view
-        dashboardView.post {
-            Log.d(TAG, "Dashboard view width: ${dashboardView.width}, height: ${dashboardView.height}")
-            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
-        }
-
-        // Setup dashboard content dengan ViewModel
         setupDashboardContent(dashboardView)
     }
 
@@ -457,7 +435,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Log.d(TAG, "setupDashboardContent called")
 
         try {
-            // Find views
             val tvJumlahSiswa = dashboardView.findViewById<TextView>(R.id.tv_jumlah_siswa)
             val tvJumlahGuru = dashboardView.findViewById<TextView>(R.id.tv_jumlah_guru)
             val tvJumlahTes = dashboardView.findViewById<TextView>(R.id.tv_jumlah_tes)
@@ -469,30 +446,22 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val tvErrorMessage = dashboardView.findViewById<TextView>(R.id.tv_error_message)
             val btnRetry = dashboardView.findViewById<Button>(R.id.btn_retry)
 
-            Log.d(TAG, "All views found successfully")
-
-            // Setup listeners
             tvLihatSemua.setOnClickListener {
                 Toast.makeText(this, "Membuka semua tes", Toast.LENGTH_SHORT).show()
             }
 
             swipeRefresh.setOnRefreshListener {
-                Log.d(TAG, "Swipe refresh triggered")
                 dashboardViewModel.fetchDashboardData()
             }
 
             btnRetry.setOnClickListener {
-                Log.d(TAG, "Retry button clicked")
                 dashboardViewModel.fetchDashboardData()
             }
 
-            // Setup ViewModel observers
             setupDashboardViewModelObservers(tvJumlahSiswa, tvJumlahGuru, tvJumlahTes,
                 containerTesTerpopuler, swipeRefresh,
                 progressBar, errorLayout, tvErrorMessage)
 
-            // Load initial data
-            Log.d(TAG, "Calling fetchDashboardData()")
             dashboardViewModel.fetchDashboardData()
 
         } catch (e: Exception) {
@@ -511,50 +480,20 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         errorLayout: LinearLayout,
         tvErrorMessage: TextView
     ) {
-        Log.d(TAG, "Setting up ViewModel observers")
-
         dashboardViewModel.dashboardData.observe(this) { data ->
-            Log.d(TAG, "dashboardData observer triggered, data: ${data != null}")
-
             swipeRefresh.isRefreshing = false
             progressBar.visibility = View.GONE
             errorLayout.visibility = View.GONE
 
             if (data != null) {
-                Log.d(TAG, "✓ Data received:")
-                Log.d(TAG, "  - Siswa: ${data.jumlahSiswa}")
-                Log.d(TAG, "  - Guru: ${data.jumlahGuru}")
-                Log.d(TAG, "  - Tes: ${data.jumlahTes}")
-                Log.d(TAG, "  - Tes Terpopuler items: ${data.tesTerpopuler.size}")
-
-                // Debug: tampilkan detail tes
-                data.tesTerpopuler.forEachIndexed { index, tes ->
-                    Log.d(TAG, "    ${index + 1}. ${tes.namaTes} - ${tes.jumlahSiswa} siswa")
-                }
-
-                // Update statistics
                 tvJumlahSiswa.text = data.jumlahSiswa.toString()
                 tvJumlahGuru.text = data.jumlahGuru.toString()
                 tvJumlahTes.text = data.jumlahTes.toString()
-
-                // Update tes terpopuler
                 updateTesTerpopuler(containerTesTerpopuler, data.tesTerpopuler)
-
-                // Tampilkan toast untuk konfirmasi
-                Toast.makeText(this,
-                    "Data loaded: ${data.tesTerpopuler.size} tes terpopuler",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-            } else {
-                Log.w(TAG, "⚠ Data is null!")
-                Toast.makeText(this, "Data kosong", Toast.LENGTH_SHORT).show()
             }
         }
 
         dashboardViewModel.isLoading.observe(this) { isLoading ->
-            Log.d(TAG, "isLoading observer: $isLoading")
-
             if (isLoading && !swipeRefresh.isRefreshing) {
                 progressBar.visibility = View.VISIBLE
                 errorLayout.visibility = View.GONE
@@ -562,33 +501,22 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
 
         dashboardViewModel.errorMessage.observe(this) { errorMessage ->
-            Log.d(TAG, "errorMessage observer: $errorMessage")
-
             swipeRefresh.isRefreshing = false
             if (errorMessage != null) {
                 progressBar.visibility = View.GONE
                 errorLayout.visibility = View.VISIBLE
                 tvErrorMessage.text = errorMessage
-
-                Log.e(TAG, "Error loading data: $errorMessage")
             }
         }
     }
 
-    /**
-     * Fungsi untuk menampilkan tes terpopuler di container
-     */
     private fun updateTesTerpopuler(
         container: LinearLayout,
         tesList: List<com.example.login.models.TesTerpopuler>
     ) {
-        Log.d(TAG, "updateTesTerpopuler called with ${tesList.size} items")
-
-        // Hapus semua view yang ada
         container.removeAllViews()
 
         if (tesList.isEmpty()) {
-            Log.d(TAG, "Tes list is empty, showing placeholder")
             val textView = TextView(this).apply {
                 text = "Belum ada tes yang dikerjakan"
                 setTextColor(ContextCompat.getColor(this@DashboardActivity, android.R.color.darker_gray))
@@ -600,154 +528,71 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             return
         }
 
-        Log.d(TAG, "Creating ${tesList.size} tes cards")
-
-        // Tampilkan setiap tes
         tesList.forEachIndexed { index, tes ->
-            Log.d(TAG, "Creating card for: ${tes.namaTes} (${tes.jumlahSiswa} siswa)")
-
             try {
-                // Inflate layout item tes
                 val cardView = layoutInflater.inflate(
                     R.layout.item_tes_terpopuler,
                     container,
                     false
                 ) as androidx.cardview.widget.CardView
 
-                // Find views
                 val tvNamaTes = cardView.findViewById<TextView>(R.id.tv_nama_tes)
                 val tvJumlahSiswa = cardView.findViewById<TextView>(R.id.tv_jumlah_siswa)
 
-                // Set data
                 tvNamaTes.text = tes.namaTes
                 tvJumlahSiswa.text = "Dikerjakan oleh ${tes.jumlahSiswa} siswa"
 
-                // Tambahkan ke container
                 container.addView(cardView)
 
-                // Tambahkan margin bottom (sesuai layout: 10dp)
                 val layoutParams = cardView.layoutParams as ViewGroup.MarginLayoutParams
                 layoutParams.bottomMargin = dpToPx(10)
                 cardView.layoutParams = layoutParams
 
-                // Tambahkan click listener
                 cardView.setOnClickListener {
                     Toast.makeText(this, "Membuka: ${tes.namaTes}", Toast.LENGTH_SHORT).show()
                 }
-
-                Log.d(TAG, "✓ Card created successfully for: ${tes.namaTes}")
 
             } catch (e: Exception) {
                 Log.e(TAG, "Error creating card for ${tes.namaTes}: ${e.message}")
             }
         }
-
-        Log.d(TAG, "✓ Successfully added ${tesList.size} tes items to UI")
     }
 
     // ==================== FUNGSI KELOLA TES ====================
-    /**
-     * Fungsi untuk menampilkan halaman Kelola Tes dengan data dari API
-     */
     private fun showTes() {
-        Log.d(TAG, "showTes called")
-
-        // Debug: cek jumlah child sebelum clear
-        Log.d(TAG, "Tes - Child count before: ${fragmentContainer.childCount}")
-
         fragmentContainer.removeAllViews()
-
-        // Debug: cek jumlah child setelah clear
-        Log.d(TAG, "Tes - Child count after: ${fragmentContainer.childCount}")
-
         val tesView = layoutInflater.inflate(R.layout.kelolasoaltes, null)
         fragmentContainer.addView(tesView)
 
-        // Debug: cek ukuran view
-        tesView.post {
-            Log.d(TAG, "Tes view width: ${tesView.width}, height: ${tesView.height}")
-            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
-        }
-
-        // Reset selected file
         selectedFileUri = null
         selectedFileName = null
-
-        // Setup ViewModel dan load data dari API
         setupKelolaTesContent(tesView)
     }
 
-    /**
-     * Fungsi untuk menampilkan form tambah tes baru
-     */
     private fun showTambahTesForm() {
-        Log.d(TAG, "showTambahTesForm called")
-
-        // Debug: cek jumlah child sebelum clear
-        Log.d(TAG, "Form - Child count before: ${fragmentContainer.childCount}")
-
         fragmentContainer.removeAllViews()
-
-        // Debug: cek jumlah child setelah clear
-        Log.d(TAG, "Form - Child count after: ${fragmentContainer.childCount}")
-
         val tambahTesView = layoutInflater.inflate(R.layout.formtambahtes, null)
         fragmentContainer.addView(tambahTesView)
 
-        // Debug: cek ukuran view
-        tambahTesView.post {
-            Log.d(TAG, "Form view width: ${tambahTesView.width}, height: ${tambahTesView.height}")
-            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
-        }
-
-        // Tetapkan menu navigasi tes sebagai aktif
         navigationView.setCheckedItem(R.id.nav_tes)
-
-        // Update judul
         titleText.text = "Tambah Tes Baru"
-
-        // Setup form tambah tes
         setupTambahTesForm(tambahTesView)
     }
 
-    /**
-     * Fungsi untuk menampilkan form kelola soal tes
-     */
     private fun showKelolaSoalTes() {
-        Log.d(TAG, "showKelolaSoalTes called")
-
         fragmentContainer.removeAllViews()
-
-        // Debug: cek jumlah child setelah clear
-        Log.d(TAG, "KelolaSoal - Child count after: ${fragmentContainer.childCount}")
-
         val kelolaSoalView = layoutInflater.inflate(R.layout.formkelolasoal, null)
         fragmentContainer.addView(kelolaSoalView)
 
-        // Debug: cek ukuran view
-        kelolaSoalView.post {
-            Log.d(TAG, "KelolaSoal view width: ${kelolaSoalView.width}, height: ${kelolaSoalView.height}")
-            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
-        }
-
-        // Tetapkan menu navigasi tes sebagai aktif
         navigationView.setCheckedItem(R.id.nav_tes)
-
-        // Update judul
         titleText.text = "Kelola Tes BK"
-
-        // Setup form kelola soal
         setupKelolaSoalTes(kelolaSoalView)
     }
 
-    /**
-     * Setup form kelola soal tes dengan data dari API
-     */
     private fun setupKelolaSoalTes(kelolaSoalView: View) {
         Log.d(TAG, "setupKelolaSoalTes called")
 
         try {
-            // Temukan views
             val tesRecyclerView = kelolaSoalView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.tesRecyclerView)
             val emptyStateLayout = kelolaSoalView.findViewById<LinearLayout>(R.id.emptyStateLayout)
             val loadingProgress = kelolaSoalView.findViewById<ProgressBar>(R.id.loadingProgress)
@@ -755,25 +600,19 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val titleTextView = kelolaSoalView.findViewById<TextView>(R.id.titleText)
             val subtitleTextView = kelolaSoalView.findViewById<TextView>(R.id.subtitleText)
 
-            // Setup RecyclerView
             tesRecyclerView.layoutManager = LinearLayoutManager(this)
             tesRecyclerView.setHasFixedSize(true)
 
-            // Setup tombol kembali
             backButton.setOnClickListener {
-                Log.d(TAG, "Back button clicked from kelola soal")
-                showTes() // Kembali ke halaman kelola tes
+                showTes()
             }
 
-            // Update judul
             titleTextView.text = "Kelola Tes BK"
             subtitleTextView.text = "Ubah, hapus, atau aktifkan/nonaktifkan jenis tes yang tersedia."
 
-            // Tampilkan loading
             loadingProgress.visibility = View.VISIBLE
             emptyStateLayout.visibility = View.GONE
 
-            // Fetch data dari API
             fetchKelolaSoalData(tesRecyclerView, emptyStateLayout, loadingProgress)
 
         } catch (e: Exception) {
@@ -782,9 +621,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
     }
 
-    /**
-     * Fungsi untuk mengambil data kelola soal dari API
-     */
     private fun fetchKelolaSoalData(
         recyclerView: androidx.recyclerview.widget.RecyclerView,
         emptyStateLayout: LinearLayout,
@@ -802,31 +638,18 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         if (result != null && result.success && result.data != null) {
                             val data = result.data
 
-                            // DEBUG: Tampilkan data yang diterima
                             Log.d(TAG, "Data kelola soal diterima:")
-                            Log.d(TAG, "Success: ${result.success}")
-                            Log.d(TAG, "Message: ${result.message}")
                             Log.d(TAG, "Total tes: ${data.totalTes}")
                             Log.d(TAG, "Total soal: ${data.totalSoal}")
                             Log.d(TAG, "Jumlah daftar tes: ${data.daftarTes.size}")
 
-                            // Tampilkan detail setiap tes
-                            data.daftarTes.forEachIndexed { index, tes ->
-                                Log.d(TAG, "Tes ${index + 1}:")
-                                Log.d(TAG, "  - ID: ${tes.idTes}")
-                                Log.d(TAG, "  - Kategori: ${tes.kategoriTes}")
-                                Log.d(TAG, "  - Status: ${tes.status}")
-                                Log.d(TAG, "  - Jumlah Soal: ${tes.jumlahSoal}")
-                            }
-
                             if (data.daftarTes.isNotEmpty()) {
-                                // Setup adapter - gunakan data.daftarTes (List<TesDetail>)
                                 val adapter = KelolaSoalAdapter(
                                     data.daftarTes,
-                                    { tes -> // Callback untuk detail
+                                    { tes ->
                                         showTesDetailDialog(tes)
                                     },
-                                    { tes -> // Callback untuk edit
+                                    { tes ->
                                         showEditTesForm(tes)
                                     }
                                 )
@@ -848,15 +671,10 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                             }
                         } else {
                             val errorMsg = result?.message ?: "Data tidak valid"
-                            Log.e(TAG, "API Response error: $errorMsg")
-                            Toast.makeText(this@DashboardActivity,
-                                "❌ $errorMsg",
-                                Toast.LENGTH_SHORT).show()
                             emptyStateLayout.visibility = View.VISIBLE
                         }
                     } else {
                         val errorCode = response.code()
-                        Log.e(TAG, "HTTP Error: $errorCode - ${response.message()}")
                         Toast.makeText(this@DashboardActivity,
                             "❌ Error $errorCode: ${response.message()}",
                             Toast.LENGTH_SHORT).show()
@@ -866,7 +684,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     loadingProgress.visibility = View.GONE
-                    Log.e(TAG, "Network error: ${e.message}", e)
                     Toast.makeText(this@DashboardActivity,
                         "❌ Network error: ${e.message}",
                         Toast.LENGTH_SHORT).show()
@@ -877,34 +694,29 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     /**
-     * FUNGSI BARU: Menampilkan form edit tes (formkelolates.xml)
+     * Menampilkan form edit tes
      */
     private fun showEditTesForm(tes: TesDetail) {
         Log.d(TAG, "showEditTesForm called for tes: ${tes.kategoriTes} (ID: ${tes.idTes})")
+        currentTes = tes
 
         fragmentContainer.removeAllViews()
-
         val editTesView = layoutInflater.inflate(R.layout.formkelolates, null)
         fragmentContainer.addView(editTesView)
 
-        // Tetapkan menu navigasi tes sebagai aktif
         navigationView.setCheckedItem(R.id.nav_tes)
-
-        // Update judul dengan nama tes yang sedang diedit
         titleText.text = "Edit Tes: ${tes.kategoriTes}"
 
-        // Setup form edit tes dengan data dari API
         setupEditTesForm(editTesView, tes)
     }
 
     /**
-     * FUNGSI BARU: Setup form edit tes dengan RecyclerView
+     * Setup form edit tes dengan RecyclerView
      */
     private fun setupEditTesForm(editTesView: View, tes: TesDetail) {
         Log.d(TAG, "setupEditTesForm called for tes: ${tes.kategoriTes} (ID: ${tes.idTes})")
 
         try {
-            // Temukan semua views dari formkelolates.xml
             val headerText = editTesView.findViewById<TextView>(R.id.tvHeaderTes)
             val subtitleText = editTesView.findViewById<TextView>(R.id.tvSubtitleTes)
             val totalSoalText = editTesView.findViewById<TextView>(R.id.tvTotalSoalTes)
@@ -912,157 +724,78 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val btnBatal = editTesView.findViewById<Button>(R.id.btnBatal)
             val rvSoalTes = editTesView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvSoalTes)
 
-            // Update header dengan nama tes
             headerText.text = "Kelola Tes : ${tes.kategoriTes}"
+            subtitleText.text = "Kelola soal-soal untuk tes ${tes.kategoriTes}"
 
-            // Setup RecyclerView
             rvSoalTes.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
             rvSoalTes.setHasFixedSize(true)
 
-            // Setup tombol tambah soal
             btnTambahSoal.setOnClickListener {
-                Toast.makeText(this, "Menambah soal baru untuk ${tes.kategoriTes}", Toast.LENGTH_SHORT).show()
-                // Implementasi tambah soal nanti
+                showTambahSoalForm(tes.idTes, tes.kategoriTes)
             }
 
-            // Setup tombol batal
             btnBatal.setOnClickListener {
-                Log.d(TAG, "Batal button clicked from edit tes form")
-                showKelolaSoalTes() // Kembali ke halaman kelola soal
+                showKelolaSoalTes()
             }
 
-            // Tampilkan loading
             val progressDialog = ProgressDialog(this).apply {
                 setMessage("Memuat data soal...")
                 setCancelable(false)
             }
             progressDialog.show()
 
-            // Fetch data soal dari API
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     Log.d(TAG, "🔍 Mengambil data soal untuk tes ID: ${tes.idTes}")
-
                     val response = ApiClient.apiService.getSoalByTes(tes.idTes)
-                    Log.d(TAG, "✅ Response code: ${response.code()}")
 
                     withContext(Dispatchers.Main) {
                         progressDialog.dismiss()
 
                         if (response.isSuccessful) {
                             val result = response.body()
-                            Log.d(TAG, "📊 Response body ada: ${result != null}")
+                            if (result != null && result.success && result.data != null) {
+                                val data = result.data
+                                val soalList = data.soal_list ?: emptyList()
 
-                            if (result != null) {
-                                Log.d(TAG, "✅ Success status: ${result.success}")
-                                Log.d(TAG, "✅ Error message: ${result.error}")
+                                Log.d(TAG, "🎯 Jumlah soal diterima: ${soalList.size}")
 
-                                if (result.success && result.data != null) {
-                                    val data = result.data
-                                    val soalList = data.soal_list ?: emptyList()
+                                totalSoalText.text = "Total ${data.jumlah_soal} soal untuk tes ini"
 
-                                    Log.d(TAG, "🎯 Jumlah soal diterima: ${soalList.size}")
-
-                                    // Debug detail setiap soal - DENGAN PENANGANAN NULL
-                                    if (soalList.isNotEmpty()) {
-                                        Log.d(TAG, "=== DETAIL SOAL ===")
-                                        for (i in soalList.indices) {
-                                            val soal = soalList[i]
-                                            Log.d(TAG, "\n📝 Soal ${i + 1}:")
-                                            Log.d(TAG, "   - ID: ${soal.id_soal}")
-                                            Log.d(TAG, "   - Pertanyaan: ${soal.pertanyaan}")
-                                            Log.d(TAG, "   - ID Tes: ${soal.id_tes}")
-
-                                            // Cek apakah opsi_list ada dan tidak null
-                                            val opsiList = soal.opsi_list
-                                            if (opsiList != null) {
-                                                Log.d(TAG, "   - Jumlah opsi: ${opsiList.size}")
-
-                                                if (opsiList.isNotEmpty()) {
-                                                    for (j in opsiList.indices) {
-                                                        val opsi = opsiList[j]
-                                                        Log.d(TAG, "     ○ Opsi ${j + 1}:")
-                                                        Log.d(TAG, "       ID: ${opsi.id_opsi}")
-                                                        Log.d(TAG, "       Text: ${opsi.opsi_text}")
-                                                        Log.d(TAG, "       Bobot: ${opsi.bobot}")
-                                                    }
-                                                } else {
-                                                    Log.w(TAG, "   ⚠ Opsi list KOSONG (size: 0)")
-                                                }
-                                            } else {
-                                                Log.e(TAG, "   ❌ Opsi list is NULL!")
-                                            }
+                                if (soalList.isNotEmpty()) {
+                                    val adapter = SoalTesAdapter(
+                                        soalList = soalList,
+                                        onEditClick = { soal ->
+                                            showEditSoalFormDialog(soal)
+                                        },
+                                        onDeleteClick = { soal ->
+                                            showDeleteSoalDialog(soal.id_soal, soal.pertanyaan)
                                         }
-                                        Log.d(TAG, "=== END DETAIL ===")
-                                    } else {
-                                        Log.w(TAG, "⚠ Soal list KOSONG")
-                                    }
-
-                                    // Update total soal
-                                    totalSoalText.text = "Total ${data.jumlah_soal} soal untuk tes ini"
-
-                                    // Cek apakah ada soal
-                                    if (soalList.isNotEmpty()) {
-                                        // Setup adapter untuk RecyclerView
-                                        val adapter = SoalTesAdapter(
-                                            soalList = soalList,
-                                            onEditClick = { soal ->
-                                                // Handle edit soal - langsung pakai data yang sudah ada
-                                                showEditSoalFormDialog(soal)
-                                            },
-                                            onDeleteClick = { soal ->
-                                                // Handle delete soal
-                                                showDeleteSoalDialog(soal.id_soal, soal.pertanyaan)
-                                            }
-                                        )
-                                        rvSoalTes.adapter = adapter
-
-                                        Toast.makeText(
-                                            this@DashboardActivity,
-                                            "✅ ${soalList.size} soal dimuat",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
-                                        // Tampilkan pesan jika tidak ada soal
-                                        Toast.makeText(
-                                            this@DashboardActivity,
-                                            "ℹ️ Belum ada soal untuk tes ini",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-
-                                } else {
-                                    // Data null atau success = false
-                                    val errorMsg = result.error ?: "Data tidak valid atau kosong"
-                                    Log.e(TAG, "❌ API Error: $errorMsg")
-                                    Log.e(TAG, "❌ Data field is null: ${result.data == null}")
+                                    )
+                                    rvSoalTes.adapter = adapter
 
                                     Toast.makeText(
                                         this@DashboardActivity,
-                                        "❌ $errorMsg",
-                                        Toast.LENGTH_LONG
+                                        "✅ ${soalList.size} soal dimuat",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@DashboardActivity,
+                                        "ℹ️ Belum ada soal untuk tes ini",
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 }
                             } else {
-                                // Result null
-                                Log.e(TAG, "❌ Response body is NULL")
+                                val errorMsg = result?.error ?: "Data tidak valid"
                                 Toast.makeText(
                                     this@DashboardActivity,
-                                    "❌ Tidak ada data yang diterima dari server",
+                                    "❌ $errorMsg",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
                         } else {
                             Log.e(TAG, "❌ HTTP Error: ${response.code()} - ${response.message()}")
-
-                            // Coba baca error body
-                            try {
-                                val errorBody = response.errorBody()?.string()
-                                Log.e(TAG, "❌ Error body: $errorBody")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ Cannot read error body: ${e.message}")
-                            }
-
                             Toast.makeText(
                                 this@DashboardActivity,
                                 "❌ Error ${response.code()}: ${response.message()}",
@@ -1075,11 +808,9 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         progressDialog.dismiss()
                         Log.e(TAG, "❌ Exception fetching soal data: ${e.message}", e)
 
-                        // Tampilkan error lebih detail
                         val errorMsg = when (e) {
-                            is java.net.UnknownHostException -> "Tidak dapat terhubung ke server. Cek koneksi internet."
+                            is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
                             is java.net.SocketTimeoutException -> "Timeout. Server terlalu lama merespon."
-                            is javax.net.ssl.SSLHandshakeException -> "Error SSL. Pastikan URL HTTPS valid."
                             else -> "Error: ${e.message}"
                         }
 
@@ -1091,7 +822,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     }
                 }
             }
-
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error in setupEditTesForm: ${e.message}", e)
             Toast.makeText(this, "❌ Error setup form edit: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -1099,173 +829,852 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     /**
-     * FUNGSI BARU: Menampilkan dialog form edit soal dengan model SoalData
+     * FUNGSI BARU: Menampilkan form edit soal dengan opsi yang MUNCUL
      */
     private fun showEditSoalFormDialog(soal: SoalData) {
         try {
-            // Buat dialog custom
+            // DEBUG: Tampilkan detail soal
+            debugSoalData(soal)
+
+            // Buat dialog
             val dialog = android.app.AlertDialog.Builder(this)
-                .setTitle("Edit Soal")
+                .setTitle("Edit Soal #${soal.id_soal}")
                 .setCancelable(false)
                 .create()
 
-            // Inflate layout dialog
             val dialogView = layoutInflater.inflate(R.layout.dialog_edit_soal, null)
             dialog.setView(dialogView)
 
-            // Temukan views dalam dialog
+            // Temukan views
+            val tvEditSoal = dialogView.findViewById<TextView>(R.id.tvEditSoal)
+            val iconClose = dialogView.findViewById<ImageView>(R.id.iconClose)
             val etPertanyaan = dialogView.findViewById<EditText>(R.id.etPertanyaan)
-            val etOpsiA = dialogView.findViewById<EditText>(R.id.etOpsiA)
-            val etBobotA = dialogView.findViewById<EditText>(R.id.etBobotA)
-            val etOpsiB = dialogView.findViewById<EditText>(R.id.etOpsiB)
-            val etBobotB = dialogView.findViewById<EditText>(R.id.etBobotB)
-            val etOpsiC = dialogView.findViewById<EditText>(R.id.etOpsiC)
-            val etBobotC = dialogView.findViewById<EditText>(R.id.etBobotC)
-            val btnSimpan = dialogView.findViewById<Button>(R.id.btnSimpan)
-            val btnBatal = dialogView.findViewById<Button>(R.id.btnBatal)
+            val containerOpsi = dialogView.findViewById<LinearLayout>(R.id.containerOpsi)
+            val btnSimpan = dialogView.findViewById<LinearLayout>(R.id.btnSimpan)
+            val btnBatal = dialogView.findViewById<LinearLayout>(R.id.btnBatal)
 
-            // Set data ke form
+            // Set judul
+            tvEditSoal.text = "Edit Soal #${soal.id_soal}"
+
+            // Set pertanyaan
             etPertanyaan.setText(soal.pertanyaan)
 
-            // Set opsi dari soal.opsi_list
+            // Kosongkan container
+            containerOpsi.removeAllViews()
+
+            // Tampilkan semua opsi dari API
             val opsiList = soal.opsi_list ?: emptyList()
             if (opsiList.isNotEmpty()) {
-                etOpsiA.setText(opsiList[0].opsi_text)
-                etBobotA.setText(opsiList[0].bobot.toString())
+                Log.d(TAG, "🎨 Menampilkan ${opsiList.size} opsi")
+
+                // Labels untuk opsi
+                val labels = listOf("A", "B", "C", "D", "E", "F", "G", "H")
+
+                for (i in opsiList.indices) {
+                    val opsi = opsiList[i]
+                    val label = if (i < labels.size) labels[i] else "${i + 1}"
+
+                    try {
+                        // EKSTRAK DATA DARI OPSI
+                        var text = ""
+                        var bobot = "1"
+
+                        // Cara 1: Coba akses langsung jika modelnya OpsiData
+                        if (opsi is com.example.login.models.OpsiData) {
+                            text = opsi.opsi ?: ""
+                            bobot = opsi.bobot?.toString() ?: "1"
+                        }
+                        // Cara 2: Coba akses dengan refleksi
+                        else {
+                            try {
+                                val opsiField = opsi.javaClass.getDeclaredField("opsi")
+                                opsiField.isAccessible = true
+                                val opsiValue = opsiField.get(opsi)
+                                text = opsiValue?.toString() ?: ""
+
+                                val bobotField = opsi.javaClass.getDeclaredField("bobot")
+                                bobotField.isAccessible = true
+                                val bobotValue = bobotField.get(opsi)
+                                bobot = bobotValue?.toString() ?: "1"
+                            } catch (e: Exception) {
+                                Log.e(TAG, "❌ Error akses field: ${e.message}")
+                                text = opsi.toString()
+                            }
+                        }
+
+                        Log.d(TAG, "📝 Opsi $label: '$text' (bobot: $bobot)")
+
+                        // Inflate layout
+                        val opsiItemView = layoutInflater.inflate(R.layout.item_opsi_edit, containerOpsi, false)
+
+                        // Temukan views
+                        val tvLabel = opsiItemView.findViewById<TextView>(R.id.tvLabelOpsi)
+                        val etOpsi = opsiItemView.findViewById<EditText>(R.id.etOpsi)
+                        val etBobot = opsiItemView.findViewById<EditText>(R.id.etBobot)
+
+                        // SET DATA KE UI
+                        tvLabel.text = "Opsi $label"
+                        etOpsi.setText(text)
+                        etBobot.setText(bobot)
+
+                        // Debug: verifikasi data sudah diset
+                        Log.d(TAG, "   ✓ Set: ${tvLabel.text} = '${etOpsi.text}' (bobot: ${etBobot.text})")
+
+                        // Tambahkan ke container
+                        containerOpsi.addView(opsiItemView)
+
+                    } catch (e: Exception) {
+                        Log.e(TAG, "❌ Error menampilkan opsi $i: ${e.message}")
+                    }
+                }
             } else {
-                etOpsiA.setText("")
-                etBobotA.setText("0")
+                // Jika tidak ada opsi
+                val textView = TextView(this).apply {
+                    text = "Tidak ada opsi jawaban"
+                    setTextColor(Color.GRAY)
+                    textSize = 14f
+                    gravity = Gravity.CENTER
+                    setPadding(0, 32, 0, 32)
+                }
+                containerOpsi.addView(textView)
+                Log.w(TAG, "⚠️ Tidak ada opsi untuk ditampilkan")
             }
 
-            if (opsiList.size > 1) {
-                etOpsiB.setText(opsiList[1].opsi_text)
-                etBobotB.setText(opsiList[1].bobot.toString())
-            } else {
-                etOpsiB.setText("")
-                etBobotB.setText("0")
-            }
+            // Setup tombol close
+            iconClose.setOnClickListener { dialog.dismiss() }
 
-            if (opsiList.size > 2) {
-                etOpsiC.setText(opsiList[2].opsi_text)
-                etBobotC.setText(opsiList[2].bobot.toString())
-            } else {
-                etOpsiC.setText("")
-                etBobotC.setText("0")
-            }
+            // Setup tombol batal
+            btnBatal.setOnClickListener { dialog.dismiss() }
 
-            // Setup tombol simpan
+            // Setup tombol simpan - FUNGSI UTAMA
             btnSimpan.setOnClickListener {
-                val pertanyaanBaru = etPertanyaan.text.toString().trim()
-                val opsiABaru = etOpsiA.text.toString().trim()
-                val bobotABaru = etBobotA.text.toString().toIntOrNull() ?: 0
-                val opsiBBaru = etOpsiB.text.toString().trim()
-                val bobotBBaru = etBobotB.text.toString().toIntOrNull() ?: 0
-                val opsiCBaru = etOpsiC.text.toString().trim()
-                val bobotCBaru = etBobotC.text.toString().toIntOrNull() ?: 0
-
-                if (pertanyaanBaru.isEmpty()) {
-                    etPertanyaan.error = "Pertanyaan tidak boleh kosong"
-                    return@setOnClickListener
-                }
-
-                if (opsiABaru.isEmpty() || opsiBBaru.isEmpty() || opsiCBaru.isEmpty()) {
-                    Toast.makeText(this, "Semua opsi harus diisi", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
-                // Panggil API update soal
-                updateSoal(
-                    soal.id_soal,
-                    pertanyaanBaru,
-                    opsiABaru, bobotABaru,
-                    opsiBBaru, bobotBBaru,
-                    opsiCBaru, bobotCBaru,
-                    dialog
+                saveSoalToDatabase(
+                    soalId = soal.id_soal,
+                    originalSoal = soal,
+                    etPertanyaan = etPertanyaan,
+                    containerOpsi = containerOpsi,
+                    dialog = dialog
                 )
             }
 
-            // Setup tombol batal
-            btnBatal.setOnClickListener {
-                dialog.dismiss()
-            }
-
+            // Tampilkan dialog
             dialog.show()
 
+            // Atur ukuran dialog
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
+            Log.d(TAG, "✅ Dialog edit soal berhasil ditampilkan")
+
         } catch (e: Exception) {
-            Log.e(TAG, "Error showing edit dialog: ${e.message}", e)
+            Log.e(TAG, "❌ Error showEditSoalFormDialog: ${e.message}", e)
             Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * FUNGSI BARU: Update soal ke server
+     * FUNGSI UTAMA: Simpan soal ke database via API - SESUAI FORMAT SERVER
      */
-    private fun updateSoal(
-        idSoal: Int,
-        pertanyaan: String,
-        opsiA: String, bobotA: Int,
-        opsiB: String, bobotB: Int,
-        opsiC: String, bobotC: Int,
+    private fun saveSoalToDatabase(
+        soalId: Int,
+        originalSoal: SoalData,
+        etPertanyaan: EditText,
+        containerOpsi: LinearLayout,
         dialog: android.app.AlertDialog
     ) {
+        // 1. Validasi pertanyaan
+        val pertanyaanBaru = etPertanyaan.text.toString().trim()
+        if (pertanyaanBaru.isEmpty()) {
+            etPertanyaan.error = "Pertanyaan tidak boleh kosong"
+            etPertanyaan.requestFocus()
+            return
+        }
+
+        // 2. Validasi semua opsi
+        val opsiData = mutableListOf<Pair<String, Int>>()
+        for (i in 0 until containerOpsi.childCount) {
+            val child = containerOpsi.getChildAt(i)
+            if (child is LinearLayout) {
+                try {
+                    val etOpsi = child.findViewById<EditText?>(R.id.etOpsi)
+                    val etBobot = child.findViewById<EditText?>(R.id.etBobot)
+
+                    if (etOpsi != null && etBobot != null) {
+                        val opsiText = etOpsi.text.toString().trim()
+                        val bobotText = etBobot.text.toString().trim()
+
+                        if (opsiText.isEmpty()) {
+                            etOpsi.error = "Opsi tidak boleh kosong"
+                            etOpsi.requestFocus()
+                            return
+                        }
+
+                        val bobot = bobotText.toIntOrNull() ?: 1
+                        // Validasi bobot 1-5
+                        val validatedBobot = if (bobot < 1 || bobot > 5) 1 else bobot
+                        opsiData.add(Pair(opsiText, validatedBobot))
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error reading opsi $i: ${e.message}")
+                }
+            }
+        }
+
+        // 3. Validasi minimal 2 opsi
+        if (opsiData.size < 2) {
+            Toast.makeText(this, "Minimal diperlukan 2 opsi jawaban", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 4. Tampilkan progress dialog
         val progressDialog = ProgressDialog(this).apply {
-            setMessage("Menyimpan perubahan...")
+            setMessage("Menyimpan perubahan ke database...")
             setCancelable(false)
         }
         progressDialog.show()
 
-        // Untuk sekarang, tampilkan data yang akan dikirim
-        progressDialog.dismiss()
-        dialog.dismiss()
+        // 5. Siapkan data opsi_list sesuai format server
+        val originalOpsiList = originalSoal.opsi_list ?: emptyList()
+        val opsiList = mutableListOf<OpsiUpdateItem>()
 
-        Log.d(TAG, "Mengupdate soal ID: $idSoal")
-        Log.d(TAG, "Pertanyaan: $pertanyaan")
-        Log.d(TAG, "Opsi A: $opsiA (Bobot: $bobotA)")
-        Log.d(TAG, "Opsi B: $opsiB (Bobot: $bobotB)")
-        Log.d(TAG, "Opsi C: $opsiC (Bobot: $bobotC)")
+        for (i in opsiData.indices) {
+            val (opsiText, bobot) = opsiData[i]
 
-        Toast.makeText(
-            this,
-            "Fitur update soal akan segera tersedia",
-            Toast.LENGTH_SHORT
-        ).show()
+            // CARI ID_OPSI DENGAN CARA YANG BENAR
+            var idOpsi = 0
+
+            try {
+                if (i < originalOpsiList.size) {
+                    val opsiObj = originalOpsiList[i]
+
+                    // DEKLARASIKAN SEBAGAI OBJECT KOSONG DULU
+                    Log.d(TAG, "🔍 Mencari id_opsi untuk opsi ke-$i")
+
+                    // COBA 1: Jika OpsiData
+                    if (opsiObj is com.example.login.models.OpsiData) {
+                        idOpsi = opsiObj.id_opsi ?: 0
+                        Log.d(TAG, "✅ id_opsi dari OpsiData: $idOpsi")
+                    }
+                    // COBA 2: Refleksi
+                    else {
+                        // Cari field yang mengandung 'id_opsi'
+                        val fields = opsiObj.javaClass.declaredFields
+                        for (field in fields) {
+                            val fieldName = field.name.lowercase()
+                            if (fieldName.contains("id_opsi") || fieldName.contains("id")) {
+                                field.isAccessible = true
+                                val value = field.get(opsiObj)
+                                when (value) {
+                                    is Int -> idOpsi = value
+                                    is Number -> idOpsi = value.toInt()
+                                    is String -> idOpsi = value.toIntOrNull() ?: 0
+                                }
+                                if (idOpsi > 0) {
+                                    Log.d(TAG, "✅ id_opsi ditemukan di field '${field.name}': $idOpsi")
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Jika masih 0, coba pendekatan lain
+                if (idOpsi <= 0) {
+                    // COBA 3: Ambil dari string representation
+                    val opsiStr = originalOpsiList[i].toString()
+                    if (opsiStr.contains("id_opsi")) {
+                        val regex = """id_opsi[=:]\s*(\d+)""".toRegex()
+                        val match = regex.find(opsiStr)
+                        idOpsi = match?.groupValues?.get(1)?.toIntOrNull() ?: 0
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Error mencari id_opsi: ${e.message}")
+            }
+
+            // VALIDASI FINAL: id_opsi HARUS > 0
+            if (idOpsi <= 0) {
+                // Jika tidak ditemukan, kita perlu mendapatkan dari API atau memberi nilai default
+                // Untuk sekarang, gunakan incremental sebagai fallback
+                idOpsi = i + 1
+                Log.w(TAG, "⚠️ id_opsi tidak ditemukan, menggunakan fallback: $idOpsi")
+
+                // Tampilkan error jika tidak bisa mendapatkan id_opsi
+                Toast.makeText(
+                    this,
+                    "⚠️ ID opsi tidak valid. Pastikan data soal sudah dimuat dengan benar.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            // Buat OpsiUpdateItem sesuai format server
+            opsiList.add(OpsiUpdateItem(
+                id_opsi = idOpsi,
+                opsi = opsiText,
+                bobot = bobot
+            ))
+
+            Log.d(TAG, "📝 Opsi $i: id_opsi=$idOpsi, opsi='$opsiText', bobot=$bobot")
+        }
+
+        // 6. Buat request sesuai format server PHP
+        val request = UpdateSoalCompleteRequest(
+            id_soal = soalId,
+            pertanyaan = pertanyaanBaru,
+            opsi_list = opsiList
+        )
+
+        // 7. DEBUG: Tampilkan request JSON
+        val gson = com.google.gson.Gson()
+        val jsonRequest = gson.toJson(request)
+        Log.d(TAG, "📋 Request JSON yang dikirim:")
+        Log.d(TAG, jsonRequest)
+
+        // 8. Kirim ke API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "🚀 Memanggil API updateSoalComplete...")
+                val response = ApiClient.apiService.updateSoalComplete(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    Log.d(TAG, "📥 Response received. Code: ${response.code()}")
+                    Log.d(TAG, "📥 Response message: ${response.message()}")
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        // Debug response body
+                        if (result != null) {
+                            Log.d(TAG, "✅ Response body: success=${result.success}, message=${result.message}, error=${result.error}")
+                        } else {
+                            Log.e(TAG, "❌ Response body is null")
+                        }
+
+                        if (result != null) {
+                            if (result.success) {
+                                Log.d(TAG, "✅ API Success: ${result.message}")
+
+                                dialog.dismiss()
+
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                // Refresh halaman edit tes
+                                currentTes?.let { tes ->
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        showEditTesForm(tes)
+                                    }, 800)
+                                }
+
+                            } else {
+                                val errorMsg = result.error ?: "Update gagal"
+                                Log.e(TAG, "❌ API Error: $errorMsg")
+
+                                // Tampilkan error yang lebih spesifik
+                                val displayError = if (errorMsg.contains("id_opsi")) {
+                                    "Error ID opsi: $errorMsg\nPastikan data sudah dimuat dengan benar."
+                                } else {
+                                    errorMsg
+                                }
+
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $displayError",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Log.e(TAG, "❌ Response body is null")
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = try {
+                            response.errorBody()?.string() ?: "No error body"
+                        } catch (e: Exception) {
+                            "Cannot read error body"
+                        }
+
+                        Log.e(TAG, "❌ HTTP Error $errorCode: $errorBody")
+
+                        // Parse error body untuk info lebih detail
+                        val errorMessage = try {
+                            val errorJson = com.google.gson.Gson().fromJson(errorBody, Map::class.java)
+                            errorJson["error"]?.toString() ?: "Error $errorCode"
+                        } catch (e: Exception) {
+                            when (errorCode) {
+                                400 -> "Bad Request: Data tidak sesuai format"
+                                401 -> "Unauthorized"
+                                404 -> "Endpoint tidak ditemukan"
+                                500 -> "Server error"
+                                else -> "Error $errorCode"
+                            }
+                        }
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ $errorMessage",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        // DEBUG: Tampilkan error body
+                        Log.e(TAG, "❌ Error Body: $errorBody")
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "❌ Network error: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout: Server terlalu lama merespon"
+                        is javax.net.ssl.SSLHandshakeException -> "Error SSL/Koneksi aman"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Fungsi debug untuk melihat struktur data soal
+     */
+    private fun debugSoalData(soal: SoalData) {
+        Log.d(TAG, "=== DEBUG DETAIL SOAL ===")
+        Log.d(TAG, "Soal ID: ${soal.id_soal}")
+        Log.d(TAG, "Pertanyaan: ${soal.pertanyaan}")
+        Log.d(TAG, "ID Tes: ${soal.id_tes}")
+        Log.d(TAG, "opsi_list is null? ${soal.opsi_list == null}")
+
+        val opsiList = soal.opsi_list
+        if (opsiList != null) {
+            Log.d(TAG, "Jumlah opsi: ${opsiList.size}")
+
+            for (i in opsiList.indices) {
+                val opsi = opsiList[i]
+                Log.d(TAG, "--- Opsi $i ---")
+                Log.d(TAG, "  Class: ${opsi.javaClass.name}")
+                Log.d(TAG, "  SimpleName: ${opsi.javaClass.simpleName}")
+                Log.d(TAG, "  toString(): $opsi")
+
+                try {
+                    val fields = opsi.javaClass.declaredFields
+                    Log.d(TAG, "  Available fields: ${fields.map { it.name }}")
+
+                    for (field in fields) {
+                        try {
+                            field.isAccessible = true
+                            val value = field.get(opsi)
+                            Log.d(TAG, "    ${field.name}: $value (Type: ${value?.javaClass?.simpleName})")
+                        } catch (e: Exception) {
+                            Log.d(TAG, "    ${field.name}: ERROR - ${e.message}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "  Error in reflection: ${e.message}")
+                }
+            }
+        } else {
+            Log.d(TAG, "opsi_list is NULL")
+        }
+        Log.d(TAG, "=== END DEBUG ===")
     }
 
     /**
      * FUNGSI BARU: Menampilkan dialog konfirmasi hapus soal
      */
     private fun showDeleteSoalDialog(idSoal: Int, pertanyaan: String) {
-        android.app.AlertDialog.Builder(this)
-            .setTitle("Hapus Soal")
-            .setMessage("Apakah Anda yakin ingin menghapus soal ini?\n\n\"${pertanyaan.take(50)}...\"")
-            .setPositiveButton("Ya, Hapus") { dialog, which ->
-                // Panggil API hapus soal
-                deleteSoal(idSoal)
+        try {
+            val pertanyaanSingkat = if (pertanyaan.length > 100) {
+                "${pertanyaan.substring(0, 100)}..."
+            } else {
+                pertanyaan
             }
-            .setNegativeButton("Batal", null)
-            .show()
+
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Hapus Soal")
+                .setMessage("Apakah Anda yakin ingin menghapus soal ini?\n\n\"$pertanyaanSingkat\"")
+                .setPositiveButton("Ya, Hapus") { dialog, which ->
+                    deleteSoal(idSoal, pertanyaan) // Panggil fungsi baru yang terhubung API
+                }
+                .setNegativeButton("Batal", null)
+                .setIcon(ContextCompat.getDrawable(this, android.R.drawable.ic_delete))
+                .show()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error showing delete dialog: ${e.message}", e)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**
      * FUNGSI BARU: Hapus soal dari server
      */
-    private fun deleteSoal(idSoal: Int) {
+    private fun deleteSoal(idSoal: Int, pertanyaan: String) {
         val progressDialog = ProgressDialog(this).apply {
             setMessage("Menghapus soal...")
             setCancelable(false)
         }
         progressDialog.show()
 
-        // Untuk sekarang, tampilkan konfirmasi
-        progressDialog.dismiss()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "🚀 Mengirim request hapus soal ID: $idSoal")
 
-        Log.d(TAG, "Menghapus soal ID: $idSoal")
+                val request = HapusSoalRequest(idSoal = idSoal)
 
-        Toast.makeText(
-            this,
-            "Fitur hapus soal akan segera tersedia",
-            Toast.LENGTH_SHORT
-        ).show()
+                // Kirim request ke API
+                val response = ApiClient.apiService.hapusSoal(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        if (result != null) {
+                            if (result.success) {
+                                Log.d(TAG, "✅ Soal berhasil dihapus: ${result.message}")
+
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                // Refresh data setelah hapus
+                                currentTes?.let {
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        showEditTesForm(it)
+                                    }, 800)
+                                }
+
+                            } else {
+                                val errorMsg = result.error ?: "Gagal menghapus soal"
+                                Log.e(TAG, "❌ Error: $errorMsg")
+
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "❌ HTTP Error $errorCode: $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "❌ Network error: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout: Server terlalu lama merespon"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Menampilkan form tambah soal
+     */
+    private fun showTambahSoalForm(idTes: Int, namaTes: String) {
+        Log.d(TAG, "showTambahSoalForm called for tes ID: $idTes - $namaTes")
+
+        fragmentContainer.removeAllViews()
+        val tambahSoalView = layoutInflater.inflate(R.layout.tambahsoal, null)
+        fragmentContainer.addView(tambahSoalView)
+
+        titleText.text = "Tambah Soal - $namaTes"
+        setupTambahSoalForm(tambahSoalView, idTes, namaTes)
+    }
+
+    /**
+     * FUNGSI BARU: Setup form tambah soal
+     */
+    private fun setupTambahSoalForm(tambahSoalView: View, idTes: Int, namaTes: String) {
+        Log.d(TAG, "setupTambahSoalForm called for tes ID: $idTes")
+
+        try {
+            val tvHeader = tambahSoalView.findViewById<TextView>(R.id.tvHeader)
+            val etPertanyaan = tambahSoalView.findViewById<EditText>(R.id.etPertanyaan)
+            val containerOpsi = tambahSoalView.findViewById<LinearLayout>(R.id.containerOpsi)
+            val btnTambahOpsi = tambahSoalView.findViewById<LinearLayout>(R.id.btnTambahOpsi)
+            val btnBatal = tambahSoalView.findViewById<LinearLayout>(R.id.btnBatal)
+            val btnSimpan = tambahSoalView.findViewById<LinearLayout>(R.id.btnSimpan)
+
+            tvHeader.text = "Tambah Soal Baru - $namaTes"
+
+            val opsiList = mutableListOf<Pair<EditText, EditText>>()
+            setupInitialOpsi(tambahSoalView, opsiList)
+
+            btnTambahOpsi.setOnClickListener {
+                addNewOpsiOption(containerOpsi, opsiList)
+            }
+
+            btnBatal.setOnClickListener {
+                currentTes?.let { tes ->
+                    showEditTesForm(tes)
+                }
+            }
+
+            btnSimpan.setOnClickListener {
+                saveSoal(idTes, etPertanyaan, opsiList, namaTes)
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupTambahSoalForm: ${e.message}", e)
+            Toast.makeText(this, "Error setup form: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Setup opsi awal
+     */
+    private fun setupInitialOpsi(view: View, opsiList: MutableList<Pair<EditText, EditText>>) {
+        try {
+            val etOpsi1 = view.findViewById<EditText>(R.id.etOpsi1)
+            val etBobot1 = view.findViewById<EditText>(R.id.etBobot1)
+            opsiList.add(Pair(etOpsi1, etBobot1))
+
+            val etOpsi2 = view.findViewById<EditText>(R.id.etOpsi2)
+            val etBobot2 = view.findViewById<EditText>(R.id.etBobot2)
+            opsiList.add(Pair(etOpsi2, etBobot2))
+
+            val btnHapus2 = view.findViewById<androidx.cardview.widget.CardView>(R.id.btnHapus2)
+            btnHapus2.setOnClickListener {
+                removeOpsiOption(etOpsi2, etBobot2, btnHapus2, opsiList)
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupInitialOpsi: ${e.message}", e)
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Tambah opsi baru
+     */
+    private fun addNewOpsiOption(container: LinearLayout, opsiList: MutableList<Pair<EditText, EditText>>) {
+        try {
+            val inflater = LayoutInflater.from(this)
+            val opsiItem = inflater.inflate(R.layout.item_opsi_dinamis, container, false)
+
+            val etOpsi = opsiItem.findViewById<EditText>(R.id.etOpsiDinamis)
+            val etBobot = opsiItem.findViewById<EditText>(R.id.etBobotDinamis)
+            val btnHapus = opsiItem.findViewById<androidx.cardview.widget.CardView>(R.id.btnHapusDinamis)
+
+            etOpsi.hint = "Opsi jawaban"
+            etBobot.hint = "1"
+            etBobot.setText("1")
+
+            btnHapus.setOnClickListener {
+                removeOpsiOption(etOpsi, etBobot, btnHapus, opsiList)
+                container.removeView(opsiItem)
+            }
+
+            container.addView(opsiItem)
+            opsiList.add(Pair(etOpsi, etBobot))
+
+            container.post {
+                val scrollView = container.parent as? androidx.core.widget.NestedScrollView
+                scrollView?.fullScroll(View.FOCUS_DOWN)
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error adding new opsi: ${e.message}", e)
+            Toast.makeText(this, "Gagal menambah opsi", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Hapus opsi
+     */
+    private fun removeOpsiOption(
+        etOpsi: EditText,
+        etBobot: EditText,
+        btnHapus: androidx.cardview.widget.CardView,
+        opsiList: MutableList<Pair<EditText, EditText>>
+    ) {
+        val pairToRemove = opsiList.find { it.first == etOpsi && it.second == etBobot }
+        opsiList.remove(pairToRemove)
+    }
+
+    /**
+     * FUNGSI BARU: Simpan soal ke server
+     */
+    private fun saveSoal(
+        idTes: Int,
+        etPertanyaan: EditText,
+        opsiList: List<Pair<EditText, EditText>>,
+        namaTes: String
+    ) {
+        val pertanyaan = etPertanyaan.text.toString().trim()
+
+        if (pertanyaan.isEmpty()) {
+            etPertanyaan.error = "Pertanyaan tidak boleh kosong"
+            etPertanyaan.requestFocus()
+            return
+        }
+
+        val opsiData = mutableListOf<Pair<String, Int>>()
+        for (pair in opsiList) {
+            val opsiText = pair.first.text.toString().trim()
+            val bobotText = pair.second.text.toString().trim()
+
+            if (opsiText.isEmpty()) {
+                pair.first.error = "Opsi tidak boleh kosong"
+                pair.first.requestFocus()
+                return
+            }
+
+            val bobot = bobotText.toIntOrNull() ?: 1
+            opsiData.add(Pair(opsiText, bobot))
+        }
+
+        if (opsiData.size < 2) {
+            Toast.makeText(this, "Minimal diperlukan 2 opsi jawaban", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menyimpan soal...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val request = TambahSoalRequest(
+                    id_tes = idTes,
+                    pertanyaan = pertanyaan,
+                    opsi = opsiData.map { it.first },
+                    bobot = opsiData.map { it.second }
+                )
+
+                Log.d(TAG, "Mengirim request tambah soal:")
+                Log.d(TAG, "ID Tes: $idTes")
+                Log.d(TAG, "Pertanyaan: $pertanyaan")
+                Log.d(TAG, "Jumlah opsi: ${opsiData.size}")
+
+                val response = ApiClient.apiService.tambahSoal(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        Log.d(TAG, "API Response: $result")
+
+                        if (result != null) {
+                            if (result.success) {
+                                val idSoalBaru = result.data?.id_soal ?: 0
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    currentTes?.let {
+                                        showEditTesForm(it)
+                                    }
+                                }, 1500)
+
+                            } else {
+                                val errorMsg = if (!result.error.isNullOrEmpty()) {
+                                    "${result.message}: ${result.error}"
+                                } else {
+                                    result.message
+                                }
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "API Error: $errorCode - $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error saving soal: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
     /**
@@ -1298,14 +1707,13 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      */
     private fun formatDate(dateString: String): String {
         return try {
-            // Coba parsing format dari database
             val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val date = inputFormat.parse(dateString)
 
             val outputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
             outputFormat.format(date)
         } catch (e: Exception) {
-            dateString // Return as-is jika error
+            dateString
         }
     }
 
@@ -1316,7 +1724,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Log.d(TAG, "setupTambahTesForm called")
 
         try {
-            // Temukan views
             val etNamaTesBaru = tambahTesView.findViewById<EditText>(R.id.et_nama_tes_baru)
             val etDeskripsiTes = tambahTesView.findViewById<EditText>(R.id.et_deskripsi_tes)
             val tvFileStatus = tambahTesView.findViewById<TextView>(R.id.tv_file_status)
@@ -1324,32 +1731,26 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val btnBatal = tambahTesView.findViewById<Button>(R.id.btn_batal)
             val btnSimpan = tambahTesView.findViewById<Button>(R.id.btn_simpan)
 
-            // Reset status file
             selectedFileUri = null
             selectedFileName = null
             tvFileStatus.text = "[Pilih file CSV]"
             tvFileStatus.setTextColor(Color.parseColor("#888888"))
 
-            // Setup browse button untuk memilih file CSV
             btnBrowse.setOnClickListener {
                 Log.d(TAG, "Browse button clicked")
                 openFilePicker()
             }
 
-            // Setup button batal (kembali ke halaman kelola tes)
             btnBatal.setOnClickListener {
-                Log.d(TAG, "Batal button clicked")
-                showTes() // Kembali ke halaman kelola tes
+                showTes()
             }
 
-            // Setup button simpan
             btnSimpan.setOnClickListener {
                 Log.d(TAG, "Simpan button clicked")
 
                 val namaTes = etNamaTesBaru.text.toString().trim()
                 val deskripsi = etDeskripsiTes.text.toString().trim()
 
-                // Validasi input
                 if (namaTes.isEmpty()) {
                     etNamaTesBaru.error = "Nama tes harus diisi"
                     etNamaTesBaru.requestFocus()
@@ -1371,14 +1772,12 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     return@setOnClickListener
                 }
 
-                // Tampilkan progress dialog
                 val progressDialog = ProgressDialog(this).apply {
                     setMessage("Mengupload tes ke server...")
                     setCancelable(false)
                 }
                 progressDialog.show()
 
-                // Baca file CSV dan kirim ke API
                 try {
                     val csvContent = readCSVFile(selectedFileUri!!)
                     if (csvContent == null) {
@@ -1391,7 +1790,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         return@setOnClickListener
                     }
 
-                    // Validasi minimal CSV memiliki header
                     if (!csvContent.contains("PERTANYAAN") || !csvContent.contains("OPSI_A")) {
                         progressDialog.dismiss()
                         Toast.makeText(
@@ -1403,9 +1801,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     }
 
                     Log.d(TAG, "CSV content length: ${csvContent.length}")
-                    Log.d(TAG, "First 500 chars of CSV: ${csvContent.take(500)}...")
 
-                    // Kirim ke API SEDERHANA tanpa token
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
                             val request = TambahTesRequest(
@@ -1415,11 +1811,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                             )
 
                             Log.d(TAG, "Mengirim request ke API...")
-                            Log.d(TAG, "Nama Tes: ${request.nama_tes}")
-                            Log.d(TAG, "Deskripsi length: ${request.deskripsi_tes.length}")
-                            Log.d(TAG, "CSV lines: ${csvContent.lines().size}")
-
-                            // Gunakan API sederhana tanpa token
                             val response = ApiClient.apiService.tambahTes(request)
 
                             withContext(Dispatchers.Main) {
@@ -1428,7 +1819,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                                 if (response.isSuccessful) {
                                     val result = response.body()
                                     Log.d(TAG, "API Response Status: ${response.code()}")
-                                    Log.d(TAG, "API Response Body: $result")
 
                                     if (result != null) {
                                         if (result.status == "success") {
@@ -1438,7 +1828,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                                                 Toast.LENGTH_LONG
                                             ).show()
 
-                                            // Refresh halaman kelola tes setelah 2 detik
                                             Handler(Looper.getMainLooper()).postDelayed({
                                                 showTes()
                                             }, 2000)
@@ -1463,7 +1852,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                                     val errorBody = response.errorBody()?.string() ?: "No error body"
 
                                     Log.e(TAG, "API Error Code: $errorCode")
-                                    Log.e(TAG, "API Error Body: $errorBody")
 
                                     val errorMessage = when (errorCode) {
                                         400 -> "Bad Request: Data tidak valid"
@@ -1484,7 +1872,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         } catch (e: java.net.SocketTimeoutException) {
                             withContext(Dispatchers.Main) {
                                 progressDialog.dismiss()
-                                Log.e(TAG, "Socket timeout: ${e.message}", e)
                                 Toast.makeText(
                                     this@DashboardActivity,
                                     "❌ Timeout: Koneksi ke server terlalu lama",
@@ -1494,27 +1881,15 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         } catch (e: java.net.UnknownHostException) {
                             withContext(Dispatchers.Main) {
                                 progressDialog.dismiss()
-                                Log.e(TAG, "Unknown host: ${e.message}", e)
                                 Toast.makeText(
                                     this@DashboardActivity,
                                     "❌ Tidak dapat terhubung ke server. Cek koneksi internet",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
-                        } catch (e: java.io.IOException) {
-                            withContext(Dispatchers.Main) {
-                                progressDialog.dismiss()
-                                Log.e(TAG, "IO Error: ${e.message}", e)
-                                Toast.makeText(
-                                    this@DashboardActivity,
-                                    "❌ Network error: ${e.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
                                 progressDialog.dismiss()
-                                Log.e(TAG, "Unexpected error: ${e.message}", e)
                                 Toast.makeText(
                                     this@DashboardActivity,
                                     "❌ Error: ${e.message}",
@@ -1526,7 +1901,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
                 } catch (e: Exception) {
                     progressDialog.dismiss()
-                    Log.e(TAG, "Error processing CSV: ${e.message}", e)
                     Toast.makeText(
                         this,
                         "❌ Error membaca file: ${e.message}",
@@ -1545,7 +1919,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Log.d(TAG, "setupKelolaTesContent called")
 
         try {
-            // Temukan semua views dari XML
             val tvTotalSoal = tesView.findViewById<TextView>(R.id.tvTotalSoal)
             val tvJenisTes = tesView.findViewById<TextView>(R.id.tvJenisTes)
             val kelolaTesBKLayout = tesView.findViewById<LinearLayout>(R.id.kelolaTesBKLayout)
@@ -1555,18 +1928,12 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val mainLayout = tesView.findViewById<LinearLayout>(R.id.kelolaTesMainLayout)
             val tvErrorTes = tesView.findViewById<TextView>(R.id.tvErrorTes)
             val swipeRefreshTes = tesView.findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.swipeRefreshTes)
-
-            // Temukan TextView "Tambah Tes Baru"
             val tvTambahTesBaru = tesView.findViewById<TextView>(R.id.tvTambahTesBaru)
-
-            // Temukan TextView "Kelola Tes BK"
             val tvKelolaTesBK = tesView.findViewById<TextView>(R.id.tvKelolaTesBK)
 
-            // Setup RecyclerView
             rvDaftarTes.layoutManager = LinearLayoutManager(this)
             rvDaftarTes.setHasFixedSize(true)
 
-            // Setup SwipeRefreshLayout
             swipeRefreshTes.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -1575,35 +1942,25 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             )
 
             swipeRefreshTes.setOnRefreshListener {
-                Log.d(TAG, "Swipe refresh triggered for kelola tes")
                 kelolaTesViewModel.fetchKelolaTesData()
             }
 
-            // Setup click listeners untuk tombol aksi
             kelolaTesBKLayout.setOnClickListener {
-                Log.d(TAG, "KelolaTesBKLayout clicked")
                 showKelolaSoalTes()
             }
 
-            // Listener untuk TextView "Kelola Tes BK"
             tvKelolaTesBK?.setOnClickListener {
-                Log.d(TAG, "tvKelolaTesBK clicked")
                 showKelolaSoalTes()
             }
 
-            // Listener untuk layout Tambah Tes Baru
             tambahTesBaruLayout.setOnClickListener {
-                Log.d(TAG, "TambahTesBaruLayout clicked")
                 showTambahTesForm()
             }
 
-            // Listener untuk TextView "Tambah Tes Baru"
             tvTambahTesBaru.setOnClickListener {
-                Log.d(TAG, "tvTambahTesBaru clicked")
                 showTambahTesForm()
             }
 
-            // Setup observers untuk ViewModel
             kelolaTesViewModel.kelolaTesData.observe(this) { response ->
                 swipeRefreshTes.isRefreshing = false
                 progressBarInitial.visibility = View.GONE
@@ -1611,20 +1968,12 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 if (response != null && response.success && response.data != null) {
                     val data = response.data
 
-                    Log.d(TAG, "✓ Data tes berhasil dimuat:")
-                    Log.d(TAG, "  - Total Soal: ${data.totalSoal}")
-                    Log.d(TAG, "  - Jenis Tes: ${data.jenisTes}")
-                    Log.d(TAG, "  - Jumlah Tes: ${data.daftarTes.size}")
-
-                    // Tampilkan main layout
                     mainLayout.visibility = View.VISIBLE
                     tvErrorTes.visibility = View.GONE
 
-                    // Update statistik
                     tvTotalSoal.text = data.totalSoal.toString()
                     tvJenisTes.text = data.jenisTes.toString()
 
-                    // Update daftar tes di RecyclerView
                     if (data.daftarTes.isNotEmpty()) {
                         val adapter = TesAdapter(data.daftarTes) { tes ->
                             val statusText = if (tes.status == "aktif") "Aktif" else "Nonaktif"
@@ -1642,26 +1991,21 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
                     Toast.makeText(this, "Data tes berhasil dimuat", Toast.LENGTH_SHORT).show()
                 } else if (response != null && !response.success) {
-                    Log.e(TAG, "API returned error: ${response.message}")
                     mainLayout.visibility = View.VISIBLE
                     tvErrorTes.text = "Error: ${response.message}"
                     tvErrorTes.visibility = View.VISIBLE
 
-                    // Tampilkan data default jika error
                     tvTotalSoal.text = "0"
                     tvJenisTes.text = "0"
                 }
             }
 
             kelolaTesViewModel.isLoading.observe(this) { isLoading ->
-                Log.d(TAG, "KelolaTes isLoading: $isLoading")
-
                 if (isLoading && !swipeRefreshTes.isRefreshing) {
                     progressBarInitial.visibility = View.VISIBLE
                     mainLayout.visibility = View.GONE
                 }
 
-                // Nonaktifkan swipe refresh saat loading initial
                 swipeRefreshTes.isEnabled = !isLoading
             }
 
@@ -1670,23 +2014,18 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 progressBarInitial.visibility = View.GONE
 
                 if (errorMessage != null) {
-                    Log.e(TAG, "KelolaTes error: $errorMessage")
                     mainLayout.visibility = View.VISIBLE
                     tvErrorTes.text = "Error: $errorMessage"
                     tvErrorTes.visibility = View.VISIBLE
 
-                    // Tampilkan data default jika error
                     tvTotalSoal.text = "0"
                     tvJenisTes.text = "0"
                 }
             }
 
-            // Tampilkan loading saat awal
             progressBarInitial.visibility = View.VISIBLE
             mainLayout.visibility = View.GONE
 
-            // Load data dari API
-            Log.d(TAG, "Fetching kelola tes data...")
             kelolaTesViewModel.fetchKelolaTesData()
 
         } catch (e: Exception) {
@@ -1696,30 +2035,13 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     private fun showGuru() {
-        Log.d(TAG, "showGuru called")
-
-        // Debug: cek jumlah child sebelum clear
-        Log.d(TAG, "Guru - Child count before: ${fragmentContainer.childCount}")
-
         fragmentContainer.removeAllViews()
-
-        // Ganti dengan layout kelolaguru.xml
         val guruView = layoutInflater.inflate(R.layout.kelolaguru, null)
         fragmentContainer.addView(guruView)
 
-        // Debug: cek ukuran view
-        guruView.post {
-            Log.d(TAG, "Guru view width: ${guruView.width}, height: ${guruView.height}")
-            Log.d(TAG, "Fragment container width: ${fragmentContainer.width}, height: ${fragmentContainer.height}")
-        }
-
-        // Tetapkan menu navigasi guru sebagai aktif (jika ada)
         navigationView.setCheckedItem(R.id.nav_guru)
-
-        // Update judul
         titleText.text = "Kelola Guru"
 
-        // Setup konten kelola guru
         setupKelolaGuruContent(guruView)
 
         Toast.makeText(this, "Kelola Data Guru", Toast.LENGTH_SHORT).show()
@@ -1731,16 +2053,16 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START)
                 } else if (titleText.text.toString().startsWith("Tambah Tes Baru")) {
-                    // Jika sedang di form tambah tes, kembali ke kelola tes
                     showTes()
                 } else if (titleText.text.toString().startsWith("Kelola Tes BK")) {
-                    // Jika sedang di form kelola tes BK, kembali ke kelola tes
                     showTes()
                 } else if (titleText.text.toString().startsWith("Edit Tes:")) {
-                    // Jika sedang di form edit tes, kembali ke kelola soal
                     showKelolaSoalTes()
+                } else if (titleText.text.toString().startsWith("Tambah Soal -")) {
+                    currentTes?.let {
+                        showEditTesForm(it)
+                    }
                 } else if (titleText.text.toString() == "Kelola Tes") {
-                    // Jika sedang di kelola tes, cek apakah ingin keluar app
                     if (System.currentTimeMillis() - backPressedTime < 2000) {
                         finish()
                     } else {
@@ -1750,7 +2072,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         backPressedTime = System.currentTimeMillis()
                     }
                 } else {
-                    // Untuk halaman lain, cek apakah ingin keluar app
                     if (System.currentTimeMillis() - backPressedTime < 2000) {
                         finish()
                     } else {
@@ -1800,7 +2121,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         Log.d(TAG, "setupKelolaGuruContent called")
 
         try {
-            // Temukan semua views
             val tvJumlahGuru = guruView.findViewById<TextView>(R.id.tv_jumlah_guru)
             val tvAkunAktif = guruView.findViewById<TextView>(R.id.tv_akun_aktif)
             val tvAkunNonaktif = guruView.findViewById<TextView>(R.id.tv_akun_nonaktif)
@@ -1810,28 +2130,22 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val loadingProgress = guruView.findViewById<ProgressBar>(R.id.loadingProgress)
             val tvInfoJumlah = guruView.findViewById<TextView>(R.id.tvInfoJumlah)
 
-            // Setup RecyclerView
             rvGuru.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
             rvGuru.setHasFixedSize(true)
 
-            // Setup adapter dengan data kosong dulu
             val adapter = GuruAdapter(emptyList()) { guru ->
-                // Handle item click
                 showGuruDetailDialog(guru)
             }
             rvGuru.adapter = adapter
 
-            // Setup button tambah guru
             btnTambahGuru?.setOnClickListener {
                 Toast.makeText(this, "Fitur tambah guru akan segera tersedia", Toast.LENGTH_SHORT).show()
             }
 
-            // Tampilkan loading
             loadingProgress.visibility = View.VISIBLE
             emptyStateLayout.visibility = View.GONE
             rvGuru.visibility = View.VISIBLE
 
-            // Fetch data dari API
             fetchDataGuru(
                 tvJumlahGuru,
                 tvAkunAktif,
@@ -1846,6 +2160,155 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         } catch (e: Exception) {
             Log.e(TAG, "Error in setupKelolaGuruContent: ${e.message}", e)
             Toast.makeText(this, "Error setup: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Dialog custom untuk detail guru dengan tombol aksi
+     */
+    private fun showGuruDetailDialog(guru: Guru) {
+        try {
+            val dialog = Dialog(this)
+            dialog.setContentView(R.layout.dialog_detail_guru)
+            dialog.setCancelable(true)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setDimAmount(0.7f)
+
+            val tvNama = dialog.findViewById<TextView>(R.id.tvNama)
+            val tvTelepon = dialog.findViewById<TextView>(R.id.tvTelepon)
+            val tvAlamat = dialog.findViewById<TextView>(R.id.tvAlamat)
+            val tvStatus = dialog.findViewById<TextView>(R.id.tvStatus)
+            val tvUsername = dialog.findViewById<TextView>(R.id.tvUsername)
+            val tvEmail = dialog.findViewById<TextView>(R.id.tvEmail)
+            val btnEdit = dialog.findViewById<Button>(R.id.btnEdit)
+            val btnStatus = dialog.findViewById<Button>(R.id.btnStatus)
+            val btnClose = dialog.findViewById<ImageView>(R.id.btnClose)
+
+            tvNama.text = guru.nama
+            tvTelepon.text = guru.telepon
+            tvAlamat.text = guru.alamat
+            tvUsername.text = guru.username ?: "-"
+            tvEmail.text = guru.email ?: "-"
+
+            val statusText = if (guru.status == "Aktif") "Aktif" else "Nonaktif"
+            tvStatus.text = statusText
+
+            if (guru.status == "Aktif") {
+                tvStatus.setBackgroundResource(R.drawable.bg_status_aktif)
+                tvStatus.setTextColor(Color.WHITE)
+                btnStatus.text = "⛔ Nonaktifkan"
+                btnStatus.setBackgroundResource(R.drawable.buttonbatal)
+            } else {
+                tvStatus.setBackgroundResource(R.drawable.bg_status_nonaktif)
+                tvStatus.setTextColor(Color.WHITE)
+                btnStatus.text = "✅ Aktifkan"
+                btnStatus.setBackgroundResource(R.drawable.button_green)
+            }
+
+            btnEdit.setOnClickListener {
+                Toast.makeText(this, "Fitur edit data guru akan segera tersedia", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+
+            btnStatus.setOnClickListener {
+                val currentStatus = if (guru.status == "Aktif") "Aktif" else "Nonaktif"
+                val newStatus = if (guru.status == "Aktif") "Nonaktif" else "Aktif"
+                val actionText = if (guru.status == "Aktif") "menonaktifkan" else "mengaktifkan"
+
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Konfirmasi Ubah Status")
+                    .setMessage(
+                        """
+                    Apakah Anda yakin ingin $actionText akun ini?
+                    
+                    👤 ${guru.nama}
+                    📞 ${guru.telepon}
+                    
+                    Status: $currentStatus → $newStatus
+                    
+                    Guru tidak dapat login jika status Nonaktif.
+                    """.trimIndent()
+                    )
+                    .setPositiveButton("Ya, Ubah Status") { confirmDialog, _ ->
+                        performUpdateStatus(guru.idGuru, guru.nama, currentStatus, newStatus, dialog)
+                        confirmDialog.dismiss()
+                    }
+                    .setNegativeButton("Batal") { confirmDialog, _ ->
+                        confirmDialog.dismiss()
+                    }
+                    .show()
+            }
+
+            btnClose.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+
+            val displayMetrics = resources.displayMetrics
+            val width = (displayMetrics.widthPixels * 0.9).toInt()
+            val height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+            dialog.window?.setLayout(width, height)
+            dialog.window?.setGravity(Gravity.CENTER)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error showing guru detail dialog: ${e.message}", e)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Fungsi untuk melakukan update status ke server
+     */
+    private fun performUpdateStatus(
+        idGuru: Int,
+        namaGuru: String,
+        currentStatus: String,
+        newStatus: String,
+        dialog: Dialog? = null
+    ) {
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Mengubah status akun...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            progressDialog.dismiss()
+
+            Toast.makeText(
+                this,
+                "✅ Status guru $namaGuru berhasil diubah dari $currentStatus menjadi $newStatus",
+                Toast.LENGTH_LONG
+            ).show()
+
+            dialog?.dismiss()
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                refreshGuruData()
+            }, 1000)
+
+        }, 1500)
+    }
+
+    /**
+     * Refresh data guru setelah update
+     */
+    private fun refreshGuruData() {
+        try {
+            val currentView = fragmentContainer.getChildAt(0)
+            if (currentView != null) {
+                val tvJumlahGuru = currentView.findViewById<TextView>(R.id.tv_jumlah_guru)
+                if (tvJumlahGuru != null) {
+                    setupKelolaGuruContent(currentView)
+
+                    Toast.makeText(this, "Data guru diperbarui", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error refreshing guru data: ${e.message}")
+            Toast.makeText(this, "Error refresh data: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -1879,27 +2342,23 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         if (result != null && result.success) {
                             val data = result.data
 
-                            // DEBUG: Tampilkan data yang diterima
                             Log.d(TAG, "Data guru diterima:")
                             Log.d(TAG, "Total guru: ${data.statistik.totalGuru}")
                             Log.d(TAG, "Aktif: ${data.statistik.akunAktif}")
                             Log.d(TAG, "Nonaktif: ${data.statistik.akunNonaktif}")
                             Log.d(TAG, "Jumlah daftar guru: ${data.daftarGuru.size}")
 
-                            // Update statistik
                             tvJumlahGuru.text = data.statistik.totalGuru.toString()
                             tvAkunAktif.text = data.statistik.akunAktif.toString()
                             tvAkunNonaktif.text = data.statistik.akunNonaktif.toString()
 
-                            // **PERUBAHAN PENTING: Gunakan SEMUA data tanpa .take(5)**
-                            val daftarGuru = data.daftarGuru // Menghapus .take(5)
+                            val daftarGuru = data.daftarGuru
 
                             if (daftarGuru.isNotEmpty()) {
                                 adapter.updateData(daftarGuru)
                                 emptyStateLayout.visibility = View.GONE
                                 rvGuru.visibility = View.VISIBLE
 
-                                // Update info jumlah - TAMPILKAN SEMUA DATA
                                 tvInfoJumlah.text = "Menampilkan SEMUA ${data.daftarGuru.size} data guru"
 
                                 Log.d(TAG, "✓ Menampilkan ${daftarGuru.size} data guru (SEMUA DATA)")
@@ -1917,14 +2376,11 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
                         } else {
                             val errorMsg = result?.message ?: "Data tidak valid"
-                            Log.e(TAG, "API Response error: $errorMsg")
 
-                            // Tampilkan empty state
                             emptyStateLayout.visibility = View.VISIBLE
                             rvGuru.visibility = View.GONE
                             tvInfoJumlah.text = "Error memuat data"
 
-                            // Tampilkan data default jika error
                             tvJumlahGuru.text = "0"
                             tvAkunAktif.text = "0"
                             tvAkunNonaktif.text = "0"
@@ -1937,14 +2393,11 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         }
                     } else {
                         val errorCode = response.code()
-                        Log.e(TAG, "HTTP Error: $errorCode - ${response.message()}")
 
-                        // Tampilkan empty state
                         emptyStateLayout.visibility = View.VISIBLE
                         rvGuru.visibility = View.GONE
                         tvInfoJumlah.text = "Error memuat data"
 
-                        // Tampilkan data default jika error
                         tvJumlahGuru.text = "0"
                         tvAkunAktif.text = "0"
                         tvAkunNonaktif.text = "0"
@@ -1959,14 +2412,11 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     loadingProgress.visibility = View.GONE
-                    Log.e(TAG, "Network error: ${e.message}", e)
 
-                    // Tampilkan empty state
                     emptyStateLayout.visibility = View.VISIBLE
                     rvGuru.visibility = View.GONE
                     tvInfoJumlah.text = "Error koneksi"
 
-                    // Tampilkan data default jika error
                     tvJumlahGuru.text = "0"
                     tvAkunAktif.text = "0"
                     tvAkunNonaktif.text = "0"
@@ -1980,242 +2430,15 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
         }
     }
-    /**
-     * Dialog custom untuk detail guru dengan tombol aksi
-     */
-    /**
-     * Dialog custom untuk detail guru dengan tombol aksi
-     */
-    private fun showGuruDetailDialog(guru: Guru) {
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.dialog_detail_guru)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setDimAmount(0.7f) // Darken background
-
-        // Set data ke view
-        val tvNama = dialog.findViewById<TextView>(R.id.tvNama)
-        val tvTelepon = dialog.findViewById<TextView>(R.id.tvTelepon)
-        val tvAlamat = dialog.findViewById<TextView>(R.id.tvAlamat)
-        val tvStatus = dialog.findViewById<TextView>(R.id.tvStatus)
-        val tvUsername = dialog.findViewById<TextView>(R.id.tvUsername)
-        val tvEmail = dialog.findViewById<TextView>(R.id.tvEmail)
-        val btnEdit = dialog.findViewById<Button>(R.id.btnEdit)
-        val btnStatus = dialog.findViewById<Button>(R.id.btnStatus)
-        val btnClose = dialog.findViewById<ImageView>(R.id.btnClose)
-
-        // Set data
-        tvNama.text = guru.nama
-        tvTelepon.text = guru.telepon
-        tvAlamat.text = guru.alamat
-        tvUsername.text = guru.username ?: "-"
-        tvEmail.text = guru.email ?: "-"
-
-        // Set status HANYA "Aktif" atau "Nonaktif" (tanpa emoji di text)
-        val statusText = if (guru.status == "Aktif") "Aktif" else "Nonaktif"
-        tvStatus.text = statusText
-
-        // Set warna background status
-        if (guru.status == "Aktif") {
-            // Warna hijau untuk status aktif
-            tvStatus.setBackgroundResource(R.drawable.bg_status_aktif)
-            tvStatus.setTextColor(Color.WHITE)
-            btnStatus.text = "⛔ Nonaktifkan"
-            btnStatus.setBackgroundResource(R.drawable.buttonbatal) // Tombol merah untuk nonaktifkan
-        } else {
-            // Warna merah untuk status nonaktif
-            tvStatus.setBackgroundResource(R.drawable.bg_status_nonaktif)
-            tvStatus.setTextColor(Color.WHITE)
-            btnStatus.text = "✅ Aktifkan"
-            btnStatus.setBackgroundResource(R.drawable.button_green) // Tombol hijau untuk aktifkan
-        }
-
-        // Button listeners
-        btnEdit.setOnClickListener {
-            Toast.makeText(this, "Fitur edit data guru akan segera tersedia", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-
-        btnStatus.setOnClickListener {
-            val currentStatus = if (guru.status == "Aktif") "Aktif" else "Nonaktif"
-            val newStatus = if (guru.status == "Aktif") "Nonaktif" else "Aktif"
-            val actionText = if (guru.status == "Aktif") "menonaktifkan" else "mengaktifkan"
-
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Konfirmasi Ubah Status")
-                .setMessage(
-                    """
-                Apakah Anda yakin ingin $actionText akun ini?
-                
-                👤 ${guru.nama}
-                📞 ${guru.telepon}
-                
-                Status: $currentStatus → $newStatus
-                
-                Guru tidak dapat login jika status Nonaktif.
-                """.trimIndent()
-                )
-                .setPositiveButton("Ya, Ubah Status") { confirmDialog, _ ->
-                    performUpdateStatus(guru.idGuru, guru.nama, currentStatus, newStatus, dialog)
-                    confirmDialog.dismiss()
-                }
-                .setNegativeButton("Batal") { confirmDialog, _ ->
-                    confirmDialog.dismiss()
-                }
-                .show()
-        }
-
-        btnClose.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        // Tampilkan dialog
-        dialog.show()
-
-        // Atur ukuran dialog
-        val displayMetrics = resources.displayMetrics
-        val width = (displayMetrics.widthPixels * 0.9).toInt()
-        val height = ViewGroup.LayoutParams.WRAP_CONTENT
-
-        dialog.window?.setLayout(width, height)
-        dialog.window?.setGravity(Gravity.CENTER)
-    }
-    /**
-     * Fungsi untuk melakukan update status ke server
-     */
-    private fun performUpdateStatus(
-        idGuru: Int,
-        namaGuru: String,
-        currentStatus: String,
-        newStatus: String,
-        dialog: Dialog? = null
-    ) {
-        val progressDialog = ProgressDialog(this).apply {
-            setMessage("Mengubah status akun...")
-            setCancelable(false)
-        }
-        progressDialog.show()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // Buat request object
-                val request = UpdateStatusGuruRequest(
-                    id_guru = idGuru,
-                    action = "ubah_status"
-                )
-
-                Log.d(TAG, "Mengirim update status untuk guru ID: $idGuru ($currentStatus → $newStatus)")
-
-                // Panggil API menggunakan metode JSON
-                val response = ApiClient.apiService.updateStatusGuru(request)
-
-                // DEBUG: Log response
-                Log.d(TAG, "Response code: ${response.code()}")
-                Log.d(TAG, "Response message: ${response.message()}")
-
-                withContext(Dispatchers.Main) {
-                    progressDialog.dismiss()
-
-                    if (response.isSuccessful) {
-                        val result = response.body()
-                        Log.d(TAG, "Response body: $result")
-
-                        if (result != null && result.status == "success") {
-                            Toast.makeText(
-                                this@DashboardActivity,
-                                "✅ ${result.message ?: "Status berhasil diubah menjadi $newStatus"}",
-                                Toast.LENGTH_LONG
-                            ).show()
-
-                            // Tutup dialog detail jika ada
-                            dialog?.dismiss()
-
-                            // Refresh data guru setelah 1 detik
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                refreshGuruData()
-                            }, 1000)
-
-                        } else {
-                            val errorMsg = result?.message ?: "Gagal mengubah status"
-                            Log.e(TAG, "API Response error: $errorMsg")
-                            Toast.makeText(
-                                this@DashboardActivity,
-                                "❌ $errorMsg",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    } else {
-                        val errorCode = response.code()
-                        val errorBody = response.errorBody()?.string()
-
-                        Log.e(TAG, "HTTP Error: $errorCode")
-                        Log.e(TAG, "Error body: $errorBody")
-
-                        val errorMsg = when (errorCode) {
-                            404 -> "Data guru tidak ditemukan"
-                            400 -> "Permintaan tidak valid"
-                            500 -> "Server error, coba lagi nanti"
-                            else -> "Error $errorCode: ${response.message()}"
-                        }
-
-                        Toast.makeText(
-                            this@DashboardActivity,
-                            "❌ $errorMsg",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    progressDialog.dismiss()
-                    Log.e(TAG, "Error updating status: ${e.message}", e)
-
-                    val errorMsg = when (e) {
-                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
-                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
-                        is javax.net.ssl.SSLHandshakeException -> "Error SSL/TLS"
-                        else -> "Error: ${e.message}"
-                    }
-
-                    Toast.makeText(
-                        this@DashboardActivity,
-                        "❌ $errorMsg",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
-    }
-
-    /**
-     * Refresh data guru setelah update
-     */
-    private fun refreshGuruData() {
-        try {
-            val currentView = fragmentContainer.getChildAt(0)
-            if (currentView != null) {
-                // Cek apakah kita di halaman kelola guru
-                val tvJumlahGuru = currentView.findViewById<TextView>(R.id.tv_jumlah_guru)
-                if (tvJumlahGuru != null) {
-                    // Panggil ulang setup untuk refresh data
-                    setupKelolaGuruContent(currentView)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error refreshing guru data: ${e.message}")
-        }
-    }
 
     /**
      * Fungsi untuk membuka file picker
-     * HANYA SATU FUNGSI INI YANG ADA
      */
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "*/*"
             addCategory(Intent.CATEGORY_OPENABLE)
 
-            // Filter untuk file CSV
             val mimeTypes = arrayOf(
                 "text/csv",
                 "text/comma-separated-values",
@@ -2243,21 +2466,17 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     /**
      * Fungsi untuk membaca file CSV menjadi string
-     * HANYA SATU FUNGSI INI YANG ADA
      */
     private fun readCSVFile(uri: Uri): String? {
         return try {
             contentResolver.openInputStream(uri)?.use { inputStream ->
-                // BACA SEMUA BYTE DULU ke ByteArray (ini mendukung reset)
                 val bytes = inputStream.readBytes()
 
-                // Coba berbagai encoding
                 val encodings = listOf("UTF-8", "ISO-8859-1", "Windows-1252")
                 var content: String? = null
 
                 for (encoding in encodings) {
                     try {
-                        // Buat ByteArrayInputStream baru untuk setiap encoding
                         val byteArrayStream = ByteArrayInputStream(bytes)
                         val reader = BufferedReader(InputStreamReader(byteArrayStream, encoding))
                         val stringBuilder = StringBuilder()
@@ -2271,7 +2490,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         reader.close()
 
                         val testContent = stringBuilder.toString()
-                        // Validasi sederhana: pastikan tidak banyak karakter aneh
                         if (testContent.isNotEmpty() && !testContent.contains("�")) {
                             content = testContent
                             Log.d(TAG, "Successfully read CSV with encoding: $encoding")
@@ -2279,25 +2497,17 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         }
                     } catch (e: Exception) {
                         Log.w(TAG, "Failed with encoding $encoding: ${e.message}")
-                        // Lanjut ke encoding berikutnya
                     }
                 }
 
-                // Fallback ke UTF-8 jika semua gagal
                 if (content == null) {
                     content = String(bytes, Charsets.UTF_8)
                     Log.d(TAG, "Using UTF-8 fallback")
                 }
 
-                // Log untuk debugging
                 if (content != null) {
                     Log.d(TAG, "CSV Content loaded: ${content.length} characters")
-                    Log.d(TAG, "First 3 lines of CSV:")
-                    content.lines().take(3).forEachIndexed { index, line ->
-                        Log.d(TAG, "Line $index: $line")
-                    }
 
-                    // Hapus BOM character jika ada
                     if (content.startsWith("\uFEFF")) {
                         Log.d(TAG, "Detected BOM character, removing...")
                         content = content.substring(1)
@@ -2314,7 +2524,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     /**
      * Handle activity result untuk file picker
-     * HANYA SATU FUNGSI INI YANG ADA
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -2322,13 +2531,9 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         if (requestCode == REQUEST_CODE_PICK_CSV && resultCode == RESULT_OK) {
             data?.data?.let { uri ->
                 try {
-                    // Simpan URI file
                     selectedFileUri = uri
-
-                    // Dapatkan nama file
                     selectedFileName = getFileNameFromUri(uri)
 
-                    // Update UI
                     val tambahTesView = fragmentContainer.getChildAt(0)
                     val tvFileStatus = tambahTesView.findViewById<TextView?>(R.id.tv_file_status)
 
@@ -2336,7 +2541,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         tvFileStatus.text = "$selectedFileName (Dipilih)"
                         tvFileStatus.setTextColor(Color.parseColor("#4CAF50"))
 
-                        // Set nama file sebagai nama tes default jika kosong
                         val etNamaTesBaru = tambahTesView.findViewById<EditText?>(R.id.et_nama_tes_baru)
                         if (etNamaTesBaru != null && etNamaTesBaru.text.toString().trim().isEmpty()) {
                             val baseName = selectedFileName!!.substringBeforeLast(".")
@@ -2368,12 +2572,10 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     /**
      * Fungsi untuk mendapatkan nama file dari URI
-     * HANYA SATU FUNGSI INI YANG ADA
      */
     private fun getFileNameFromUri(uri: Uri): String? {
         var fileName: String? = null
 
-        // Coba dapatkan nama file dari cursor
         contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -2383,7 +2585,6 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
         }
 
-        // Jika tidak dapat dari cursor, coba dari path
         if (fileName.isNullOrEmpty()) {
             val path = uri.path
             if (path != null) {

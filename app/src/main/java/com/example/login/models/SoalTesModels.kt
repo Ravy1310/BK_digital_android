@@ -73,3 +73,29 @@ data class OpsiData(
     @SerializedName("bobot")
     val bobot: Int = 0
 )
+
+
+// ==================== MODEL UPDATE SOAL ====================
+
+
+data class UpdateSoalResponse(
+    val success: Boolean,
+    val message: String,
+    val error: String? = null
+)
+
+
+
+data class UpdateOpsiResponse(
+    val success: Boolean,
+    val message: String,
+    val error: String? = null
+)
+
+/**
+ * Request untuk hapus soal
+ */
+
+
+
+

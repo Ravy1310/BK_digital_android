@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="16dp">
+
+    <!-- Label Opsi -->
+    <TextView
+        android:id="@+id/tvLabelOpsi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Opsi "
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Container untuk opsi dan bobot -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Input Opsi -->
+        <EditText
+            android:id="@+id/etOpsi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:background="@drawable/bgbaru"
+            android:padding="12dp"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Container Bobot -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bgbaru"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bobot:"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="4dp" />
+
+            <EditText
+                android:id="@+id/etBobot"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="1"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:gravity="center"
+                android:background="@drawable/bgbaru"
+                android:padding="4dp"
+                android:maxLength="1" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -36,7 +36,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="purple_200">#FFBB86FC</color>
-
+    <color name="table_row_alternate">#F5F5F5</color>
 
 
         <!-- Warna utama -->
@@ -49,7 +49,9 @@
         <color name="red_light">#F8D7DA</color>
         <color name="red_status">#721C24</color>
         <color name="green_success">#198754</color>
-        <!-- Warna teks -->
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+    <!-- Warna teks -->
     <color name="gray_500">#6B7280</color>
     <color name="gray_600">#4B5563</color>
     <color name="gray_700">#374151</color>
