@@ -76,4 +76,19 @@ interface ApiService {
     suspend fun updateStatusGuru(
         @Body request: UpdateStatusGuruRequest
     ): Response<UpdateStatusGuruResponse>
+
+    @POST("api_tambah_guru.php")
+    suspend fun tambahGuru(
+        @Body request: TambahGuruRequest
+    ): Response<TambahGuruResponse>
+
+    @PUT("api_update_guru.php")
+    suspend fun updateGuru(
+        @Body request: UpdateGuruRequest
+    ): Response<UpdateGuruResponse>
+
+    @POST("api_hapus_guru.php")
+    suspend fun hapusGuru(
+        @Body request: HapusGuruRequest
+    ): Response<HapusGuruResponse>
 }

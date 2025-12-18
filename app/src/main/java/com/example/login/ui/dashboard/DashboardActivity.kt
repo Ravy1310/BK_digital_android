@@ -48,6 +48,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.*
 
+
+
 class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     // TAG untuk debugging
@@ -2445,7 +2447,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             rvGuru.adapter = adapter
 
             btnTambahGuru?.setOnClickListener {
-                Toast.makeText(this, "Fitur tambah guru akan segera tersedia", Toast.LENGTH_SHORT).show()
+                showTambahGuruForm()
             }
 
             loadingProgress.visibility = View.VISIBLE
@@ -2487,6 +2489,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             val tvUsername = dialog.findViewById<TextView>(R.id.tvUsername)
             val tvEmail = dialog.findViewById<TextView>(R.id.tvEmail)
             val btnEdit = dialog.findViewById<Button>(R.id.btnEdit)
+            val btnHapus = dialog.findViewById<Button>(R.id.btnHapus)
             val btnStatus = dialog.findViewById<Button>(R.id.btnStatus)
             val btnClose = dialog.findViewById<ImageView>(R.id.btnClose)
 
@@ -2512,8 +2515,13 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
 
             btnEdit.setOnClickListener {
-                Toast.makeText(this, "Fitur edit data guru akan segera tersedia", Toast.LENGTH_SHORT).show()
+                dialog.dismiss() // Tutup dialog
+                showEditGuruForm(guru) // Panggil fungsi edit
+            }
+
+            btnHapus.setOnClickListener {
                 dialog.dismiss()
+                showDeleteConfirmationDialog(guru)
             }
 
             btnStatus.setOnClickListener {
@@ -2731,6 +2739,591 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                         this@DashboardActivity,
                         "❌ Network error: ${e.message}",
                         Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+    /**
+     * FUNGSI BARU: Menampilkan form tambah guru
+     */
+    private fun showTambahGuruForm() {
+        Log.d(TAG, "showTambahGuruForm called")
+
+        fragmentContainer.removeAllViews()
+        val tambahGuruView = layoutInflater.inflate(R.layout.formkelolaguru, null)
+        fragmentContainer.addView(tambahGuruView)
+
+        navigationView.setCheckedItem(R.id.nav_guru)
+        titleText.text = "Tambah Data Guru"
+
+        setupTambahGuruForm(tambahGuruView, isEditMode = false, guru = null)
+    }
+
+    /**
+     * FUNGSI BARU: Menampilkan form edit guru
+     */
+    private fun showEditGuruForm(guru: Guru) {
+        Log.d(TAG, "showEditGuruForm called for guru: ${guru.nama} (ID: ${guru.idGuru})")
+
+        fragmentContainer.removeAllViews()
+        val editGuruView = layoutInflater.inflate(R.layout.formkelolaguru, null)
+        fragmentContainer.addView(editGuruView)
+
+        navigationView.setCheckedItem(R.id.nav_guru)
+        titleText.text = "Edit Data Guru"
+
+        setupTambahGuruForm(editGuruView, isEditMode = true, guru = guru)
+    }
+
+    /**
+     * FUNGSI UTAMA: Setup form guru (untuk tambah dan edit)
+     */
+    /**
+     * FUNGSI UTAMA: Setup form guru (untuk tambah dan edit) TANPA STATUS
+     */
+    private fun setupTambahGuruForm(guruView: View, isEditMode: Boolean = false, guru: Guru? = null) {
+        Log.d(TAG, "setupTambahGuruForm called - isEditMode: $isEditMode, guru: ${guru?.nama}")
+
+        try {
+            val tvHeader = guruView.findViewById<TextView>(R.id.tvHeader)
+            val btnBatal = guruView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnBatal)
+            val btnSimpan = guruView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSimpan)
+            val etNama = guruView.findViewById<EditText>(R.id.etNamaGuru)
+            val etTelepon = guruView.findViewById<EditText>(R.id.etTeleponGuru)
+            val etAlamat = guruView.findViewById<EditText>(R.id.etAlamatGuru)
+
+            // Setup berdasarkan mode
+            if (isEditMode && guru != null) {
+                // MODE EDIT
+                tvHeader.text = "Edit Data Guru"
+                btnSimpan.text = "Update"
+
+                // Isi data guru ke form
+                etNama.setText(guru.nama)
+                etTelepon.setText(guru.telepon)
+                etAlamat.setText(guru.alamat)
+
+            } else {
+                // MODE TAMBAH
+                tvHeader.text = "Tambah Data Guru"
+                btnSimpan.text = "Simpan"
+            }
+
+            // Setup tombol Batal
+            btnBatal.setOnClickListener {
+                Log.d(TAG, "Tombol Batal diklik")
+                showGuru() // Kembali ke halaman kelola guru
+            }
+
+            // Setup tombol Simpan/Update
+            btnSimpan.setOnClickListener {
+                Log.d(TAG, "Tombol ${btnSimpan.text} diklik")
+
+                // Validasi input
+                val nama = etNama.text.toString().trim()
+                val telepon = etTelepon.text.toString().trim()
+                val alamat = etAlamat.text.toString().trim()
+
+                // Reset error
+                etNama.error = null
+                etTelepon.error = null
+                etAlamat.error = null
+
+                var hasError = false
+
+                // Validasi Nama
+                if (nama.isEmpty()) {
+                    etNama.error = "Nama tidak boleh kosong"
+                    etNama.requestFocus()
+                    hasError = true
+                } else if (nama.length < 3) {
+                    etNama.error = "Nama minimal 3 karakter"
+                    etNama.requestFocus()
+                    hasError = true
+                }
+
+                // Validasi Telepon
+                if (telepon.isEmpty()) {
+                    etTelepon.error = "Telepon tidak boleh kosong"
+                    if (!hasError) {
+                        etTelepon.requestFocus()
+                        hasError = true
+                    }
+                } else {
+                    // Validasi hanya angka
+                    val cleanTelepon = telepon.replace("[^0-9]".toRegex(), "")
+                    if (cleanTelepon.length < 10 || cleanTelepon.length > 15) {
+                        etTelepon.error = "Telepon harus 10-15 digit angka"
+                        if (!hasError) {
+                            etTelepon.requestFocus()
+                            hasError = true
+                        }
+                    }
+                }
+
+                // Validasi Alamat
+                if (alamat.isEmpty()) {
+                    etAlamat.error = "Alamat tidak boleh kosong"
+                    if (!hasError) {
+                        etAlamat.requestFocus()
+                        hasError = true
+                    }
+                } else if (alamat.length < 5) {
+                    etAlamat.error = "Alamat terlalu pendek"
+                    if (!hasError) {
+                        etAlamat.requestFocus()
+                        hasError = true
+                    }
+                }
+
+                if (hasError) {
+                    return@setOnClickListener
+                }
+
+                // Bersihkan telepon dari karakter non-angka
+                val cleanTelepon = telepon.replace("[^0-9]".toRegex(), "")
+
+                if (isEditMode && guru != null) {
+                    // MODE EDIT: Panggil fungsi update (TANPA STATUS)
+                    updateGuruInDatabase(guru.idGuru, nama, cleanTelepon, alamat)
+                } else {
+                    // MODE TAMBAH: Panggil fungsi simpan
+                    saveGuruToDatabase(nama, cleanTelepon, alamat)
+                }
+            }
+
+            // Fokus ke field nama
+            if (!isEditMode) {
+                etNama.requestFocus()
+            }
+
+            Log.d(TAG, "Form guru berhasil di-setup (Mode: ${if (isEditMode) "Edit" else "Tambah"})")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupTambahGuruForm: ${e.message}", e)
+            Toast.makeText(this, "Gagal memuat form: ${e.message}", Toast.LENGTH_SHORT).show()
+            showGuru() // Kembali ke halaman guru
+        }
+    }
+
+
+    /**
+     * FUNGSI BARU: Menyimpan data guru baru ke database via API
+     */
+    private fun saveGuruToDatabase(nama: String, telepon: String, alamat: String) {
+        // Tampilkan ProgressDialog
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menyimpan data guru...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Buat request
+        val request = TambahGuruRequest(
+            nama = nama,
+            telepon = telepon,
+            alamat = alamat
+        )
+
+        Log.d(TAG, "Request untuk API: nama=$nama, telepon=$telepon, alamat=$alamat")
+
+        // Kirim ke API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengirim request tambah guru...")
+                val response = ApiClient.apiService.tambahGuru(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        if (result != null) {
+                            if (result.success) {
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                Log.d(TAG, "Data guru berhasil disimpan: ${result.data}")
+
+                                // Kembali ke halaman kelola guru dan refresh data
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    showGuru()
+                                }, 1500)
+
+                            } else {
+                                val errorMsg = result.error ?: "Gagal menyimpan data"
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "API Error: $errorCode - $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error saving guru: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Update data guru ke database via API
+     */
+    private fun updateGuruInDatabase(idGuru: Int, nama: String, telepon: String, alamat: String, status: String = "Nonaktif") {
+        // Tampilkan ProgressDialog
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Memperbarui data guru...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Buat request update
+        val request = UpdateGuruRequest(
+            id_guru = idGuru,
+            nama = nama,
+            telepon = telepon,
+            alamat = alamat
+        )
+
+        Log.d(TAG, "Request untuk update guru: ID=$idGuru, nama=$nama, status=$status")
+
+        // Kirim ke API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengirim request update guru...")
+                val response = ApiClient.apiService.updateGuru(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        if (result != null) {
+                            if (result.success) {
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                Log.d(TAG, "Data guru berhasil diupdate: ${result.data}")
+
+                                // Kembali ke halaman kelola guru dan refresh data
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    showGuru()
+                                }, 1500)
+
+                            } else {
+                                val errorMsg = result.error ?: "Gagal update data"
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "API Error: $errorCode - $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error updating guru: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+
+
+
+
+    /**
+     * FUNGSI BARU: Update data guru ke database via API (TANPA STATUS)
+     */
+    private fun updateGuruInDatabase(idGuru: Int, nama: String, telepon: String, alamat: String) {
+        // Tampilkan ProgressDialog
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Memperbarui data guru...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Buat request update TANPA STATUS
+        val request = UpdateGuruRequest(
+            id_guru = idGuru,
+            nama = nama,
+            telepon = telepon,
+            alamat = alamat
+        )
+
+        Log.d(TAG, "Request untuk update guru: ID=$idGuru, nama=$nama")
+
+        // Kirim ke API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengirim request update guru...")
+                val response = ApiClient.apiService.updateGuru(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        if (result != null) {
+                            if (result.success) {
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                Log.d(TAG, "Data guru berhasil diupdate: ${result.data}")
+
+                                // Kembali ke halaman kelola guru dan refresh data
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    showGuru()
+                                }, 1500)
+
+                            } else {
+                                val errorMsg = result.error ?: "Gagal update data"
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "API Error: $errorCode - $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error updating guru: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+    /**
+     * FUNGSI BARU: Menampilkan dialog konfirmasi hapus guru
+     */
+    private fun showDeleteConfirmationDialog(guru: Guru) {
+        try {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Hapus Data Guru")
+                .setMessage(
+                    """
+                Apakah Anda yakin ingin menghapus data guru ini?
+                
+                👤 Nama: ${guru.nama}
+                📞 Telepon: ${guru.telepon}
+                📍 Alamat: ${guru.alamat}
+                
+                Data yang dihapus tidak dapat dikembalikan.
+                """.trimIndent()
+                )
+                .setPositiveButton("Ya, Hapus") { dialog, which ->
+                    deleteGuruFromDatabase(guru.idGuru, guru.nama)
+                }
+                .setNegativeButton("Batal") { dialog, which ->
+                    dialog.dismiss()
+                    // Tampilkan kembali dialog detail (opsional)
+                    showGuruDetailDialog(guru)
+                }
+                .setIcon(ContextCompat.getDrawable(this, android.R.drawable.ic_delete))
+                .setCancelable(false)
+                .show()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error showing delete confirmation dialog: ${e.message}", e)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * FUNGSI BARU: Menghapus data guru dari database via API
+     */
+    private fun deleteGuruFromDatabase(idGuru: Int, namaGuru: String) {
+        // Tampilkan ProgressDialog
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menghapus data guru...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Buat request hapus
+        val request = HapusGuruRequest(
+            id_guru = idGuru
+        )
+
+        Log.d(TAG, "Request untuk hapus guru: ID=$idGuru, nama=$namaGuru")
+
+        // Kirim ke API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengirim request hapus guru...")
+                val response = ApiClient.apiService.hapusGuru(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        if (result != null) {
+                            if (result.success) {
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                Log.d(TAG, "Data guru berhasil dihapus: $namaGuru")
+
+                                // Refresh data guru
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    showGuru()
+                                }, 1000)
+
+                            } else {
+                                val errorMsg = result.error ?: "Gagal menghapus data"
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "API Error: $errorCode - $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error deleting guru: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
                     ).show()
                 }
             }

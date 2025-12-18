@@ -15,6 +15,7 @@
 
         <!-- Header -->
         <TextView
+            android:id="@+id/tvHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tambah Data Guru"
@@ -55,13 +56,15 @@
                 android:textSize="14sp"
                 android:textColor="#000000"
                 android:hint="Masukkan nama guru"
+                android:maxLines="1"
+                android:inputType="textCapWords"
                 android:layout_marginBottom="24dp" />
 
             <!-- No.Tlp Field -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No.Tlp"
+                android:text="No. Telepon"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
@@ -78,6 +81,7 @@
                 android:textColor="#000000"
                 android:hint="Masukkan nomor telepon"
                 android:inputType="phone"
+                android:maxLines="1"
                 android:layout_marginBottom="24dp" />
 
             <!-- Alamat Field -->
@@ -101,10 +105,12 @@
                 android:paddingBottom="12dp"
                 android:textSize="14sp"
                 android:textColor="#000000"
-                android:hint="Masukkan alamat"
+                android:hint="Masukkan alamat lengkap"
                 android:gravity="top"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textCapSentences"
                 android:layout_marginBottom="24dp" />
+
+
 
             <!-- Buttons Container -->
             <LinearLayout
