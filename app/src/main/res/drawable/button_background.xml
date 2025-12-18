@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#0050BC" />
-    <corners android:radius="20dp" />
-    <padding android:all="4dp" />
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ganti android:all dengan item yang benar -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#4CAF50" /> <!-- Warna saat ditekan -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#4CAF50" /> <!-- Warna normal -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

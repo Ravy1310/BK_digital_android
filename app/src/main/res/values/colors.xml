@@ -37,29 +37,72 @@
     <color name="black">#FF000000</color>
     <color name="purple_200">#FFBB86FC</color>
 
+    <!-- Warna utama -->
+    <color name="red_primary">#C60000</color>
+    <color name="red_dark">#710303</color>
 
+    <!-- Warna status -->
+    <color name="green_light">#D4EDDA</color>
+    <color name="green_dark">#155724</color>
+    <color name="red_light">#F8D7DA</color>
+    <color name="red_status">#721C24</color>
+    <color name="green_success">#198754</color>
 
-        <!-- Warna utama -->
-        <color name="red_primary">#C60000</color>
-        <color name="red_dark">#710303</color>
-
-        <!-- Warna status -->
-        <color name="green_light">#D4EDDA</color>
-        <color name="green_dark">#155724</color>
-        <color name="red_light">#F8D7DA</color>
-        <color name="red_status">#721C24</color>
-        <color name="green_success">#198754</color>
-        <!-- Warna teks -->
+    <!-- Warna teks -->
     <color name="gray_500">#6B7280</color>
     <color name="gray_600">#4B5563</color>
     <color name="gray_700">#374151</color>
     <color name="gray_800">#1F2937</color>
 
+    <!-- Warna warning (kuning/orange seperti di web) -->
+    <color name="yellow_warning">#FFC107</color>
+    <color name="yellow_warning_dark">#E0A800</color>
 
+    <!-- ===== TAMBAHKAN WARNA YANG DIBUTUHKAN BERDASARKAN ERROR ===== -->
 
-        <!-- Warna warning (kuning/orange seperti di web) -->
-        <color name="yellow_warning">#FFC107</color>
-        <color name="yellow_warning_dark">#E0A800</color>
+    <!-- Warna yang direferensikan di GuruAdapter.kt -->
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+
+    <!-- Warna untuk table row -->
+    <color name="table_row_alternate">#F0F0F0</color>
+    <color name="table_row_even">#FFFFFF</color>
+    <color name="table_row_odd">#FAFAFA</color>
+
+    <!-- Warna untuk status background -->
+    <color name="status_active">#E8F5E9</color>
+    <color name="status_inactive">#FFEBEE</color>
+    <color name="status_pending">#FFF3E0</color>
+
+    <!-- Warna tambahan untuk dashboard -->
+    <color name="primary">#4CAF50</color>
+    <color name="secondary">#2196F3</color>
+    <color name="accent">#FF9800</color>
+    <color name="primary_light2">#C8E6C9</color>
+    <color name="secondary_light">#BBDEFB</color>
+    <color name="accent_light">#FFE0B2</color>
+
+    <!-- Warna untuk UI components -->
+    <color name="surface">#FFFFFF</color>
+    <color name="background">#F5F5F5</color>
+    <color name="border_light">#E0E0E0</color>
+    <color name="border_dark">#BDBDBD</color>
+
+    <!-- Warna untuk text -->
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_black">#000000</color>
+
+    <!-- Warna lain yang mungkin dibutuhkan -->
+    <color name="blue">#2196F3</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="orange">#FF9800</color>
+
+    <!-- Table Colors -->
+    <color name="table_header">#F5F5F5</color>
+    <color name="table_border">#E0E0E0</color>
+
+    <!-- Card Colors -->
+    <color name="card_background">#FFFFFF</color>
 
 
 </resources>
