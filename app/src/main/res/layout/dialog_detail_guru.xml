@@ -233,13 +233,15 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Tombol Aksi -->
+    <!-- Tombol Aksi: Baris 1 - Edit dan Status -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginBottom="8dp">
 
+        <!-- Button Edit (kiri) - BIRU -->
         <Button
             android:id="@+id/btnEdit"
             android:layout_width="0dp"
@@ -249,20 +251,44 @@
             android:text="✏️ Edit Data"
             android:textSize="14sp"
             android:textColor="#FFFFFF"
-            android:background="@drawable/button_blue"
+            android:backgroundTint="#2196F3"
+            android:background="@drawable/button_background"
             android:elevation="2dp" />
 
+        <!-- Button Status (kanan) - ORANGE -->
         <Button
             android:id="@+id/btnStatus"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="Ubah Status"
+            android:text="🔄 Ubah Status"
             android:textSize="14sp"
             android:textColor="#FFFFFF"
-            android:background="@drawable/button_orange"
+            android:backgroundTint="#FF9800"
+            android:background="@drawable/button_background"
             android:elevation="2dp" />
+    </LinearLayout>
+
+    <!-- Tombol Aksi: Baris 2 - Hapus di tengah -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- Button Hapus (tengah) - MERAH dengan width lebih kecil -->
+        <Button
+            android:id="@+id/btnHapus"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="🗑️ Hapus Data"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#FF0000"
+            android:elevation="2dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp" />
     </LinearLayout>
 
 </LinearLayout>

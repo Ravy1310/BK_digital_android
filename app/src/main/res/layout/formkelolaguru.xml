@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#BFD6E9"
@@ -45,6 +46,7 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
+                android:id="@+id/etNamaGuru"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_background"
@@ -66,6 +68,7 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
+                android:id="@+id/etTeleponGuru"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_background"
@@ -88,6 +91,7 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
+                android:id="@+id/etAlamatGuru"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:background="@drawable/edittext_background"
@@ -109,8 +113,8 @@
                 android:orientation="horizontal"
                 android:gravity="center">
 
-                <!-- Button Batal -->
-                <Button
+                <!-- Button Batal - MERAH dengan MaterialButton -->
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnBatal"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
@@ -120,11 +124,13 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#ffffff"
-                    android:background="@drawable/buttonbatal"
-                    android:elevation="2dp" />
+                    app:backgroundTint="#FF0000"
+                    app:cornerRadius="8dp"
+                    android:elevation="2dp"
+                    tools:ignore="ExtraText" />
 
-                <!-- Button Simpan -->
-                <Button
+                <!-- Button Simpan - BIRU dengan MaterialButton -->
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSimpan"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
@@ -133,8 +139,9 @@
                     android:text="Simpan"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:background="@drawable/button_background"
+                    android:textColor="#ffffff"
+                    app:backgroundTint="#2196F3"
+                    app:cornerRadius="8dp"
                     android:elevation="4dp" />
 
             </LinearLayout>
