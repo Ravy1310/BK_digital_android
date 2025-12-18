@@ -78,18 +78,8 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private lateinit var progressBarSiswa: ProgressBar
     private lateinit var btnAddStudentFloating: Button
 
-    // Data class untuk Siswa
-    data class Siswa(
-        val id: String,
-        val name: String,
-        val kelas: String,
-        val gender: String,
-        val status: String = "aktif"
-    )
-
-    // Sample data untuk siswa
-    private val siswaList = mutableListOf<Siswa>()
-    private var siswaIdCounter = 1
+    // Data siswa dari API
+    private val siswaList = mutableListOf<SiswaData>()
 
     // Variables untuk Tes
     private var currentTes: TesDetail? = null
@@ -201,16 +191,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showSiswa() {
         Log.d(TAG, "showSiswa called")
 
-        // Debug: cek jumlah child sebelum clear
-        Log.d(TAG, "Siswa - Child count before: ${fragmentContainer.childCount}")
-
-        // Kosongkan container
         fragmentContainer.removeAllViews()
-
-        // Debug: cek jumlah child setelah clear
-        Log.d(TAG, "Siswa - Child count after: ${fragmentContainer.childCount}")
-
-        // Tambahkan layout kelola siswa
         val siswaView = layoutInflater.inflate(R.layout.activity_kelola_siswa, null)
         fragmentContainer.addView(siswaView)
 
@@ -233,11 +214,11 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
             // Setup click listeners
             btnAddStudentFloating.setOnClickListener {
-                addSampleStudent()
+                showTambahSiswaDialog()
             }
 
-            // Load initial data
-            loadInitialDataSiswa()
+            // Load data dari API
+            fetchDataSiswa()
 
         } catch (e: Exception) {
             Log.e(TAG, "Error in setupKelolaSiswaContent: ${e.message}", e)
@@ -245,69 +226,64 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
     }
 
-    private fun loadInitialDataSiswa() {
+    private fun fetchDataSiswa() {
         showLoadingSiswa()
 
-        // Simulate API call delay
-        Handler(Looper.getMainLooper()).postDelayed({
-            // Add sample data
-            siswaList.clear()
-            siswaList.addAll(getSampleDataSiswa())
-            siswaIdCounter = siswaList.size + 1
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengambil data siswa dari API...")
 
-            updateUISiswa()
-            hideLoadingSiswa()
-        }, 1000)
-    }
+                // Gunakan ApiClient.apiService yang sudah ada
+                val response = ApiClient.apiService.getDataSiswa()
 
-    private fun getSampleDataSiswa(): List<Siswa> {
-        return listOf(
-            Siswa("001", "Ahmad Budiman", "XII IPA 1", "Laki-laki", "aktif"),
-            Siswa("002", "Siti Aisyah", "XI IPS 2", "Perempuan", "aktif"),
-            Siswa("003", "Rizki Pratama", "X IPA 3", "Laki-laki", "aktif"),
-            Siswa("004", "Dewi Anggraini", "XII IPA 2", "Perempuan", "aktif"),
-            Siswa("005", "Bambang Sugiarto", "XI IPA 1", "Laki-laki", "aktif"),
-            Siswa("006", "Maya Sari", "X IPS 1", "Perempuan", "aktif"),
-            Siswa("007", "Fajar Hidayat", "XII IPS 1", "Laki-laki", "nonaktif"),
-            Siswa("008", "Rina Melati", "XI IPA 3", "Perempuan", "aktif")
-        )
-    }
+                withContext(Dispatchers.Main) {
+                    hideLoadingSiswa()
 
-    private fun addSampleStudent() {
-        val newId = siswaIdCounter.toString().padStart(3, '0')
-        val gender = if (siswaIdCounter % 2 == 0) "Perempuan" else "Laki-laki"
-        val kelas = when ((siswaIdCounter - 1) % 6) {
-            0 -> "X IPA 1"
-            1 -> "X IPA 2"
-            2 -> "XI IPA 1"
-            3 -> "XI IPA 2"
-            4 -> "XII IPA 1"
-            else -> "XII IPA 2"
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        if (result != null && result.success) {
+                            val data = result.data ?: emptyList()
+
+                            // Update UI dengan data dari API
+                            updateUISiswaWithApiData(data)
+
+                            Log.d(TAG, "✓ ${data.size} data siswa dimuat dari API")
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "✅ ${data.size} data siswa dimuat",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        } else {
+                            val errorMsg = result?.message ?: "Data tidak valid"
+                            showErrorState("❌ $errorMsg")
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        showErrorState("❌ Error $errorCode: ${response.message()}")
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    hideLoadingSiswa()
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout. Server terlalu lama merespon."
+                        else -> "Error: ${e.message}"
+                    }
+
+                    showErrorState("❌ $errorMsg")
+                    Log.e(TAG, "Network error fetching siswa: ${e.message}", e)
+                }
+            }
         }
-
-        val newSiswa = Siswa(
-            id = newId,
-            name = "Siswa Baru $newId",
-            kelas = kelas,
-            gender = gender,
-            status = "aktif"
-        )
-
-        siswaList.add(0, newSiswa) // Add to top
-        siswaIdCounter++
-
-        // Update UI
-        updateUISiswa()
-
-        // Show success message
-        Toast.makeText(
-            this,
-            "Siswa $newId berhasil ditambahkan",
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
-    private fun updateUISiswa() {
+    private fun updateUISiswaWithApiData(data: List<SiswaData>) {
+        siswaList.clear()
+        siswaList.addAll(data)
+
         // Update statistics
         updateStatisticsSiswa()
 
@@ -317,8 +293,8 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun updateStatisticsSiswa() {
         val total = siswaList.size
-        val male = siswaList.count { it.gender == "Laki-laki" }
-        val female = siswaList.count { it.gender == "Perempuan" }
+        val male = siswaList.count { it.jenis_kelamin == "Laki-Laki" }
+        val female = siswaList.count { it.jenis_kelamin == "Perempuan" }
 
         tvTotalSiswa.text = total.toString()
         tvMaleCount.text = male.toString()
@@ -342,15 +318,15 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
     }
 
-    private fun addStudentRow(siswa: Siswa, position: Int) {
+    private fun addStudentRow(siswa: SiswaData, position: Int) {
         // Inflate row layout
         val rowView = layoutInflater.inflate(R.layout.table_row_empty, tableRowsContainer, false)
 
         // Set data
-        rowView.findViewById<TextView>(R.id.tvId).text = siswa.id
-        rowView.findViewById<TextView>(R.id.tvNama).text = siswa.name
+        rowView.findViewById<TextView>(R.id.tvId).text = siswa.id_siswa
+        rowView.findViewById<TextView>(R.id.tvNama).text = siswa.nama
         rowView.findViewById<TextView>(R.id.tvKelas).text = siswa.kelas
-        rowView.findViewById<TextView>(R.id.tvGender).text = siswa.gender
+        rowView.findViewById<TextView>(R.id.tvGender).text = siswa.jenis_kelamin
 
         // Set alternate background color
         if (position % 2 == 0) {
@@ -368,44 +344,100 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         tableRowsContainer.addView(rowView)
     }
 
-    private fun showSiswaDetail(siswa: Siswa) {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Detail Siswa")
-            .setMessage(
-                "ID: ${siswa.id}\n" +
-                        "Nama: ${siswa.name}\n" +
-                        "Kelas: ${siswa.kelas}\n" +
-                        "Jenis Kelamin: ${siswa.gender}\n" +
-                        "Status: ${if (siswa.status == "aktif") "Aktif" else "Nonaktif"}"
-            )
-            .setPositiveButton("OK", null)
-            .setNeutralButton("Edit") { _, _ ->
+    private fun showSiswaDetail(siswa: SiswaData) {
+        try {
+            val dialog = Dialog(this)
+            dialog.setContentView(R.layout.dialog_detail_siswa)
+            dialog.setCancelable(true)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setDimAmount(0.6f)
+
+            // Temukan views
+            val btnClose = dialog.findViewById<ImageView>(R.id.btnClose)
+            val tvIdSiswa = dialog.findViewById<TextView>(R.id.tvIdSiswa)
+            val tvNama = dialog.findViewById<TextView>(R.id.tvNama)
+            val tvKelas = dialog.findViewById<TextView>(R.id.tvKelas)
+            val tvGender = dialog.findViewById<TextView>(R.id.tvGender)
+            val tvTahunMasuk = dialog.findViewById<TextView>(R.id.tvTahunMasuk)
+            val btnEdit = dialog.findViewById<Button>(R.id.btnEdit)
+            val btnHapus = dialog.findViewById<Button>(R.id.btnHapus)
+
+            // Set data siswa
+            tvIdSiswa.text = siswa.id_siswa
+            tvNama.text = siswa.nama
+            tvKelas.text = siswa.kelas
+            tvGender.text = siswa.jenis_kelamin
+            tvTahunMasuk.text = siswa.tahun_masuk
+
+            // Setup tombol
+            btnClose.setOnClickListener { dialog.dismiss() }
+
+            btnEdit.setOnClickListener {
+                dialog.dismiss()
                 editSiswa(siswa)
             }
-            .setNegativeButton("Hapus") { _, _ ->
+
+            btnHapus.setOnClickListener {
+                dialog.dismiss()
                 deleteSiswa(siswa)
             }
-            .show()
+
+            // Tampilkan dialog
+            dialog.show()
+
+            // Atur ukuran dialog
+            val displayMetrics = resources.displayMetrics
+            val width = (displayMetrics.widthPixels * 0.9).toInt()
+            val height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+            dialog.window?.setLayout(width, height)
+            dialog.window?.setGravity(Gravity.CENTER)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error showing siswa detail dialog: ${e.message}", e)
+
+            // Fallback ke AlertDialog jika ada error
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Detail Siswa")
+                .setMessage(
+                    "ID: ${siswa.id_siswa}\n" +
+                            "Nama: ${siswa.nama}\n" +
+                            "Kelas: ${siswa.kelas}\n" +
+                            "Jenis Kelamin: ${siswa.jenis_kelamin}\n" +
+                            "Tahun Masuk: ${siswa.tahun_masuk}"
+                )
+                .setPositiveButton("OK", null)
+                .setNeutralButton("Edit") { _, _ ->
+                    editSiswa(siswa)
+                }
+                .setNegativeButton("Hapus") { _, _ ->
+                    deleteSiswa(siswa)
+                }
+                .show()
+        }
     }
 
-    private fun editSiswa(siswa: Siswa) {
+    private fun editSiswa(siswa: SiswaData) {
         Toast.makeText(
             this,
-            "Edit siswa: ${siswa.name}",
+            "Edit siswa: ${siswa.nama}",
             Toast.LENGTH_SHORT
         ).show()
+        // TODO: Implement edit functionality
     }
 
-    private fun deleteSiswa(siswa: Siswa) {
+    private fun deleteSiswa(siswa: SiswaData) {
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Konfirmasi Hapus")
-            .setMessage("Apakah Anda yakin ingin menghapus siswa ${siswa.name}?")
+            .setMessage("Apakah Anda yakin ingin menghapus siswa ${siswa.nama}?")
             .setPositiveButton("Hapus") { _, _ ->
+                // TODO: Implement delete functionality via API
                 siswaList.remove(siswa)
-                updateUISiswa()
+                updateStatisticsSiswa()
+                updateTableSiswa()
                 Toast.makeText(
                     this,
-                    "Siswa ${siswa.name} berhasil dihapus",
+                    "Siswa ${siswa.nama} berhasil dihapus",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -413,14 +445,288 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             .show()
     }
 
+    private fun showTambahSiswaDialog() {
+        // Redirect ke form tambah siswa
+        showTambahSiswaForm()
+    }
+
+    // Tambahkan fungsi baru untuk menampilkan form tambah siswa
+    private fun showTambahSiswaForm() {
+        fragmentContainer.removeAllViews()
+        val tambahSiswaView = layoutInflater.inflate(R.layout.tambahsiswa, null)
+        fragmentContainer.addView(tambahSiswaView)
+
+        navigationView.setCheckedItem(R.id.nav_siswa)
+        titleText.text = "Tambah Siswa Baru"
+
+        setupTambahSiswaForm(tambahSiswaView)
+    }
+
+    private fun setupTambahSiswaForm(tambahSiswaView: View) {
+        Log.d(TAG, "setupTambahSiswaForm called")
+
+        try {
+            // Cari views berdasarkan ID yang ada di XML
+            val btnBatal = tambahSiswaView.findViewById<Button>(R.id.btnBack) // Tombol "Batal" dengan ID btnBack
+            val btnSimpan = tambahSiswaView.findViewById<Button>(R.id.btnSimpan)
+
+            val etID = tambahSiswaView.findViewById<EditText>(R.id.etID)
+            val etName = tambahSiswaView.findViewById<EditText>(R.id.etName)
+            val etKelas = tambahSiswaView.findViewById<EditText>(R.id.etKelas)
+            val etTahunMasuk = tambahSiswaView.findViewById<EditText>(R.id.etTahunMasuk)
+            val rgJenisKelamin = tambahSiswaView.findViewById<RadioGroup>(R.id.rgJenisKelamin)
+
+            // Setup tombol Batal
+            btnBatal.setOnClickListener {
+                Log.d(TAG, "Tombol Batal diklik")
+                showSiswa()
+            }
+
+            // Setup tombol Simpan
+            btnSimpan.setOnClickListener {
+                Log.d(TAG, "Tombol Simpan diklik")
+
+                // Validasi semua field
+                val id = etID.text.toString().trim()
+                val nama = etName.text.toString().trim()
+                val kelas = etKelas.text.toString().trim()
+                val tahunMasuk = etTahunMasuk.text.toString().trim()
+
+                // Reset error
+                etID.error = null
+                etName.error = null
+                etKelas.error = null
+                etTahunMasuk.error = null
+
+                var hasError = false
+
+                // Validasi ID
+                if (id.isEmpty()) {
+                    etID.error = "ID tidak boleh kosong"
+                    etID.requestFocus()
+                    hasError = true
+                }
+
+                // Validasi Nama
+                if (nama.isEmpty()) {
+                    etName.error = "Nama tidak boleh kosong"
+                    if (!hasError) {
+                        etName.requestFocus()
+                        hasError = true
+                    }
+                }
+
+                // Validasi Kelas
+                if (kelas.isEmpty()) {
+                    etKelas.error = "Kelas tidak boleh kosong"
+                    if (!hasError) {
+                        etKelas.requestFocus()
+                        hasError = true
+                    }
+                }
+
+                // Validasi Tahun Masuk
+                if (tahunMasuk.isEmpty()) {
+                    etTahunMasuk.error = "Tahun masuk tidak boleh kosong"
+                    if (!hasError) {
+                        etTahunMasuk.requestFocus()
+                        hasError = true
+                    }
+                } else if (tahunMasuk.length != 4 || !tahunMasuk.all { it.isDigit() }) {
+                    etTahunMasuk.error = "Tahun harus 4 digit angka"
+                    if (!hasError) {
+                        etTahunMasuk.requestFocus()
+                        hasError = true
+                    }
+                }
+
+                // Validasi Jenis Kelamin
+                val selectedId = rgJenisKelamin.checkedRadioButtonId
+                if (selectedId == -1) {
+                    Toast.makeText(this, "Pilih jenis kelamin", Toast.LENGTH_SHORT).show()
+                    hasError = true
+                }
+
+                if (hasError) {
+                    return@setOnClickListener
+                }
+
+                // Dapatkan jenis kelamin
+                val jenisKelamin = when (selectedId) {
+                    R.id.rbLaki -> "Laki-laki"
+                    R.id.rbPerempuan -> "Perempuan"
+                    else -> ""
+                }
+
+                // Panggil fungsi untuk menyimpan data ke API
+                saveSiswaToDatabase(etID, etName, etKelas, etTahunMasuk, rgJenisKelamin)
+            }
+
+            // Set default radio button ke Laki-laki
+            rgJenisKelamin.check(R.id.rbLaki)
+
+            // Fokus ke field ID
+            etID.requestFocus()
+
+            Log.d(TAG, "Form tambah siswa berhasil di-setup")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in setupTambahSiswaForm: ${e.message}", e)
+            Toast.makeText(this, "Gagal memuat form: ${e.message}", Toast.LENGTH_SHORT).show()
+            showSiswa() // Kembali ke halaman siswa
+        }
+    }
+
+// Hapus fungsi generateAutoID karena tidak digunakan
+// private fun generateAutoID(etID: EditText) { ... }
+
+
+    private fun saveSiswaToDatabase(
+        etID: EditText,
+        etName: EditText,
+        etKelas: EditText,
+        etTahunMasuk: EditText,
+        rgJenisKelamin: RadioGroup
+    ) {
+        // Validasi input
+        val id = etID.text.toString().trim()
+        val nama = etName.text.toString().trim()
+        val kelas = etKelas.text.toString().trim()
+        val tahunMasuk = etTahunMasuk.text.toString().trim()
+
+        if (id.isEmpty() || nama.isEmpty() || kelas.isEmpty() || tahunMasuk.isEmpty()) {
+            Toast.makeText(this, "Semua field harus diisi", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validasi tahun masuk
+        if (tahunMasuk.length != 4 || !tahunMasuk.all { it.isDigit() }) {
+            etTahunMasuk.error = "Tahun harus 4 digit angka"
+            etTahunMasuk.requestFocus()
+            return
+        }
+
+        // Get jenis kelamin
+        val selectedId = rgJenisKelamin.checkedRadioButtonId
+        if (selectedId == -1) {
+            Toast.makeText(this, "Pilih jenis kelamin", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val jenisKelamin = when (selectedId) {
+            R.id.rbLaki -> "Laki-laki"
+            R.id.rbPerempuan -> "Perempuan"
+            else -> ""
+        }
+
+        // Tampilkan ProgressDialog
+        val progressDialog = ProgressDialog(this).apply {
+            setMessage("Menyimpan data siswa...")
+            setCancelable(false)
+        }
+        progressDialog.show()
+
+        // Buat request
+        val request = TambahSiswaRequest(
+            id_siswa = id,
+            nama = nama,
+            kelas = kelas,
+            tahun_masuk = tahunMasuk,
+            jenis_kelamin = jenisKelamin
+        )
+
+        // Kirim ke API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Mengirim request tambah siswa: $request")
+                val response = ApiClient.apiService.tambahSiswa(request)
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+
+                    if (response.isSuccessful) {
+                        val result = response.body()
+
+                        if (result != null) {
+                            if (result.success) {
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "✅ ${result.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                // Kembali ke halaman kelola siswa dan refresh data
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    showSiswa()
+                                }, 1500)
+
+                            } else {
+                                val errorMsg = result.error ?: result.message
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    "❌ $errorMsg",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                this@DashboardActivity,
+                                "❌ Tidak ada response dari server",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorCode = response.code()
+                        val errorBody = response.errorBody()?.string() ?: "No error body"
+
+                        Log.e(TAG, "API Error: $errorCode - $errorBody")
+
+                        Toast.makeText(
+                            this@DashboardActivity,
+                            "❌ Error $errorCode: ${response.message()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Log.e(TAG, "Error saving siswa: ${e.message}", e)
+
+                    val errorMsg = when (e) {
+                        is java.net.UnknownHostException -> "Tidak dapat terhubung ke server"
+                        is java.net.SocketTimeoutException -> "Timeout, coba lagi"
+                        else -> "Error: ${e.message}"
+                    }
+
+                    Toast.makeText(
+                        this@DashboardActivity,
+                        "❌ $errorMsg",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
     private fun showLoadingSiswa() {
         progressBarSiswa.visibility = View.VISIBLE
         tableRowsContainer.visibility = View.GONE
+        emptyStateLayout.visibility = View.GONE
     }
 
     private fun hideLoadingSiswa() {
         progressBarSiswa.visibility = View.GONE
         tableRowsContainer.visibility = View.VISIBLE
+    }
+
+    private fun showErrorState(errorMessage: String) {
+        progressBarSiswa.visibility = View.GONE
+        tableRowsContainer.visibility = View.GONE
+        emptyStateLayout.visibility = View.VISIBLE
+
+        // Update error message in empty state
+        emptyStateLayout.findViewById<TextView>(R.id.tv_error_message).text = errorMessage
     }
 
     // ==================== FUNGSI DASHBOARD ====================
@@ -512,7 +818,7 @@ class DashboardActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun updateTesTerpopuler(
         container: LinearLayout,
-        tesList: List<com.example.login.models.TesTerpopuler>
+        tesList: List<TesTerpopuler>
     ) {
         container.removeAllViews()
 

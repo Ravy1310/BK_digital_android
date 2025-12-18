@@ -12,6 +12,21 @@ interface ApiService {
     @GET("api_dashboard.php")
     suspend fun getDashboardData(): Response<DashboardResponse>
 
+    // ==================== SISWA ====================
+    // ==================== SISWA ====================
+    @GET("api_get_siswa.php")
+    suspend fun getDataSiswa(): Response<SiswaResponse>
+
+    @POST("api_tambah_siswa.php")
+    suspend fun tambahSiswa(
+        @Body request: TambahSiswaRequest
+    ): Response<TambahSiswaResponse>
+
+    @GET("api_get_siswa.php")
+    suspend fun getSiswaById(
+        @Query("id_siswa") idSiswa: String
+    ): Response<SiswaResponse>
+
     // ==================== KELOLA TES ====================
     @GET("api_kelola_tes.php")
     suspend fun getKelolaTesData(): Response<KelolaTesResponse>
@@ -45,16 +60,14 @@ interface ApiService {
         @Body request: TambahSoalRequest
     ): Response<TambahSoalResponse>
 
-    // ✅ ENDPOINT BARU: Update Soal
     @POST("api_update_soal_dan_opsi.php")
     suspend fun updateSoalComplete(@Body request: UpdateSoalCompleteRequest): Response<UpdateSoalCompleteResponse>
 
-
-    // ✅ ENDPOINT BARU: Hapus Soal
     @POST("api_hapus_soal.php")
     suspend fun hapusSoal(
         @Body request: HapusSoalRequest
     ): Response<HapusSoalResponse>
+
     // ==================== GURU ====================
     @GET("api_get_guru.php")
     suspend fun getDataGuru(): Response<GuruResponse>

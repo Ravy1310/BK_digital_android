@@ -57,7 +57,8 @@
     <color name="gray_700">#374151</color>
     <color name="gray_800">#1F2937</color>
 
-
+    <color name="table_row_even">#FFFFFF</color> <!-- Putih -->
+    <color name="table_row_odd">#F5F5F5</color>
 
         <!-- Warna warning (kuning/orange seperti di web) -->
         <color name="yellow_warning">#FFC107</color>
