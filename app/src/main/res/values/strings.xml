@@ -10,12 +10,20 @@
     <!-- Login strings -->
     <string name="app_name">BK Digital</string>
     <string name="login_title">Login</string>
-    <string name="username_hint">Masukkan username</string>
+     <string name="logo_description">Logo BK Digital</string>
+    <string name="welcome_text1">Selamat Datang</string>
+    <string name="welcome_text2">Di BK Digital</string>
+    <string name="username_label">Email/Username</string>
+    <string name="username_hint">Masukkan email atau username</string>
+    <string name="password_label">Password</string>
     <string name="password_hint">Masukkan password</string>
+    <string name="toggle_password_description">Toggle password visibility</string>
     <string name="login_button">Login</string>
-    <string name="google_login_button">Sign in with Google</string>
-
-
+    <string name="forgot_password">Lupa Password?</string>
+    <string name="or_text">ATAU</string>
+    <string name="google_logo_description">Logo Google</string>
+    <string name="google_login_button">Masuk dengan Google</string>
+    <string name="register_link">Belum punya akun? Daftar disini</string>
 
     <!-- String Dashboard-->
     <string name="icon_jumlah_siswa">Icon jumlah siswa</string>

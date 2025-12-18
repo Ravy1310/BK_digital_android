@@ -1,7 +1,5 @@
 package com.example.login.adapter
 
-
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +14,6 @@ class GuruAdapter(
     private val onItemClick: (Guru) -> Unit
 ) : RecyclerView.Adapter<GuruAdapter.GuruViewHolder>() {
 
-    // Update data
     fun updateData(newList: List<Guru>) {
         guruList = newList
         notifyDataSetChanged()
@@ -33,13 +30,13 @@ class GuruAdapter(
         holder.bind(guru, position + 1)
 
         // Set background warna bergantian
-        if (position % 2 == 0) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"))
+        val bgColor = if (position % 2 == 0) {
+            ContextCompat.getColor(holder.itemView.context, R.color.table_row_even)
         } else {
-            holder.itemView.setBackgroundColor(Color.parseColor("#F8F8F8"))
+            ContextCompat.getColor(holder.itemView.context, R.color.table_row_odd)
         }
+        holder.itemView.setBackgroundColor(bgColor)
 
-        // Click listener
         holder.itemView.setOnClickListener {
             onItemClick(guru)
         }
@@ -61,12 +58,13 @@ class GuruAdapter(
             tvAlamat.text = guru.alamat
             tvStatus.text = guru.status
 
-            // Set warna status
-            if (guru.status == "Aktif") {
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.context, R.color.green))
+            // Set warna status berdasarkan data
+            val statusColor = if (guru.status.equals("Aktif", ignoreCase = true)) {
+                ContextCompat.getColor(itemView.context, R.color.success)
             } else {
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.context, R.color.red))
+                ContextCompat.getColor(itemView.context, R.color.error)
             }
+            tvStatus.setTextColor(statusColor)
         }
     }
 }
