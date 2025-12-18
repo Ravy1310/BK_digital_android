@@ -27,6 +27,16 @@ interface ApiService {
         @Query("id_siswa") idSiswa: String
     ): Response<SiswaResponse>
 
+    @POST("api_update_siswa.php")
+    suspend fun updateSiswa(
+        @Body request: UpdateSiswaRequest
+    ): Response<UpdateSiswaResponse>
+    // Di bagian SISWA, tambahkan:
+    @POST("api_hapus_siswa.php")
+    suspend fun hapusSiswa(
+        @Body request: HapusSiswaRequest
+    ): Response<HapusSiswaResponse>
+
     // ==================== KELOLA TES ====================
     @GET("api_kelola_tes.php")
     suspend fun getKelolaTesData(): Response<KelolaTesResponse>

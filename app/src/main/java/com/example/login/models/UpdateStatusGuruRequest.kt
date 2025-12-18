@@ -8,6 +8,7 @@ data class UpdateStatusGuruRequest(
     @SerializedName("id_guru")
     val id_guru: Int,
 
+
     @SerializedName("action")
     val action: String = "ubah_status"
 )
